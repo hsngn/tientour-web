@@ -49,6 +49,8 @@ create table public.bookings (
 create index on public.bookings (tour_slug);
 create index on public.bookings (status);
 alter table public.bookings add column if not exists message text;
+alter table public.bookings add column if not exists admin_notes text;
+alter table public.bookings add column if not exists admin_note text;
 
 -- PAIEMENTS (Stripe)
 create table public.payments (
@@ -114,3 +116,17 @@ create policy "public_create_booking" on public.bookings for insert with check (
 -- édition blog) passe par la SERVICE ROLE KEY côté serveur (admin), qui
 -- contourne la RLS. Ne jamais exposer cette clé côté client.
 -- ============================================================================
+
+-- ============================================================================
+--  HISTORIQUE DES COMMENTAIRES ADMIN (un-à-plusieurs avec bookings)
+-- ============================================================================
+create table if not exists public.booking_notes (
+  id         uuid primary key default gen_random_uuid(),
+  booking_id uuid not null references public.bookings(id) on delete cascade,
+  author     text,                       -- e-mail de l'admin
+  body       text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists booking_notes_bid_idx on public.booking_notes (booking_id, created_at);
+-- RLS activée sans policy publique : accès uniquement via la service role (fonctions admin)
+alter table public.booking_notes enable row level security;
