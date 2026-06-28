@@ -1,0 +1,19 @@
+---
+import { LANGS, t } from '../../i18n/ui';
+import Base from '../../layouts/Base.astro';
+import Reviews from '../../components/Reviews.astro';
+import FinalCta from '../../components/FinalCta.astro';
+export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
+const { lang } = Astro.params;
+const seo = lang==='fr'
+  ? { t:"Avis voyageurs — boucle de Ha Giang | Tien Tour", d:"Les avis de nos voyageurs sur la boucle de Ha Giang. 5,0★ sur 300+ avis." }
+  : { t:"Traveler reviews — Ha Giang Loop | Tien Tour", d:"Reviews from our travelers on the Ha Giang Loop. 5.0★ across 300+ reviews." };
+---
+<Base title={seo.t} description={seo.d} lang={lang}>
+  <section style="padding-bottom:0"><div class="wrap">
+    <div class="eyebrow">{t(lang,'reviews_eyebrow')}</div>
+    <h1 class="title">{t(lang,'reviews_title')}</h1>
+  </div></section>
+  <Reviews lang={lang} head={false} />
+  <FinalCta lang={lang} />
+</Base>

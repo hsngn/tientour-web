@@ -1,0 +1,28 @@
+---
+import { t } from '../i18n/ui';
+const { lang, head = true } = Astro.props;
+const data = {
+  en:[["“The best thing I did in Southeast Asia. Tien knows every bend in the road. We stayed in a homestay where we actually felt like guests, not tourists.”","🇬🇧 James T. · United Kingdom"],
+      ["“An incredible experience. The landscapes are breathtaking and the team is rare in their kindness. Thank you Hoang!”","🇫🇷 Marie L. · France"],
+      ["“I've ridden all over the world but the hospitality of the Tien Tour team is unmatched. Local expertise at its finest.”","🇦🇺 Sarah K. · Australia"]],
+  fr:[["« La meilleure chose que j’ai faite en Asie du Sud-Est. Tien connaît chaque virage. Dans le homestay, on se sentait invités, pas touristes. »","🇬🇧 James T. · Royaume-Uni"],
+      ["« Une expérience incroyable. Les paysages sont à couper le souffle et l’équipe d’une gentillesse rare. Merci Hoang ! »","🇫🇷 Marie L. · France"],
+      ["« J’ai roulé partout dans le monde, mais l’accueil de l’équipe Tien Tour est inégalé. L’expertise locale à son meilleur. »","🇦🇺 Sarah K. · Australie"]],
+};
+const list = data[lang] ?? data.en;
+---
+<section class="rev"><div class="wrap">
+  {head && (
+    <div class="sec-head">
+      <div><div class="eyebrow">{t(lang,'reviews_eyebrow')}</div>
+        <h2 class="title">{t(lang,'reviews_title')}</h2></div>
+      <a class="alllink" href={`/${lang}/reviews`}>{t(lang,'reviews_all')}</a>
+    </div>
+  )}
+  <div class="grid">
+    {list.map((r)=>(
+      <figure class="card" style="margin:0"><div class="stars">★★★★★</div>
+        <blockquote>{r[0]}</blockquote><figcaption class="who">{r[1]}</figcaption></figure>
+    ))}
+  </div>
+</div></section>

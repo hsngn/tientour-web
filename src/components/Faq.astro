@@ -1,0 +1,28 @@
+---
+import { t } from '../i18n/ui';
+const { lang, faq } = Astro.props;
+const def = {
+  en:[["Do I need a motorcycle license?","With the easy-rider option, no — a local pilot drives. To self-drive legally you need a valid license; we'll advise you honestly."],
+      ["When is the best time to ride the loop?","September–November and March–May offer clear roads and the best scenery. We ride year-round with the right gear."],
+      ["What bikes do you provide?","Well-maintained semi-automatic and manual bikes suited to the terrain, with full-spec helmets included."],
+      ["Is it safe?","Yes. Small groups (max 6 per guide), 12-point bike checks, a sweeper rider, a licensed operator and insurance during the tour."],
+      ["What's included in the price?","Your rider/guide, homestay nights, meals on tour, fuel, permits and insurance during the tour. Transport to Ha Giang and drinks are extra."]],
+  fr:[["Faut-il un permis moto ?","Avec l’option easy rider, non — un pilote local conduit. Pour conduire vous-même légalement, il faut un permis valide ; on vous conseille honnêtement."],
+      ["Quelle est la meilleure période ?","Septembre–novembre et mars–mai offrent des routes dégagées et les plus beaux paysages. On roule toute l’année avec le bon équipement."],
+      ["Quelles motos fournissez-vous ?","Des motos semi-automatiques et manuelles bien entretenues, adaptées au terrain, casques complets inclus."],
+      ["Est-ce sûr ?","Oui. Petits groupes (max 6 par guide), contrôle moto en 12 points, pilote serre-file, opérateur licencié et assurance pendant le tour."],
+      ["Qu’est-ce qui est inclus ?","Votre pilote/guide, les nuits chez l’habitant, les repas pendant le tour, l’essence, les permis et l’assurance pendant le tour. Le transport jusqu’à Ha Giang et les boissons sont en supplément."]],
+};
+const list = faq ?? def[lang] ?? def.en;
+const norm = list.map((x)=> Array.isArray(x) ? {q:x[0],a:x[1]} : x);
+---
+<section class="faq"><div class="wrap">
+  <div class="grid">
+    <div><div class="eyebrow">{t(lang,'faq_eyebrow')}</div><h2>{t(lang,'faq_title')}</h2></div>
+    <div>
+      {norm.map((f)=>(
+        <details><summary>{f.q}<span class="plus">+</span></summary><p>{f.a}</p></details>
+      ))}
+    </div>
+  </div>
+</div></section>

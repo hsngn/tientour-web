@@ -1,0 +1,31 @@
+---
+import { t } from '../i18n/ui';
+const { lang } = Astro.props;
+const riders = {
+  en:[["TI","Tien","Founder & Lead Guide",["VN","EN","FR"]],
+      ["HG","Hoang","Senior Navigator",["VN","EN"]],
+      ["MH","Minh","Safety Officer",["VN","EN"]],
+      ["LH","Linh","Cultural Guide & Fleet Manager",["VN","EN","FR"]]],
+  fr:[["TI","Tien","Fondateur & guide principal",["VN","EN","FR"]],
+      ["HG","Hoang","Navigateur senior",["VN","EN"]],
+      ["MH","Minh","Responsable sécurité",["VN","EN"]],
+      ["LH","Linh","Guide culturelle & resp. flotte",["VN","EN","FR"]]],
+};
+const list = riders[lang] ?? riders.en;
+---
+<section class="riders" id="riders"><div class="wrap">
+  <div class="lead">
+    <div><div class="eyebrow">{t(lang,'riders_eyebrow')}</div>
+      <h2>{t(lang,'riders_title')}</h2></div>
+    <p>{t(lang,'riders_lead')}</p>
+  </div>
+  <div class="row">
+    {list.map((r)=>(
+      <div class="rider">
+        <div class="av"><span class="ini">{r[0]}</span>
+          <span class="langs">{r[3].map((l)=>(<span>{l}</span>))}</span></div>
+        <h3>{r[1]}</h3><div class="role">{r[2]}</div>
+      </div>
+    ))}
+  </div>
+</div></section>

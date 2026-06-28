@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import { LANGS } from '../../i18n/ui';
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import Why from '../../components/Why.astro';
+import TourGrid from '../../components/TourGrid.astro';
+import Rental from '../../components/Rental.astro';
+import Riders from '../../components/Riders.astro';
+import Reviews from '../../components/Reviews.astro';
+import Guide from '../../components/Guide.astro';
+import Faq from '../../components/Faq.astro';
+import FinalCta from '../../components/FinalCta.astro';
+export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
+const { lang } = Astro.params;
+const tours = (await getCollection('tours')).sort((a,b)=>a.data.order-b.data.order);
+const site = Astro.site?.toString().replace(/\/$/,'') ?? '';
+const seo = lang==='fr'
+  ? { t:"Tien Tour — Boucle de Ha Giang avec des pilotes locaux", d:"Vivez la boucle de Ha Giang avec une équipe locale de confiance. Easy rider, petits groupes, chez l'habitant. 5,0★, réservation en direct." }
+  : { t:"Tien Tour — Ha Giang Loop with Local Riders", d:"Ride the legendary Ha Giang Loop with a trusted local team. Easy rider, small groups, homestays. 5.0★, book direct." };
+const faq = lang==='fr'
+  ? [{q:"Faut-il un permis moto ?",a:"Avec l'option easy rider, non — un pilote local conduit. Pour conduire vous-même, un permis valide est requis."},
+     {q:"Quelle est la meilleure période ?",a:"Septembre–novembre et mars–mai : routes dégagées et plus beaux paysages."},
+     {q:"Est-ce sûr ?",a:"Oui : petits groupes (max 6 par guide), contrôles moto, pilote serre-file, opérateur licencié et assurance pendant le tour."}]
+  : [{q:"Do I need a motorcycle license?",a:"With the easy-rider option, no — a local pilot drives. To self-drive you need a valid license."},
+     {q:"When is the best time to ride?",a:"September–November and March–May: clear roads and the best scenery."},
+     {q:"Is it safe?",a:"Yes: small groups (max 6 per guide), bike checks, a sweeper rider, a licensed operator and insurance during the tour."}];
+const jsonld = { "@context":"https://schema.org","@graph":[
+  { "@type":"TravelAgency","name":"Tien Tour","areaServed":"Ha Giang, Vietnam","url":`${site}/${lang}/`,
+    "aggregateRating":{"@type":"AggregateRating","ratingValue":"5.0","reviewCount":"300","bestRating":"5"} },
+  { "@type":"FAQPage","mainEntity":faq.map(f=>({"@type":"Question","name":f.q,"acceptedAnswer":{"@type":"Answer","text":f.a}})) }
+]};
+---
+<Base title={seo.t} description={seo.d} lang={lang} jsonld={jsonld}>
+  <Hero lang={lang} />
+  <Why lang={lang} />
+  <TourGrid lang={lang} tours={tours} limit={3} />
+  <Rental lang={lang} />
+  <Riders lang={lang} />
+  <Reviews lang={lang} />
+  <Guide lang={lang} />
+  <Faq lang={lang} faq={faq} />
+  <FinalCta lang={lang} />
+</Base>

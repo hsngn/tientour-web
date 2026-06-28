@@ -1,0 +1,9 @@
+---
+import { t } from '../i18n/ui';
+const { lang } = Astro.props;
+---
+<div class="proof"><div class="wrap">
+  <span class="stars">★★★★★</span>
+  <b>{t(lang,'proof')}</b>
+  <span class="mono">{t(lang,'rating')}</span>
+</div></div>

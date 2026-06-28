@@ -1,0 +1,14 @@
+---
+import { t } from '../i18n/ui';
+const { lang } = Astro.props;
+---
+<section class="rental" id="rental"><div class="wrap c">
+  <h2>{t(lang,'rental_title')}</h2>
+  <p class="sub">{t(lang,'rental_sub')}</p>
+  <div class="grid" style="text-align:left">
+    <div class="card"><div class="img"></div><div class="b">
+      <h3>{t(lang,'rental_er_t')}</h3><p>{t(lang,'rental_er_d')}</p></div></div>
+    <div class="card"><div class="img"></div><div class="b">
+      <h3>{t(lang,'rental_sd_t')}</h3><p>{t(lang,'rental_sd_d')}</p></div></div>
+  </div>
+</div></section>

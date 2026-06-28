@@ -1,0 +1,13 @@
+---
+import { LANGS, t } from '../../i18n/ui';
+import Base from '../../layouts/Base.astro';
+import Guide from '../../components/Guide.astro';
+export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
+const { lang } = Astro.params;
+const seo = lang==='fr'
+  ? { t:"Guide de la boucle de Ha Giang 2026 | Tien Tour", d:"Conseils pratiques pour la boucle de Ha Giang : meilleure période, quoi emporter, sécurité, easy rider vs self-drive." }
+  : { t:"Ha Giang Loop Travel Guide 2026 | Tien Tour", d:"Practical advice for the Ha Giang Loop: best time to visit, what to pack, safety, easy rider vs self-drive." };
+---
+<Base title={seo.t} description={seo.d} lang={lang}>
+  <Guide lang={lang} />
+</Base>

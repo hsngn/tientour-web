@@ -1,0 +1,27 @@
+---
+const { title, description, lang, jsonld } = Astro.props;
+const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
+const path = Astro.url.pathname;
+const enPath = path.replace(/^\/(en|fr)/, '/en');
+const frPath = path.replace(/^\/(en|fr)/, '/fr');
+const full = site + path;
+const fonts = "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..600&family=Inter:wght@400;500;600;700&display=swap";
+---
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={full} />
+<link rel="alternate" hreflang="en" href={site + enPath} />
+<link rel="alternate" hreflang="fr" href={site + frPath} />
+<link rel="alternate" hreflang="x-default" href={site + enPath} />
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={full} />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="style" href={fonts} />
+<link href={fonts} rel="stylesheet" />
+{jsonld && <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />}

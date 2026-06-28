@@ -1,0 +1,35 @@
+---
+import { t } from '../i18n/ui';
+const { lang, tours, showHead = true, limit } = Astro.props;
+const list = limit ? tours.slice(0, limit) : tours;
+const diff = { easy:{en:'Easy',fr:'Facile'}, moderate:{en:'Moderate',fr:'Modéré'}, challenging:{en:'Advanced',fr:'Avancé'} };
+const sym = (c)=> c==='USD' ? '$' : '€';
+---
+<section><div class="wrap">
+  {showHead && (
+    <div class="sec-head">
+      <div><div class="eyebrow">{t(lang,'tours_eyebrow')}</div>
+        <h2 class="title">{t(lang,'tours_title')}</h2></div>
+      <a class="alllink" href={`/${lang}/tours`}>{t(lang,'tours_all')}</a>
+    </div>
+    <p class="sub">{t(lang,'tours_sub')}</p>
+  )}
+  <div class="tour-grid">
+    {list.map((tr)=>{ const d=tr.data[lang]; return (
+      <a class="tcard" href={`/${lang}/tours/${tr.slug}`}>
+        <div class="img">
+          <span class="pill day">{tr.data.durationDays} {t(lang,'days')}</span>
+          <span class="pill diff">{diff[tr.data.difficulty][lang]}</span>
+        </div>
+        <div class="b">
+          <h3>{d.title}</h3>
+          <p>{d.summary}</p>
+          <div class="row">
+            <span class="price">{t(lang,'from')} {sym(tr.data.currency)}{tr.data.priceFrom}<small> / pers</small></span>
+            <span class="go">{t(lang,'details')} →</span>
+          </div>
+        </div>
+      </a>
+    );})}
+  </div>
+</div></section>

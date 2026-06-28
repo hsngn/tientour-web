@@ -1,0 +1,22 @@
+---
+import { t } from '../i18n/ui';
+const { lang } = Astro.props;
+const items = {
+  en:[["Born here, raised here","Our guides grew up navigating these switchbacks. They speak the local dialects, know every market day, and have family in every valley."],
+      ["Safety, not shortcuts","12-point bike checks before every departure, full-spec adventure helmets, and a sweeper rider on every group tour."],
+      ["Authentic homestays","We partner with ethnic minority families — not hotels. You eat at their table, sleep under their roof, and leave with a friend."],
+      ["Small groups, real attention","Maximum 6 riders per guide. Always. We refuse to run cattle-call tours."]],
+  fr:[["Nés ici, élevés ici","Nos guides ont grandi dans ces lacets. Ils parlent les dialectes locaux, connaissent chaque jour de marché et ont de la famille dans chaque vallée."],
+      ["La sécurité, pas les raccourcis","Contrôle des motos en 12 points avant chaque départ, casques aventure complets et un pilote serre-file sur chaque tour de groupe."],
+      ["Nuits authentiques chez l’habitant","Nous travaillons avec des familles des minorités ethniques — pas des hôtels. Vous mangez à leur table, dormez sous leur toit et repartez avec un ami."],
+      ["Petits groupes, vraie attention","Maximum 6 motos par guide. Toujours. Nous refusons les tours à la chaîne."]],
+};
+const list = items[lang] ?? items.en;
+---
+<section class="why"><div class="wrap">
+  <div class="eyebrow">{t(lang,'why_eyebrow')}</div>
+  <h2 class="title">{t(lang,'why_title')}</h2>
+  <div class="why-grid">
+    {list.map((it,i)=>(<div><div class="num">0{i+1}</div><h3>{it[0]}</h3><p>{it[1]}</p></div>))}
+  </div>
+</div></section>

@@ -1,0 +1,16 @@
+---
+import { t } from '../i18n/ui';
+const { lang } = Astro.props;
+---
+<section class="hero"><div class="wrap">
+  <div class="col">
+    <div class="eyebrow">{t(lang,'hero_eyebrow')}</div>
+    <h1>{t(lang,'hero_1')}<span class="italic">{t(lang,'hero_em')}</span>{t(lang,'hero_2')}</h1>
+    <p>{t(lang,'hero_sub')}</p>
+    <div class="cta">
+      <a class="btn btn-rust" href={`/${lang}/book`}>{t(lang,'hero_book')}</a>
+      <a class="btn btn-outline" href={`/${lang}/tours`}>{t(lang,'hero_tours')}</a>
+    </div>
+  </div>
+  <div class="pic"><span class="note">[ photo: Ma Pi Leng / Nho Que ]</span></div>
+</div></section>

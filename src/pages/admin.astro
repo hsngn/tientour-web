@@ -1,0 +1,183 @@
+---
+import '../styles/global.css';
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Tien Tour — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body{background:var(--cream);padding:0;margin:0}
+    .abar{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--line);background:var(--paper)}
+    .abar .brand{font-family:'Fraunces',serif;font-weight:900;font-size:22px}
+    .abar .brand b{color:var(--rust)}
+    .awrap{max-width:1180px;margin:0 auto;padding:28px}
+    /* login */
+    .login{max-width:380px;margin:8vh auto;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:34px}
+    .login h1{font-family:'Fraunces',serif;font-size:28px;font-weight:600;margin:0 0 6px}
+    .login p{color:var(--muted);font-size:14px;margin:0 0 22px}
+    .login label{display:block;font:700 11px Inter;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+    .login input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font:400 15px Inter;background:#fff}
+    .login input:focus{outline:none;border-color:var(--forest)}
+    .login button{width:100%;margin-top:20px;border:none;border-radius:999px;background:var(--forest);color:#fff;
+      padding:14px;font:600 15px Inter;cursor:pointer}
+    .err{color:var(--rust-d);font-size:13.5px;margin-top:12px;min-height:18px}
+    /* dashboard */
+    .counts{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+    .kpi{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 20px;min-width:120px}
+    .kpi .v{font-family:'Fraunces',serif;font-size:30px;font-weight:600}
+    .kpi .l{font:600 11px Inter;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    h2.sech{font-family:'Fraunces',serif;font-size:24px;font-weight:600;margin:30px 0 14px}
+    table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+    th,td{text-align:left;padding:12px 14px;font-size:14px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{font:700 11px Inter;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:#efe9dc}
+    tr:last-child td{border-bottom:none}
+    td .sub{color:var(--muted);font-size:12.5px}
+    select.st{border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font:600 12.5px Inter;background:#fff;cursor:pointer}
+    .pill{display:inline-block;padding:3px 9px;border-radius:999px;font:700 10.5px Inter;letter-spacing:.04em;text-transform:uppercase}
+    .pending{background:#FBEAD2;color:#9A5B12}.confirmed{background:#D9E5F2;color:#274B6E}
+    .paid{background:#DCEFE0;color:#1E6B36}.cancelled{background:#EFE0DC;color:#9A3B22}
+    .empty{color:var(--muted);font-size:14px;padding:14px 0}
+    .btn-ghost{background:transparent;border:1.5px solid var(--ink);border-radius:999px;padding:9px 16px;font:600 13px Inter;cursor:pointer}
+    .hidden{display:none !important}
+  </style>
+</head>
+<body>
+  <div class="abar">
+    <div class="brand">TIEN<b>.</b> <span style="font-family:Inter;font-weight:600;font-size:14px;color:var(--muted)">Admin</span></div>
+    <div id="who" class="hidden" style="display:flex;gap:12px;align-items:center">
+      <span id="email" style="font-size:13px;color:var(--muted)"></span>
+      <button class="btn-ghost" id="refresh">Refresh</button>
+      <button class="btn-ghost" id="logout">Log out</button>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="login" class="login">
+    <h1>Sign in</h1>
+    <p>Reservations management — staff only.</p>
+    <label for="le">Email</label>
+    <input id="le" type="email" autocomplete="username" />
+    <label for="lp">Password</label>
+    <input id="lp" type="password" autocomplete="current-password" />
+    <button id="loginBtn">Sign in</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dash" class="awrap hidden">
+    <div class="counts" id="counts"></div>
+    <h2 class="sech">Upcoming &amp; requests</h2>
+    <div id="upcoming"></div>
+    <h2 class="sech">Past</h2>
+    <div id="past"></div>
+  </div>
+
+  <script>
+    const API = '/api/admin';
+    const TKEY = 'tt_admin_token';
+    const $ = (id) => document.getElementById(id);
+    const token = () => localStorage.getItem(TKEY);
+    const fmtMoney = (n) => n == null ? '—' : '$' + Math.round(n).toLocaleString('en-US');
+    const pretty = (s) => (s || '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const esc = (s) => String(s ?? '').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+
+    function show(view){
+      $('login').classList.toggle('hidden', view !== 'login');
+      $('dash').classList.toggle('hidden', view !== 'dash');
+      $('who').classList.toggle('hidden', view !== 'dash');
+    }
+
+    async function login(){
+      const email = $('le').value.trim(), password = $('lp').value;
+      $('loginErr').textContent = '';
+      if(!email || !password){ $('loginErr').textContent = 'Enter your email and password.'; return; }
+      $('loginBtn').disabled = true; $('loginBtn').textContent = '…';
+      try{
+        const r = await fetch(API + '/login', { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email, password }) });
+        const d = await r.json().catch(()=>({}));
+        if(r.ok && d.ok && d.access_token){
+          localStorage.setItem(TKEY, d.access_token);
+          $('email').textContent = email;
+          await loadBookings();
+        } else {
+          $('loginErr').textContent = d.error === 'not_admin' ? 'This account is not an admin.' : 'Invalid email or password.';
+        }
+      }catch(e){ $('loginErr').textContent = 'Network error. Try again.'; }
+      $('loginBtn').disabled = false; $('loginBtn').textContent = 'Sign in';
+    }
+
+    async function loadBookings(){
+      const r = await fetch(API + '/bookings', { headers:{ Authorization: 'Bearer ' + token() } });
+      if(r.status === 401){ localStorage.removeItem(TKEY); show('login'); return; }
+      const d = await r.json().catch(()=>({}));
+      if(!d.ok){ show('login'); return; }
+      render(d.bookings || []);
+      show('dash');
+    }
+
+    function row(b){
+      const contact = [b.email, b.whatsapp].filter(Boolean).map(esc).join('<br>') || '—';
+      const date = b.date ? esc(b.date) : '<span class="sub">no date</span>';
+      const created = b.created_at ? new Date(b.created_at).toLocaleDateString() : '';
+      const sts = ['pending','confirmed','paid','cancelled'];
+      const opts = sts.map(s => `<option value="${s}"${s===b.status?' selected':''}>${pretty(s)}</option>`).join('');
+      return `<tr>
+        <td>${date}<div class="sub">req. ${created}</div></td>
+        <td><b>${esc(b.customer_name)}</b><div class="sub">${esc(b.language||'')}</div></td>
+        <td>${contact}</td>
+        <td>${esc(pretty(b.tour_slug))}<div class="sub">${esc(pretty(b.option))}</div></td>
+        <td>${esc(b.travelers)}</td>
+        <td>${fmtMoney(b.amount)}</td>
+        <td><span class="pill ${b.status}">${pretty(b.status)}</span><br>
+            <select class="st" data-id="${b.id}" style="margin-top:6px">${opts}</select></td>
+      </tr>`;
+    }
+    function table(list){
+      if(!list.length) return '<div class="empty">No bookings here.</div>';
+      return `<table><thead><tr>
+        <th>Date</th><th>Customer</th><th>Contact</th><th>Tour / option</th><th>Pax</th><th>Total</th><th>Status</th>
+      </tr></thead><tbody>${list.map(row).join('')}</tbody></table>`;
+    }
+
+    function render(all){
+      const today = new Date().toISOString().slice(0,10);
+      const past = all.filter(b => b.date && b.date < today)
+                      .sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+      const upcoming = all.filter(b => !b.date || b.date >= today)
+                          .sort((a,b)=> (a.date||'9999').localeCompare(b.date||'9999'));
+      const byStatus = (s) => all.filter(b => b.status === s).length;
+      $('counts').innerHTML = [
+        ['Total', all.length], ['Pending', byStatus('pending')],
+        ['Confirmed', byStatus('confirmed')], ['Paid', byStatus('paid')], ['Upcoming', upcoming.length],
+      ].map(([l,v]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+      $('upcoming').innerHTML = table(upcoming);
+      $('past').innerHTML = table(past);
+    }
+
+    async function setStatus(id, status){
+      const r = await fetch(API + '/update', { method:'POST',
+        headers:{'Content-Type':'application/json', Authorization:'Bearer ' + token()},
+        body: JSON.stringify({ id, status }) });
+      if(!r.ok){ alert('Update failed.'); }
+      loadBookings();
+    }
+
+    $('loginBtn').addEventListener('click', login);
+    $('lp').addEventListener('keydown', e => { if(e.key === 'Enter') login(); });
+    $('refresh').addEventListener('click', loadBookings);
+    $('logout').addEventListener('click', () => { localStorage.removeItem(TKEY); show('login'); });
+    document.addEventListener('change', e => {
+      if(e.target.classList && e.target.classList.contains('st')) setStatus(e.target.dataset.id, e.target.value);
+    });
+
+    // boot
+    if(token()) loadBookings(); else show('login');
+  </script>
+</body>
+</html>

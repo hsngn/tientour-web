@@ -1,0 +1,26 @@
+---
+import { t } from '../i18n/ui';
+const { lang } = Astro.props;
+const posts = {
+  en:[["Planning","Ha Giang Loop: The Complete 2026 Guide","Routes, costs, permits and timing — everything in one place."],
+      ["Planning","When is the best time to visit Ha Giang?","Month-by-month weather, rice-season and what to expect on the road."],
+      ["Safety","The Ha Giang Loop Safety Guide","Everything we teach in our 1-hour pre-ride briefing — written down for you."]],
+  fr:[["Préparation","Boucle de Ha Giang : le guide complet 2026","Itinéraires, budget, permis et calendrier — tout au même endroit."],
+      ["Préparation","Quelle est la meilleure période pour Ha Giang ?","La météo mois par mois, la saison des rizières et à quoi s’attendre."],
+      ["Sécurité","Le guide sécurité de la boucle de Ha Giang","Tout ce qu’on enseigne dans notre briefing d’1 h — écrit pour vous."]],
+};
+const list = posts[lang] ?? posts.en;
+---
+<section class="guide" id="guide"><div class="wrap">
+  <div class="eyebrow">{t(lang,'guide_eyebrow')}</div>
+  <h2 class="title">{t(lang,'guide_title')}</h2>
+  <p class="sub">{t(lang,'guide_sub')}</p>
+  <div class="grid">
+    {list.map((p,i)=>(
+      <article class="gcard">
+        <div class="top"><span class="n italic">0{i+1}</span></div>
+        <div class="cat">{p[0]}</div><h3>{p[1]}</h3><p>{p[2]}</p>
+      </article>
+    ))}
+  </div>
+</div></section>

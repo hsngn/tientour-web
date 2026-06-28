@@ -1,0 +1,148 @@
+---
+import { getCollection } from 'astro:content';
+import { LANGS, t } from '../../i18n/ui';
+import Base from '../../layouts/Base.astro';
+export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
+const { lang } = Astro.params;
+const tours = (await getCollection('tours')).sort((a,b)=>a.data.order-b.data.order);
+const T = tours.map((tr)=>({ slug:tr.slug, price:tr.data.priceFrom, days:tr.data.durationDays, title:tr.data[lang].title }));
+const opts = [
+  ['easy_rider','opt_er_t','opt_er_b','opt_er_d'],
+  ['self_drive','opt_sd_t','opt_sd_b','opt_sd_d'],
+  ['private','opt_pv_t','opt_pv_b','opt_pv_d'],
+  ['rental_only','opt_rt_t','opt_rt_b','opt_rt_d'],
+].map(([k,a,b,c])=>({ key:k, title:t(lang,a), badge:t(lang,b), desc:t(lang,c) }));
+const L = {
+  lang, for:t(lang,'q_for'), travelers:t(lang,'q_travelers'), days:t(lang,'days'),
+  insurance:t(lang,'q_insurance'), total:t(lang,'q_total'),
+  erSurcharge:`${t(lang,'opt_er_t')} ${t(lang,'q_surcharge')}`,
+  privateLabel:`${t(lang,'opt_pv_t')} (+40%)`, rentalLabel:t(lang,'opt_rt_t'),
+  people: lang==='fr' ? 'pers' : 'people',
+  cta:t(lang,'book_cta'), okMsg:t(lang,'ok_msg'), errMsg:t(lang,'err_msg'), errContact:t(lang,'err_contact'),
+};
+const seo = lang==='fr'
+  ? { t:"Réserver — boucle de Ha Giang | Tien Tour", d:"Composez votre aventure à Ha Giang et obtenez un devis en direct. Aucun paiement avant confirmation des disponibilités." }
+  : { t:"Book — Ha Giang Loop | Tien Tour", d:"Build your Ha Giang adventure and get a live quote. No payment until we confirm availability." };
+---
+<Base title={seo.t} description={seo.d} lang={lang}>
+  <section class="book-hero"><div class="wrap">
+    <div class="eyebrow">{t(lang,'book_eyebrow')}</div>
+    <h1>{t(lang,'book_title')}</h1>
+    <p>{t(lang,'book_sub')}</p>
+  </div></section>
+
+  <div class="wrap book-grid">
+    <div>
+      <div class="step-h"><span class="n italic">01</span><h2>{t(lang,'book_s1')}</h2></div>
+      <div class="opts">
+        {opts.map((o,i)=>(
+          <div class={"opt"+(i===0?" sel":"")} data-opt={o.key}>
+            <div class="t"><h3>{o.title}</h3><span class="badge">{o.badge}</span></div>
+            <p>{o.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="step-h"><span class="n italic">02</span><h2>{t(lang,'book_s2')}</h2></div>
+      <div id="tourlist">
+        {T.map((tr,i)=>(
+          <div class={"tour-opt"+(i===0?" sel":"")} data-slug={tr.slug} data-price={tr.price} data-days={tr.days}>
+            <div class="th"></div>
+            <div><h3>{tr.title}</h3>
+              <div class="meta">{tr.days} {t(lang,'days')} · {t(lang,'from')} ${tr.price}/pers.</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div class="step-h"><span class="n italic">03</span><h2>{t(lang,'book_travelers')}</h2></div>
+      <div class="travelers">
+        <button id="tmin" type="button" aria-label="-">−</button>
+        <span class="v" id="tval">2</span>
+        <button id="tplus" type="button" aria-label="+">+</button>
+      </div>
+
+      <div class="step-h"><span class="n italic">04</span><h2>{t(lang,'book_s4')}</h2></div>
+      <div class="form">
+        <div class="field"><label for="f_name">{t(lang,'f_name')}</label><input id="f_name" type="text" autocomplete="name" /></div>
+        <div class="row2">
+          <div class="field"><label for="f_email">{t(lang,'f_email')}</label><input id="f_email" type="email" autocomplete="email" /></div>
+          <div class="field"><label for="f_whatsapp">{t(lang,'f_whatsapp')}</label><input id="f_whatsapp" type="tel" /></div>
+        </div>
+        <div class="field"><label for="f_date">{t(lang,'f_date')}</label><input id="f_date" type="date" /></div>
+        <div class="field"><label for="f_message">{t(lang,'f_message')}</label><textarea id="f_message"></textarea></div>
+      </div>
+    </div>
+
+    <aside>
+      <div class="quote">
+        <div class="lbl">{t(lang,'q_live')}</div>
+        <div class="big" id="qbig">$0</div>
+        <div class="for" id="qfor"></div>
+        <div class="line"></div>
+        <div id="qlines"></div>
+        <div class="line"></div>
+        <div class="total"><span class="l">{t(lang,'q_total')}</span><span class="v" id="qtot">$0</span></div>
+        <p class="note">{t(lang,'q_note')}</p>
+        <button class="btn btn-rust btn-block cta" id="submitBtn" type="button">{t(lang,'book_cta')}</button>
+        <div class="formmsg" id="formmsg"></div>
+      </div>
+    </aside>
+  </div>
+
+  <script define:vars={{ T, L }}>
+    const fmt = (n)=> '$' + Math.round(n).toLocaleString('en-US');
+    const state = { opt:'easy_rider', slug:T[0].slug, travelers:2 };
+    const selTour = ()=> T.find(t=>t.slug===state.slug) || T[0];
+    function compute(){
+      const tr=selTour(), days=tr.days, pax=state.travelers, lines=[]; let total=0;
+      if(state.opt==='rental_only'){ const r=10*days*pax;
+        lines.push({d:L.rentalLabel,s:`$10 × ${days} ${L.days} × ${pax}`,a:r}); total+=r;
+      } else {
+        const base=tr.price*pax; lines.push({d:tr.title,s:`$${tr.price} × ${pax} ${L.people}`,a:base}); total+=base;
+        if(state.opt==='easy_rider'){ const s=60*days*pax; lines.push({d:L.erSurcharge,s:`$60 × ${days} ${L.days} × ${pax}`,a:s}); total+=s; }
+        if(state.opt==='private'){ const s=Math.round(base*0.40); lines.push({d:L.privateLabel,s:'',a:s}); total+=s; }
+      }
+      const ins=8*days*pax; lines.push({d:L.insurance,s:'',a:ins}); total+=ins;
+      return { days, pax, total, lines };
+    }
+    function render(){
+      const r=compute();
+      document.getElementById('qbig').textContent=fmt(r.total);
+      document.getElementById('qtot').textContent=fmt(r.total);
+      document.getElementById('qfor').textContent=`${L.for} ${r.pax} ${L.travelers} · ${r.days} ${L.days}`;
+      document.getElementById('qlines').innerHTML=r.lines.map(l=>
+        `<div class="li"><div class="d">${l.d}${l.s?`<small>${l.s}</small>`:''}</div><div class="a">${fmt(l.a)}</div></div>`).join('');
+    }
+    document.querySelectorAll('.opt').forEach(el=>el.addEventListener('click',()=>{
+      state.opt=el.dataset.opt; document.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); render();
+    }));
+    document.querySelectorAll('.tour-opt').forEach(el=>el.addEventListener('click',()=>{
+      state.slug=el.dataset.slug; document.querySelectorAll('.tour-opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); render();
+    }));
+    document.getElementById('tmin').addEventListener('click',()=>{ state.travelers=Math.max(1,state.travelers-1); document.getElementById('tval').textContent=state.travelers; render(); });
+    document.getElementById('tplus').addEventListener('click',()=>{ state.travelers=Math.min(8,state.travelers+1); document.getElementById('tval').textContent=state.travelers; render(); });
+
+    const val=(id)=>(document.getElementById(id)?.value||'').trim();
+    const msgEl=document.getElementById('formmsg');
+    const showMsg=(cls,text)=>{ msgEl.className='formmsg '+cls; msgEl.textContent=text; };
+    document.getElementById('submitBtn').addEventListener('click', async ()=>{
+      const name=val('f_name'), email=val('f_email'), whatsapp=val('f_whatsapp');
+      if(!name || (!email && !whatsapp)){ showMsg('err',L.errContact); return; }
+      const r=compute(), tr=selTour(), btn=document.getElementById('submitBtn');
+      btn.disabled=true; const old=btn.textContent; btn.textContent='…';
+      try{
+        const resp=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ name,email,whatsapp, date:val('f_date'), message:val('f_message'),
+            tour_slug:tr.slug, tour_title:tr.title, option:state.opt, travelers:r.pax, days:r.days,
+            amount:r.total, language:L.lang, source:'book_page' })});
+        const data=await resp.json().catch(()=>({}));
+        if(resp.ok && data.ok){ showMsg('ok',L.okMsg);
+          ['f_name','f_email','f_whatsapp','f_date','f_message'].forEach(i=>{const e=document.getElementById(i); if(e) e.value='';});
+        } else { showMsg('err',L.errMsg); }
+      }catch(e){ showMsg('err',L.errMsg); }
+      btn.disabled=false; btn.textContent=old;
+    });
+    render();
+  </script>
+</Base>

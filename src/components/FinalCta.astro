@@ -1,0 +1,9 @@
+---
+import { t } from '../i18n/ui';
+const { lang } = Astro.props;
+---
+<section class="final"><div class="wrap">
+  <h2>{t(lang,'final_title')}</h2>
+  <p>{t(lang,'final_sub')}</p>
+  <div class="cta"><a class="btn btn-rust" href={`/${lang}/book`}>{t(lang,'hero_book')}</a></div>
+</div></section>

@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import { LANGS, t } from '../../../i18n/ui';
+import Base from '../../../layouts/Base.astro';
+import Faq from '../../../components/Faq.astro';
+export async function getStaticPaths(){
+  const tours = await getCollection('tours');
+  return LANGS.flatMap((lang)=> tours.map((tr)=>({ params:{ lang, slug: tr.slug }, props:{ tr }})));
+}
+const { lang } = Astro.params;
+const { tr } = Astro.props;
+const d = tr.data[lang];
+const site = Astro.site?.toString().replace(/\/$/,'') ?? '';
+const url = `${site}/${lang}/tours/${tr.slug}`;
+const diff = { easy:{en:'Easy',fr:'Facile'}, moderate:{en:'Moderate',fr:'Modéré'}, challenging:{en:'Advanced',fr:'Avancé'} };
+const sym = tr.data.currency==='USD' ? '$' : '€';
+const jsonld = { "@context":"https://schema.org","@graph":[
+  { "@type":"TouristTrip","name":d.title,"description":d.seoDesc,"url":url,
+    "provider":{"@type":"TravelAgency","name":"Tien Tour"},
+    "offers":{"@type":"Offer","price":String(tr.data.priceFrom),"priceCurrency":tr.data.currency,"availability":"https://schema.org/InStock"},
+    "aggregateRating":{"@type":"AggregateRating","ratingValue":"5.0","reviewCount":"300","bestRating":"5"} },
+  { "@type":"BreadcrumbList","itemListElement":[
+    {"@type":"ListItem","position":1,"name":"Home","item":`${site}/${lang}/`},
+    {"@type":"ListItem","position":2,"name":lang==='fr'?'Circuits':'Tours',"item":`${site}/${lang}/tours`},
+    {"@type":"ListItem","position":3,"name":d.title,"item":url}]},
+  { "@type":"FAQPage","mainEntity":d.faq.map((f)=>({"@type":"Question","name":f.q,"acceptedAnswer":{"@type":"Answer","text":f.a}}))}
+]};
+---
+<Base title={d.seoTitle} description={d.seoDesc} lang={lang} jsonld={jsonld}>
+  <section class="dhero" style="padding:0"><div class="img"></div>
+    <div class="wrap">
+      <div class="eyebrow">{tr.data.durationDays} {t(lang,'days')} · {diff[tr.data.difficulty][lang]}</div>
+      <h1>{d.title}</h1><p>{d.summary}</p>
+    </div>
+  </section>
+  <section style="padding-top:48px"><div class="wrap">
+    <div class="dgrid">
+      <div>
+        <h2 class="title" style="font-size:32px">{t(lang,'itinerary')}</h2>
+        <div class="itin" style="margin-top:24px">
+          {d.itinerary.map((s)=>(<div class="step"><h4>{s.title}</h4><p>{s.text}</p></div>))}
+        </div>
+        <div class="incl">
+          <div><h3>{t(lang,'inclusions')}</h3><ul>{d.inclusions.map((x)=><li>{x}</li>)}</ul></div>
+          <div><h3>{t(lang,'exclusions')}</h3><ul>{d.exclusions.map((x)=><li>{x}</li>)}</ul></div>
+        </div>
+      </div>
+      <aside><div class="bookbox">
+        <div class="price">{t(lang,'from')} {sym}{tr.data.priceFrom}<small> / pers</small></div>
+        <div class="meta">{t(lang,'duration')}: {tr.data.durationDays} {t(lang,'days')} · {diff[tr.data.difficulty][lang]}</div>
+        <a class="btn btn-rust btn-block" href={`/${lang}/book`}>{t(lang,'hero_book')}</a>
+        <div class="meta" style="margin:14px 0 0;text-align:center">5.0★ · 300+ · licensed operator</div>
+      </div></aside>
+    </div>
+  </div></section>
+  <Faq lang={lang} faq={d.faq} />
+</Base>

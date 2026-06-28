@@ -1,0 +1,22 @@
+---
+import { getCollection } from 'astro:content';
+import { LANGS, t } from '../../../i18n/ui';
+import Base from '../../../layouts/Base.astro';
+import TourGrid from '../../../components/TourGrid.astro';
+import FinalCta from '../../../components/FinalCta.astro';
+export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
+const { lang } = Astro.params;
+const tours = (await getCollection('tours')).sort((a,b)=>a.data.order-b.data.order);
+const seo = lang==='fr'
+  ? { t:"Circuits boucle de Ha Giang — easy rider & aventure | Tien Tour", d:"Tous nos circuits de la boucle de Ha Giang : 3 à 5 jours, easy rider ou aventure. Petits groupes, opérateur local licencié, 5,0★." }
+  : { t:"Ha Giang Loop Tours — easy rider & adventure | Tien Tour", d:"All our Ha Giang Loop tours: 3 to 5 days, easy rider or adventure. Small groups, licensed local operator, 5.0★." };
+---
+<Base title={seo.t} description={seo.d} lang={lang}>
+  <section style="padding-bottom:0"><div class="wrap">
+    <div class="eyebrow">{t(lang,'tours_eyebrow')}</div>
+    <h1 class="title">{t(lang,'tours_title')}</h1>
+    <p class="sub">{t(lang,'tours_sub')}</p>
+  </div></section>
+  <TourGrid lang={lang} tours={tours} showHead={false} />
+  <FinalCta lang={lang} />
+</Base>

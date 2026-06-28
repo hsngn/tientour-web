@@ -1,0 +1,49 @@
+---
+import Seo from '../components/Seo.astro';
+import { t } from '../i18n/ui';
+import '../styles/global.css';
+const { title, description, lang, jsonld } = Astro.props;
+const path = Astro.url.pathname;
+const other = lang === 'en' ? 'fr' : 'en';
+const enPath = path.replace(/^\/(en|fr)/, '/en');
+const frPath = path.replace(/^\/(en|fr)/, '/fr');
+const L = (s) => `/${lang}${s}`;
+const items = [
+  ['nav_tours', L('/tours')], ['nav_riders', L('/#riders')], ['nav_rental', L('/#rental')],
+  ['nav_guide', L('/#guide')], ['nav_reviews', L('/reviews')],
+];
+---
+<!doctype html>
+<html lang={lang}>
+  <head><Seo title={title} description={description} lang={lang} jsonld={jsonld} /></head>
+  <body>
+    <header class="site">
+      <div class="wrap bar">
+        <a class="brand" href={L('/')}>TIEN<b>.</b></a>
+        <nav class="main">
+          {items.map(([k,href])=>(<a class="lk" href={href}>{t(lang,k)}</a>))}
+          <span class="langsw">
+            <a href={enPath} class={lang==='en'?'on':''}>EN</a>
+            <a href={frPath} class={lang==='fr'?'on':''}>FR</a>
+          </span>
+          <a class="btn btn-forest" href={L('/book')}>{t(lang,'nav_book')}</a>
+        </nav>
+        <button class="burger" aria-label="Menu" onclick="document.getElementById('mnav').classList.toggle('open')">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <div id="mnav">
+        {items.map(([k,href])=>(<a href={href}>{t(lang,k)}</a>))}
+        <a href={L('/reviews')}>{t(lang,'nav_reviews')}</a>
+        <a href={L('/book')} style="color:var(--rust)">{t(lang,'nav_book')}</a>
+        <a href={enPath}>EN</a><a href={frPath}>FR</a>
+      </div>
+    </header>
+    <main><slot /></main>
+    <footer class="site"><div class="wrap">
+      <div class="brand">TIEN<b style="color:var(--rust)">.</b></div>
+      <p>{t(lang,'footer_op')}</p>
+      <p class="lic">International tourism license n° __________</p>
+    </div></footer>
+  </body>
+</html>
