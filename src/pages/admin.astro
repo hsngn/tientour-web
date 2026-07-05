@@ -1,5 +1,8 @@
 ---
 import '../styles/global.css';
+import { getCollection } from 'astro:content';
+const tours = (await getCollection('tours')).sort((a,b)=>a.data.order-b.data.order);
+const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
 ---
 <!doctype html>
 <html lang="en">
@@ -78,6 +81,14 @@ import '../styles/global.css';
     .pill.pending{background:#FBEAD2;color:var(--amber)}.pill.confirmed{background:#D9E5F2;color:var(--blue)}
     .pill.paid{background:#DCEFE0;color:var(--green)}.pill.cancelled{background:#EFE0DC;color:#9A3B22}
     .empty{color:var(--muted);font-size:14px;padding:18px 0}
+    .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .listbar-right{display:flex;gap:12px;align-items:center}
+    .fsel,.fdate{border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font:500 13px Inter;background:#fff}
+    .tag{display:inline-block;padding:3px 9px;border-radius:7px;font:700 10.5px Inter;letter-spacing:.04em;text-transform:uppercase}
+    .tag-web{background:#E1E9F2;color:#274B6E}.tag-manual{background:#EDE6D6;color:#7a5a20}
+    .pill.pay-paid{background:#DCEFE0;color:#1E6B36}.pill.pay-partial{background:#FBEAD2;color:#9A5B12}.pill.pay-unpaid{background:#EFE0DC;color:#9A3B22}
+    .paysec{border-top:1px solid var(--line);margin-top:16px;padding-top:6px}
+    .paytitle{font:700 12px Inter;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 0;display:flex;align-items:center;gap:10px}
     .overlay{position:fixed;inset:0;background:#1b1d1799;display:flex;align-items:flex-start;justify-content:center;
       padding:40px 16px;z-index:50;overflow:auto}
     .modal{background:var(--panel);border-radius:20px;max-width:560px;width:100%;padding:28px}
@@ -92,6 +103,14 @@ import '../styles/global.css';
     .fld select:focus,.fld textarea:focus{outline:none;border-color:var(--forest)}
     .quote-msg{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;color:#33352c}
     .mactions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+    .edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+    .edit-grid .fld input[type=date]{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font:400 14px Inter;background:#fff}
+    .edit-grid .fld input[type=date]:focus{outline:none;border-color:var(--forest)}
+    .city{display:flex;gap:8px}
+    .city select{flex:1}
+    .btn.mini{padding:0 14px;font-size:18px;line-height:1;border-color:var(--line)}
+    .nights{padding:11px 13px;background:#efe9dc;border-radius:12px;font:600 14px Inter;color:var(--ink)}
+    @media(max-width:560px){.edit-grid{grid-template-columns:1fr}}
     .thread{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:220px;overflow:auto}
     .note{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
     .note .h{display:flex;justify-content:space-between;gap:8px;font:700 10.5px Inter;letter-spacing:.04em;color:var(--muted);margin-bottom:5px;text-transform:uppercase}
@@ -156,8 +175,26 @@ import '../styles/global.css';
 
       <section id="v-list" class="hidden">
         <div class="listbar">
-          <input class="search" id="search" placeholder="Search name, email, tour…" />
-          <span class="em" id="listCount"></span>
+          <div class="filters">
+            <input class="search" id="search" placeholder="Search…" />
+            <select class="fsel" id="fYear"></select>
+            <select class="fsel" id="fMonth">
+              <option value="">All months</option>
+              <option value="01">Jan</option><option value="02">Feb</option><option value="03">Mar</option>
+              <option value="04">Apr</option><option value="05">May</option><option value="06">Jun</option>
+              <option value="07">Jul</option><option value="08">Aug</option><option value="09">Sep</option>
+              <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
+            </select>
+            <input type="date" class="fdate" id="fDate" title="Exact day" />
+            <select class="fsel" id="fSource">
+              <option value="">All channels</option><option value="website">Website</option><option value="manual">Manual</option>
+            </select>
+            <button class="btn" id="fClear">Clear</button>
+          </div>
+          <div class="listbar-right">
+            <span class="em" id="listCount"></span>
+            <button class="btn pri" id="newRes">+ New reservation</button>
+          </div>
         </div>
         <div id="listTable"></div>
       </section>
@@ -170,19 +207,72 @@ import '../styles/global.css';
       <div class="meta" id="mMeta"></div>
       <div class="info" id="mInfo"></div>
       <div id="mMsgWrap" class="hidden"><div class="info" style="grid-template-columns:1fr"><div><div class="k">Customer message</div><div class="quote-msg" id="mMsg"></div></div></div></div>
-      <div class="fld"><label>Status</label>
-        <select id="mStatus"><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="paid">Paid</option><option value="cancelled">Cancelled</option></select></div>
+      <div class="edit-grid">
+        <div class="fld"><label>Tour</label><select id="mTour"></select></div>
+        <div class="fld"><label>Status</label>
+          <select id="mStatus"><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="paid">Paid</option><option value="cancelled">Cancelled</option></select></div>
+        <div class="fld"><label>Start date</label><input type="date" id="mStart"></div>
+        <div class="fld"><label>End date</label><input type="date" id="mEnd"></div>
+        <div class="fld"><label>Nights</label><div class="nights" id="mNights">—</div></div>
+        <div class="fld"></div>
+        <div class="fld"><label>Pickup city — bus to Ha Giang</label><div class="city"><select id="mDep"></select><button class="btn mini" data-add="mDep" title="Add a city">＋</button></div></div>
+        <div class="fld"><label>Drop-off city — bus from Ha Giang</label><div class="city"><select id="mRet"></select><button class="btn mini" data-add="mRet" title="Add a city">＋</button></div></div>
+      </div>
+      <div class="paysec">
+        <div class="paytitle">Payment <span id="mPayState"></span></div>
+        <div class="edit-grid">
+          <div class="fld"><label>Total ($)</label><input type="number" min="0" id="mAmount"></div>
+          <div class="fld"><label>Amount paid ($)</label><input type="number" min="0" id="mPaid"></div>
+          <div class="fld"><label>Remaining</label><div class="nights" id="mRemain">—</div></div>
+          <div class="fld"></div>
+          <div class="fld" style="grid-column:1/-1"><label>Payment link (Stripe / local — optional)</label>
+            <input type="text" id="mPayLink" placeholder="Paste a payment link to send to the customer…"></div>
+        </div>
+      </div>
       <div class="fld"><label>Comments</label>
         <div class="thread" id="mThread"></div>
         <div class="addnote"><textarea id="mNote" placeholder="Add a comment…"></textarea><button class="btn pri" id="mAddNote">Add</button></div>
       </div>
       <div class="mactions">
         <button class="btn" id="mClose">Close</button>
-        <button class="btn pri" id="mSave">Save status</button>
+        <button class="btn pri" id="mSave">Save</button>
       </div>
     </div>
   </div>
 
+  <div id="createOverlay" class="overlay hidden">
+    <div class="modal">
+      <h2>New reservation</h2>
+      <div class="meta">Manually add a booking (channel: Manual)</div>
+      <div class="edit-grid">
+        <div class="fld" style="grid-column:1/-1"><label>Customer name *</label><input type="text" id="cName"></div>
+        <div class="fld"><label>Email</label><input type="email" id="cEmail"></div>
+        <div class="fld"><label>WhatsApp</label><input type="tel" id="cWa"></div>
+        <div class="fld"><label>Tour</label><select id="cTour"></select></div>
+        <div class="fld"><label>Option</label><select id="cOption">
+          <option value="easy_rider">Easy Rider</option><option value="self_drive">Self-drive</option>
+          <option value="private">Private tour</option><option value="rental_only">Rental only</option></select></div>
+        <div class="fld"><label>Travelers</label><input type="number" min="1" id="cPax" value="2"></div>
+        <div class="fld"><label>Status</label><select id="cStatus">
+          <option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="paid">Paid</option></select></div>
+        <div class="fld"><label>Start date</label><input type="date" id="cStart"></div>
+        <div class="fld"><label>End date</label><input type="date" id="cEnd"></div>
+        <div class="fld"><label>Pickup city</label><select id="cDep"></select></div>
+        <div class="fld"><label>Drop-off city</label><select id="cRet"></select></div>
+        <div class="fld"><label>Total ($)</label><input type="number" min="0" id="cAmount"></div>
+        <div class="fld"><label>Amount paid ($)</label><input type="number" min="0" id="cPaid" value="0"></div>
+        <div class="fld"><label>Language</label><select id="cLang"><option value="en">EN</option><option value="fr">FR</option></select></div>
+        <div class="fld" style="grid-column:1/-1"><label>Note</label><textarea id="cMsg"></textarea></div>
+      </div>
+      <div class="err" id="createErr"></div>
+      <div class="mactions">
+        <button class="btn" id="cClose">Cancel</button>
+        <button class="btn pri" id="cSave">Create reservation</button>
+      </div>
+    </div>
+  </div>
+
+  <script id="tours-data" type="application/json" set:html={JSON.stringify(TOURS)}></script>
   <script>
     const API='/api/admin', TKEY='tt_admin_token';
     const $=(id)=>document.getElementById(id);
@@ -192,7 +282,8 @@ import '../styles/global.css';
     const money=(n)=>n==null?'—':'$'+Math.round(n).toLocaleString('en-US');
     const dstr=(d)=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');};
     const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
-    let ALL=[], NOTES={}, view='dash', charts={}, current=null;
+    let ALL=[], NOTES={}, CITIES=[], view='dash', charts={}, current=null;
+    const TOURS = JSON.parse(document.getElementById('tours-data').textContent||'[]');
     let cal={y:new Date().getFullYear(), m:new Date().getMonth()};
     let period={from:dstr(addDays(new Date(),-90)), to:dstr(new Date())};
 
@@ -223,7 +314,39 @@ import '../styles/global.css';
       if(r.status===401){ logout(); return; }
       const d=await r.json().catch(()=>({}));
       if(!d.ok){ show('login'); return; }
-      ALL=d.bookings||[]; await loadNotes(); show('app'); setTab(view);
+      ALL=d.bookings||[]; await loadNotes(); await loadCities(); populateTourSelect(); fillYearFilter(); show('app'); setTab(view);
+    }
+    async function loadCities(){
+      try{
+        const r=await fetch(API+'/cities',{headers:{Authorization:'Bearer '+token()}});
+        const d=await r.json().catch(()=>({})); CITIES=(d.cities||[]).map(c=>c.name);
+      }catch(e){ CITIES=[]; }
+      populateCitySelects();
+    }
+    function populateTourSelect(){
+      const html=TOURS.map(t=>`<option value="${t.slug}">${esc(t.title)}</option>`).join('');
+      $('mTour').innerHTML=html; if($('cTour')) $('cTour').innerHTML=html;
+    }
+    function cityOptions(sel){
+      return '<option value="">— None —</option>'+CITIES.map(c=>`<option value="${esc(c)}"${c===sel?' selected':''}>${esc(c)}</option>`).join('');
+    }
+    function populateCitySelects(){
+      ['mDep','mRet','cDep','cRet'].forEach(id=>{ const el=$(id); if(el){ const v=el.value; el.innerHTML=cityOptions(v); } });
+    }
+    async function addCity(targetId){
+      const name=(prompt('New city name:')||'').trim(); if(!name) return;
+      try{
+        const r=await fetch(API+'/cities',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token()},body:JSON.stringify({name})});
+        const d=await r.json().catch(()=>({}));
+        if(r.ok&&d.ok){ if(!CITIES.includes(name)) CITIES.push(name); CITIES.sort(); populateCitySelects(); $(targetId).value=name; }
+        else alert('Could not add city.');
+      }catch(e){ alert('Network error.'); }
+    }
+    function calcNights(){
+      const s=$('mStart').value, e=$('mEnd').value;
+      if(s&&e){ const n=Math.round((new Date(e)-new Date(s))/86400000);
+        $('mNights').textContent = n>0 ? (n+' night'+(n>1?'s':'')) : '—'; }
+      else $('mNights').textContent='—';
     }
     async function loadNotes(){
       try{
@@ -314,7 +437,7 @@ import '../styles/global.css';
       const y=cal.y,m=cal.m;
       $('calTitle').textContent=new Date(y,m,1).toLocaleString('en-US',{month:'long'})+' '+y;
       const first=new Date(y,m,1); const startDow=(first.getDay()+6)%7; const daysIn=new Date(y,m+1,0).getDate();
-      const byDate={}; ALL.forEach(b=>{ if(b.date){(byDate[b.date]=byDate[b.date]||[]).push(b);} });
+      const byDate={}; ALL.forEach(b=>{ const dd=b.start_date||b.date; if(dd){(byDate[dd]=byDate[dd]||[]).push(b);} });
       let h=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="cal-h">${d}</div>`).join('');
       for(let i=0;i<startDow;i++) h+='<div class="cal-cell empty"></div>';
       const today=dstr(new Date());
@@ -328,21 +451,44 @@ import '../styles/global.css';
       $('calGrid').innerHTML=h;
     }
 
+    const srcLabel=(s)=> s==='manual'?'Manual':'Website';
+    const tripDate=(b)=> b.start_date||b.date||'';
+    function payInfo(b){
+      const total=Number(b.amount)||0, paid=Number(b.amount_paid)||0, rem=Math.max(0,total-paid);
+      let st='unpaid'; if(total>0&&paid>=total) st='paid'; else if(paid>0) st='partial';
+      return {total,paid,rem,st};
+    }
+    function fillYearFilter(){
+      const years=[...new Set(ALL.map(b=>(tripDate(b)||b.created_at||'').slice(0,4)).filter(Boolean))].sort().reverse();
+      const cur=$('fYear').value;
+      $('fYear').innerHTML='<option value="">All years</option>'+years.map(y=>`<option value="${y}"${y===cur?' selected':''}>${y}</option>`).join('');
+    }
     function renderList(){
       const q=($('search').value||'').toLowerCase();
-      const rows=ALL.filter(b=>!q||[b.customer_name,b.email,b.whatsapp,b.tour_slug].some(x=>String(x||'').toLowerCase().includes(q)))
-        .sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
+      const fy=$('fYear').value, fm=$('fMonth').value, fd=$('fDate').value, fs=$('fSource').value;
+      let rows=ALL.filter(b=>{
+        if(q && ![b.customer_name,b.email,b.whatsapp,b.tour_slug,b.departure_city,b.return_city].some(x=>String(x||'').toLowerCase().includes(q))) return false;
+        const d=tripDate(b);
+        if(fd){ if(d!==fd) return false; }
+        else { if(fy && d.slice(0,4)!==fy) return false; if(fm && d.slice(5,7)!==fm) return false; }
+        if(fs){ const isManual=b.source==='manual'; if(fs==='manual'&&!isManual) return false; if(fs==='website'&&isManual) return false; }
+        return true;
+      }).sort((a,b)=>(tripDate(b)||'').localeCompare(tripDate(a)||''));
       $('listCount').textContent=rows.length+' reservation'+(rows.length!==1?'s':'');
-      if(!rows.length){ $('listTable').innerHTML='<div class="empty">No reservations.</div>'; return; }
+      if(!rows.length){ $('listTable').innerHTML='<div class="empty">No reservations match.</div>'; return; }
       $('listTable').innerHTML=`<table><thead><tr>
-        <th>Date</th><th>Customer</th><th>Tour / option</th><th>Pax</th><th>Total</th><th>Status</th><th>Notes</th></tr></thead><tbody>`+
-        rows.map(b=>`<tr class="brow" data-id="${b.id}">
-          <td>${b.date?esc(b.date):'<span class="sub">no date</span>'}<div class="sub">req. ${b.created_at?new Date(b.created_at).toLocaleDateString():''}</div></td>
+        <th>Trip dates</th><th>Route</th><th>Customer</th><th>Tour / option</th><th>Pax</th><th>Payment</th><th>Status</th><th>Channel</th><th></th>
+        </tr></thead><tbody>`+
+        rows.map(b=>{ const p=payInfo(b); return `<tr class="brow" data-id="${b.id}">
+          <td>${b.start_date?esc(b.start_date):(b.date?esc(b.date):'<span class="sub">—</span>')}${b.end_date?'<div class="sub">→ '+esc(b.end_date)+'</div>':''}</td>
+          <td>${b.departure_city||b.return_city?esc((b.departure_city||'?')+' → '+(b.return_city||'?')):'<span class="sub">—</span>'}</td>
           <td><b>${esc(b.customer_name)}</b><div class="sub">${esc(b.email||b.whatsapp||'')}</div></td>
           <td>${esc(pretty(b.tour_slug))}<div class="sub">${esc(pretty(b.option))}</div></td>
-          <td>${esc(b.travelers)}</td><td>${money(b.amount)}</td>
+          <td>${esc(b.travelers)}</td>
+          <td>${money(p.paid)} / ${money(p.total)}${p.rem>0?`<div class="sub">left ${money(p.rem)}</div>`:''}<span class="pill pay-${p.st}" style="margin-top:4px;display:inline-block">${p.st}</span></td>
           <td><span class="pill ${b.status}">${pretty(b.status)}</span></td>
-          <td>${(NOTES[b.id]&&NOTES[b.id].length)?'📝':''}</td></tr>`).join('')+`</tbody></table>`;
+          <td><span class="tag tag-${b.source==='manual'?'manual':'web'}">${srcLabel(b.source)}</span></td>
+          <td>${(NOTES[b.id]&&NOTES[b.id].length)?'📝':''}</td></tr>`;}).join('')+`</tbody></table>`;
     }
 
     function openDetail(id){
@@ -352,18 +498,62 @@ import '../styles/global.css';
       $('mInfo').innerHTML=[
         ['Tour',esc(pretty(b.tour_slug))],['Option',esc(pretty(b.option))],
         ['Travelers',esc(b.travelers)],['Preferred date',esc(b.date||'—')],
-        ['Total',money(b.amount)],['Language',esc((b.language||'').toUpperCase())],
+        ['Channel',srcLabel(b.source)],['Language',esc((b.language||'').toUpperCase())],
         ['Email',esc(b.email||'—')],['WhatsApp',esc(b.whatsapp||'—')],
       ].map(([k,v])=>`<div><div class="k">${k}</div><div class="val">${v}</div></div>`).join('');
       const has=!!(b.message&&b.message.trim());
       $('mMsgWrap').classList.toggle('hidden',!has); if(has)$('mMsg').textContent=b.message;
       $('mStatus').value=b.status||'pending'; renderThread(id); $('mNote').value='';
+      $('mTour').value=b.tour_slug||''; 
+      $('mStart').value=b.start_date||b.date||''; $('mEnd').value=b.end_date||'';
+      $('mDep').innerHTML=cityOptions(b.departure_city||''); $('mRet').innerHTML=cityOptions(b.return_city||'');
+      $('mAmount').value=b.amount!=null?b.amount:''; $('mPaid').value=b.amount_paid!=null?b.amount_paid:0;
+      $('mPayLink').value=b.payment_link||'';
+      calcNights(); calcRemain();
       $('overlay').classList.remove('hidden');
+    }
+    function calcRemain(){
+      const total=Number($('mAmount').value)||0, paid=Number($('mPaid').value)||0, rem=Math.max(0,total-paid);
+      $('mRemain').textContent=money(rem);
+      let st='unpaid'; if(total>0&&paid>=total) st='paid'; else if(paid>0) st='partial';
+      $('mPayState').innerHTML=`<span class="pill pay-${st}">${st}</span>`;
     }
     function closeModal(){ $('overlay').classList.add('hidden'); current=null; }
     async function saveDetail(){
-      if(!current) return; const ok=await update(current,{status:$('mStatus').value});
+      if(!current) return; const ok=await update(current,{
+        status:$('mStatus').value, tour_slug:$('mTour').value,
+        start_date:$('mStart').value||null, end_date:$('mEnd').value||null,
+        departure_city:$('mDep').value||null, return_city:$('mRet').value||null,
+        amount:$('mAmount').value||null, amount_paid:$('mPaid').value||0, payment_link:$('mPayLink').value||null });
       if(ok){ closeModal(); renderActive(); }
+    }
+
+    function openCreate(){
+      $('createErr').textContent='';
+      ['cName','cEmail','cWa','cStart','cEnd','cAmount','cMsg'].forEach(i=>{const e=$(i);if(e)e.value='';});
+      $('cPax').value='2'; $('cPaid').value='0'; $('cStatus').value='pending'; $('cOption').value='easy_rider'; $('cLang').value='en';
+      if($('cTour')&&TOURS[0]) $('cTour').value=TOURS[0].slug;
+      $('cDep').innerHTML=cityOptions(''); $('cRet').innerHTML=cityOptions('');
+      $('createOverlay').classList.remove('hidden');
+    }
+    function closeCreate(){ $('createOverlay').classList.add('hidden'); }
+    async function createReservation(){
+      const name=$('cName').value.trim(), email=$('cEmail').value.trim(), wa=$('cWa').value.trim();
+      $('createErr').textContent='';
+      if(!name||(!email&&!wa)){ $('createErr').textContent='Name and an email or WhatsApp are required.'; return; }
+      const btn=$('cSave'); btn.disabled=true;
+      try{
+        const r=await fetch(API+'/create',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token()},
+          body:JSON.stringify({ customer_name:name, email, whatsapp:wa, tour_slug:$('cTour').value, option:$('cOption').value,
+            travelers:$('cPax').value, status:$('cStatus').value, start_date:$('cStart').value||null, end_date:$('cEnd').value||null,
+            departure_city:$('cDep').value||null, return_city:$('cRet').value||null, amount:$('cAmount').value||null,
+            amount_paid:$('cPaid').value||0, language:$('cLang').value, message:$('cMsg').value||null })});
+        if(r.status===401){ logout(); return; }
+        const d=await r.json().catch(()=>({}));
+        if(r.ok&&d.ok&&d.booking){ ALL.unshift(d.booking); fillYearFilter(); closeCreate(); setTab('list'); }
+        else $('createErr').textContent='Could not create the reservation.';
+      }catch(e){ $('createErr').textContent='Network error.'; }
+      btn.disabled=false;
     }
 
     $('loginBtn').addEventListener('click',login);
@@ -384,6 +574,17 @@ import '../styles/global.css';
     $('listTable').addEventListener('click',e=>{const r=e.target.closest('.brow');if(r)openDetail(r.dataset.id);});
     $('mClose').addEventListener('click',closeModal);
     $('mSave').addEventListener('click',saveDetail);
+    $('mStart').addEventListener('change',calcNights);
+    $('mEnd').addEventListener('change',calcNights);
+    $('mAmount').addEventListener('input',calcRemain);
+    $('mPaid').addEventListener('input',calcRemain);
+    ['fYear','fMonth','fDate','fSource'].forEach(id=>$(id).addEventListener('change',renderList));
+    $('fClear').addEventListener('click',()=>{$('search').value='';$('fYear').value='';$('fMonth').value='';$('fDate').value='';$('fSource').value='';renderList();});
+    $('newRes').addEventListener('click',openCreate);
+    $('cClose').addEventListener('click',closeCreate);
+    $('cSave').addEventListener('click',createReservation);
+    $('createOverlay').addEventListener('click',e=>{if(e.target===$('createOverlay'))closeCreate();});
+    document.querySelectorAll('[data-add]').forEach(btn=>btn.addEventListener('click',()=>addCity(btn.dataset.add)));
     $('mAddNote').addEventListener('click',addNote);
     $('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))closeModal();});
 

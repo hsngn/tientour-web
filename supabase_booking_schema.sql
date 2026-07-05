@@ -130,3 +130,22 @@ create table if not exists public.booking_notes (
 create index if not exists booking_notes_bid_idx on public.booking_notes (booking_id, created_at);
 -- RLS activée sans policy publique : accès uniquement via la service role (fonctions admin)
 alter table public.booking_notes enable row level security;
+
+-- ============================================================================
+--  GESTION PAR RÉSERVATION : dates, transport, villes
+-- ============================================================================
+alter table public.bookings add column if not exists start_date date;
+alter table public.bookings add column if not exists end_date date;
+alter table public.bookings add column if not exists departure_city text;
+alter table public.bookings add column if not exists return_city text;
+
+create table if not exists public.cities (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique,
+  created_at timestamptz not null default now()
+);
+alter table public.cities enable row level security;
+
+-- Paiement (partiel/total) + canal
+alter table public.bookings add column if not exists amount_paid numeric default 0;
+alter table public.bookings add column if not exists payment_link text;
