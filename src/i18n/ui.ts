@@ -4,7 +4,7 @@ export const DEFAULT_LANG: Lang = 'en';
 
 export const ui = {
   en: {
-    nav_tours:'Tours', nav_riders:'Our riders', nav_rental:'Rental', nav_guide:'Travel guide',
+    nav_home:'Home', nav_tours:'Tours', nav_riders:'Our riders', nav_rental:'Rental', nav_guide:'Travel guide',
     nav_reviews:'Reviews', nav_book:'Book now',
     hero_eyebrow:'Ha Giang, Northern Vietnam',
     hero_1:'Explore ', hero_em:'the Loop', hero_2:' with Local Riders',
@@ -44,7 +44,7 @@ export const ui = {
     err_contact:'Please enter your name and either an email or a WhatsApp number.',
   },
   fr: {
-    nav_tours:'Circuits', nav_riders:'Nos pilotes', nav_rental:'Location', nav_guide:'Guide',
+    nav_home:'Accueil', nav_tours:'Circuits', nav_riders:'Nos pilotes', nav_rental:'Location', nav_guide:'Guide',
     nav_reviews:'Avis', nav_book:'Réserver',
     hero_eyebrow:'Ha Giang, Nord Vietnam',
     hero_1:'Explorez ', hero_em:'la Boucle', hero_2:' avec des pilotes locaux',

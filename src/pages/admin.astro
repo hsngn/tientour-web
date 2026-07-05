@@ -67,7 +67,14 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     .chip{font:600 11.5px Inter;color:#fff;border-radius:7px;padding:3px 7px;margin-bottom:4px;cursor:pointer;
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .chip.pending{background:var(--amber)}.chip.confirmed{background:var(--blue)}
-    .chip.paid{background:var(--green)}.chip.cancelled{background:#9A3B22;opacity:.7}
+    .chip.paid{background:var(--green)}.chip.cancelled{background:#9A3B22;text-decoration:line-through}
+    .chip.attn{outline:2px solid #1B1D17;outline-offset:1px;font-weight:700;animation:chipPulse 1.8s ease-in-out infinite}
+    @keyframes chipPulse{0%{box-shadow:0 0 0 0 rgba(27,29,23,.55)}70%{box-shadow:0 0 0 6px rgba(27,29,23,0)}100%{box-shadow:0 0 0 0 rgba(27,29,23,0)}}
+    @media(prefers-reduced-motion:reduce){.chip.attn{animation:none}}
+    .callegend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;font:600 12px Inter;color:var(--muted)}
+    .callegend span{display:inline-flex;align-items:center;gap:6px}
+    .callegend .dot{width:12px;height:12px;border-radius:4px;display:inline-block}
+    .dot.pending{background:var(--amber)}.dot.confirmed{background:var(--blue)}.dot.paid{background:var(--green)}.dot.cancelled{background:#9A3B22}
     .more{font:600 11px Inter;color:var(--muted)}
     .listbar{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
     .search{border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;font:400 14px Inter;min-width:240px;background:#fff}
@@ -86,6 +93,12 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     .fsel,.fdate{border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font:500 13px Inter;background:#fff}
     .tag{display:inline-block;padding:3px 9px;border-radius:7px;font:700 10.5px Inter;letter-spacing:.04em;text-transform:uppercase}
     .tag-web{background:#E1E9F2;color:#274B6E}.tag-manual{background:#EDE6D6;color:#7a5a20}
+    .tbadge{display:inline-block;min-width:20px;padding:1px 6px;border-radius:999px;background:var(--rust);color:#fff;font:700 11px Inter;text-align:center;margin-left:4px}
+    .btn.on{background:var(--rust);color:#fff;border-color:var(--rust)}
+    tr.attn-pending td:first-child{box-shadow:inset 4px 0 0 var(--amber)}
+    tr.attn-pending td{background:#FCF4E6}
+    tr.attn-cancelled td:first-child{box-shadow:inset 4px 0 0 #9A3B22}
+    tr.attn-cancelled td{background:#F7ECE7}
     .pill.pay-paid{background:#DCEFE0;color:#1E6B36}.pill.pay-partial{background:#FBEAD2;color:#9A5B12}.pill.pay-unpaid{background:#EFE0DC;color:#9A3B22}
     .paysec{border-top:1px solid var(--line);margin-top:16px;padding-top:6px}
     .paytitle{font:700 12px Inter;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 0;display:flex;align-items:center;gap:10px}
@@ -144,7 +157,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     <div class="tabs">
       <button class="tab on" data-view="dash">Dashboard</button>
       <button class="tab" data-view="cal">Calendar</button>
-      <button class="tab" data-view="list">Reservations</button>
+      <button class="tab" data-view="list">Reservations <span class="tbadge hidden" id="attnBadge">0</span></button>
     </div>
     <div class="wrap">
       <section id="v-dash">
@@ -170,6 +183,13 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
           <button class="btn" id="calNext">→</button>
           <button class="btn" id="calToday">Today</button>
         </div>
+        <div class="callegend">
+          <span><i class="dot pending"></i>⏳ Pending — to handle</span>
+          <span><i class="dot confirmed"></i>Confirmed</span>
+          <span><i class="dot paid"></i>Paid</span>
+          <span><i class="dot cancelled"></i>✕ Cancelled</span>
+          <span style="color:var(--rust)">⏳ / ✕ = needs attention</span>
+        </div>
         <div class="cal" id="calGrid"></div>
       </section>
 
@@ -190,6 +210,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
               <option value="">All channels</option><option value="website">Website</option><option value="manual">Manual</option>
             </select>
             <button class="btn" id="fClear">Clear</button>
+            <button class="btn" id="fAttn">⚠ To handle</button>
           </div>
           <div class="listbar-right">
             <span class="em" id="listCount"></span>
@@ -282,7 +303,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     const money=(n)=>n==null?'—':'$'+Math.round(n).toLocaleString('en-US');
     const dstr=(d)=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');};
     const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
-    let ALL=[], NOTES={}, CITIES=[], view='dash', charts={}, current=null;
+    let ALL=[], NOTES={}, CITIES=[], view='dash', charts={}, current=null, fAttn=false;
     const TOURS = JSON.parse(document.getElementById('tours-data').textContent||'[]');
     let cal={y:new Date().getFullYear(), m:new Date().getMonth()};
     let period={from:dstr(addDays(new Date(),-90)), to:dstr(new Date())};
@@ -293,7 +314,12 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       ['dash','cal','list'].forEach(x=>$('v-'+x).classList.toggle('hidden',x!==v));
       renderActive();
     }
-    function renderActive(){ if(view==='dash')renderDash(); else if(view==='cal')renderCal(); else renderList(); }
+    function renderActive(){ updateAttnBadge(); if(view==='dash')renderDash(); else if(view==='cal')renderCal(); else renderList(); }
+    function updateAttnBadge(){
+      const n=ALL.filter(b=>b.status==='pending').length;
+      const el=$('attnBadge'); if(!el) return;
+      el.textContent=n; el.classList.toggle('hidden',n===0);
+    }
 
     async function login(){
       const email=$('le').value.trim(), password=$('lp').value; $('loginErr').textContent='';
@@ -445,7 +471,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
         const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
         const items=byDate[ds]||[];
         h+=`<div class="cal-cell${ds===today?' today':''}"><div class="cal-d">${day}</div>`+
-          items.slice(0,4).map(b=>`<div class="chip ${b.status}" data-id="${b.id}" title="${esc(b.customer_name)}">${esc(b.customer_name)}</div>`).join('')+
+          items.slice(0,4).map(b=>{ const attn=(b.status==='pending'||b.status==='cancelled')?' attn':''; const ic=b.status==='pending'?'⏳ ':(b.status==='cancelled'?'✕ ':''); return `<div class="chip ${b.status}${attn}" data-id="${b.id}" title="${esc(b.customer_name)} — ${esc(b.status)}">${ic}${esc(b.customer_name)}</div>`;}).join('')+
           (items.length>4?`<div class="more">+${items.length-4} more</div>`:'')+`</div>`;
       }
       $('calGrid').innerHTML=h;
@@ -467,6 +493,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       const q=($('search').value||'').toLowerCase();
       const fy=$('fYear').value, fm=$('fMonth').value, fd=$('fDate').value, fs=$('fSource').value;
       let rows=ALL.filter(b=>{
+        if(fAttn && b.status!=='pending') return false;
         if(q && ![b.customer_name,b.email,b.whatsapp,b.tour_slug,b.departure_city,b.return_city].some(x=>String(x||'').toLowerCase().includes(q))) return false;
         const d=tripDate(b);
         if(fd){ if(d!==fd) return false; }
@@ -479,7 +506,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       $('listTable').innerHTML=`<table><thead><tr>
         <th>Trip dates</th><th>Route</th><th>Customer</th><th>Tour / option</th><th>Pax</th><th>Payment</th><th>Status</th><th>Channel</th><th></th>
         </tr></thead><tbody>`+
-        rows.map(b=>{ const p=payInfo(b); return `<tr class="brow" data-id="${b.id}">
+        rows.map(b=>{ const p=payInfo(b); const rc=b.status==='pending'?' attn-pending':(b.status==='cancelled'?' attn-cancelled':''); return `<tr class="brow${rc}" data-id="${b.id}">
           <td>${b.start_date?esc(b.start_date):(b.date?esc(b.date):'<span class="sub">—</span>')}${b.end_date?'<div class="sub">→ '+esc(b.end_date)+'</div>':''}</td>
           <td>${b.departure_city||b.return_city?esc((b.departure_city||'?')+' → '+(b.return_city||'?')):'<span class="sub">—</span>'}</td>
           <td><b>${esc(b.customer_name)}</b><div class="sub">${esc(b.email||b.whatsapp||'')}</div></td>
@@ -579,7 +606,8 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     $('mAmount').addEventListener('input',calcRemain);
     $('mPaid').addEventListener('input',calcRemain);
     ['fYear','fMonth','fDate','fSource'].forEach(id=>$(id).addEventListener('change',renderList));
-    $('fClear').addEventListener('click',()=>{$('search').value='';$('fYear').value='';$('fMonth').value='';$('fDate').value='';$('fSource').value='';renderList();});
+    $('fClear').addEventListener('click',()=>{$('search').value='';$('fYear').value='';$('fMonth').value='';$('fDate').value='';$('fSource').value='';fAttn=false;$('fAttn').classList.remove('on');renderList();});
+    $('fAttn').addEventListener('click',()=>{ fAttn=!fAttn; $('fAttn').classList.toggle('on',fAttn); if(fAttn&&view!=='list')setTab('list'); else renderList(); });
     $('newRes').addEventListener('click',openCreate);
     $('cClose').addEventListener('click',closeCreate);
     $('cSave').addEventListener('click',createReservation);
