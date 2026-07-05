@@ -12,6 +12,11 @@ const def = {
       ["Quelles motos fournissez-vous ?","Des motos semi-automatiques et manuelles bien entretenues, adaptées au terrain, casques complets inclus."],
       ["Est-ce sûr ?","Oui. Petits groupes (max 6 par guide), contrôle moto en 12 points, pilote serre-file, opérateur licencié et assurance pendant le tour."],
       ["Qu’est-ce qui est inclus ?","Votre pilote/guide, les nuits chez l’habitant, les repas pendant le tour, l’essence, les permis et l’assurance pendant le tour. Le transport jusqu’à Ha Giang et les boissons sont en supplément."]],
+  vi:[["Tôi có cần bằng lái xe máy không?","Với lựa chọn easy rider thì không — người lái địa phương sẽ cầm lái. Để tự lái hợp pháp, bạn cần bằng lái hợp lệ; chúng tôi sẽ tư vấn trung thực."],
+      ["Thời điểm nào đẹp nhất để chạy cung đường?","Tháng 9–11 và tháng 3–5 có đường thông thoáng và cảnh đẹp nhất. Chúng tôi chạy quanh năm với trang bị phù hợp."],
+      ["Các bạn cung cấp loại xe nào?","Xe số tự động và xe côn được bảo dưỡng kỹ, phù hợp địa hình, kèm mũ bảo hiểm đạt chuẩn."],
+      ["Có an toàn không?","Có. Nhóm nhỏ (tối đa 6 xe mỗi hướng dẫn viên), kiểm tra xe 12 điểm, người lái hỗ trợ cuối đoàn, đơn vị được cấp phép và bảo hiểm trong suốt tour."],
+      ["Giá đã bao gồm những gì?","Người lái/hướng dẫn viên, các đêm homestay, bữa ăn trong tour, xăng, giấy phép và bảo hiểm trong tour. Di chuyển đến Hà Giang và đồ uống tính riêng."]],
 };
 const list = faq ?? def[lang] ?? def.en;
 const norm = list.map((x)=> Array.isArray(x) ? {q:x[0],a:x[1]} : x);

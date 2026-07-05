@@ -5,9 +5,12 @@ import Reviews from '../../components/Reviews.astro';
 import FinalCta from '../../components/FinalCta.astro';
 export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
 const { lang } = Astro.params;
-const seo = lang==='fr'
-  ? { t:"Avis voyageurs — boucle de Ha Giang | Tien Tour", d:"Les avis de nos voyageurs sur la boucle de Ha Giang. 5,0★ sur 300+ avis." }
-  : { t:"Traveler reviews — Ha Giang Loop | Tien Tour", d:"Reviews from our travelers on the Ha Giang Loop. 5.0★ across 300+ reviews." };
+const seoMap = {
+  en:{ t:"Traveler Reviews — Ha Giang Loop | Tien Tour", d:"Reviews from our travelers on the Ha Giang Loop. 5.0★ across 300+ reviews." },
+  fr:{ t:"Avis voyageurs — boucle de Ha Giang | Tien Tour", d:"Les avis de nos voyageurs sur la boucle de Ha Giang. 5,0★ sur 300+ avis." },
+  vi:{ t:"Đánh giá của du khách — cung đường Hà Giang | Tien Tour", d:"Đánh giá từ du khách của chúng tôi về cung đường Hà Giang. 5,0★ trên 300+ đánh giá." },
+};
+const seo = seoMap[lang] ?? seoMap.en;
 ---
 <Base title={seo.t} description={seo.d} lang={lang}>
   <section style="padding-bottom:0"><div class="wrap">

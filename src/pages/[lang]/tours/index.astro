@@ -7,9 +7,12 @@ import FinalCta from '../../../components/FinalCta.astro';
 export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
 const { lang } = Astro.params;
 const tours = (await getCollection('tours')).sort((a,b)=>a.data.order-b.data.order);
-const seo = lang==='fr'
-  ? { t:"Circuits boucle de Ha Giang — easy rider & aventure | Tien Tour", d:"Tous nos circuits de la boucle de Ha Giang : 3 à 5 jours, easy rider ou aventure. Petits groupes, opérateur local licencié, 5,0★." }
-  : { t:"Ha Giang Loop Tours — easy rider & adventure | Tien Tour", d:"All our Ha Giang Loop tours: 3 to 5 days, easy rider or adventure. Small groups, licensed local operator, 5.0★." };
+const seoMap = {
+  en:{ t:"Ha Giang Loop Tours — Easy Rider & Adventure | Tien Tour", d:"All our Ha Giang Loop motorbike tours: 3 to 5 days, easy rider or self-drive. Small groups, licensed local operator, 5.0★." },
+  fr:{ t:"Circuits boucle de Ha Giang — easy rider & aventure | Tien Tour", d:"Tous nos circuits moto de la boucle de Ha Giang : 3 à 5 jours, easy rider ou self-drive. Petits groupes, opérateur local licencié, 5,0★." },
+  vi:{ t:"Các tour cung đường Hà Giang — Easy Rider & Phiêu lưu | Tien Tour", d:"Tất cả các tour xe máy cung đường Hà Giang: 3 đến 5 ngày, easy rider hoặc tự lái. Nhóm nhỏ, đơn vị địa phương được cấp phép, 5,0★." },
+};
+const seo = seoMap[lang] ?? seoMap.en;
 ---
 <Base title={seo.t} description={seo.d} lang={lang}>
   <section style="padding-bottom:0"><div class="wrap">

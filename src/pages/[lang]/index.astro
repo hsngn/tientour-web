@@ -15,16 +15,24 @@ export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }}))
 const { lang } = Astro.params;
 const tours = (await getCollection('tours')).sort((a,b)=>a.data.order-b.data.order);
 const site = Astro.site?.toString().replace(/\/$/,'') ?? '';
-const seo = lang==='fr'
-  ? { t:"Tien Tour — Boucle de Ha Giang avec des pilotes locaux", d:"Vivez la boucle de Ha Giang avec une équipe locale de confiance. Easy rider, petits groupes, chez l'habitant. 5,0★, réservation en direct." }
-  : { t:"Tien Tour — Ha Giang Loop with Local Riders", d:"Ride the legendary Ha Giang Loop with a trusted local team. Easy rider, small groups, homestays. 5.0★, book direct." };
-const faq = lang==='fr'
-  ? [{q:"Faut-il un permis moto ?",a:"Avec l'option easy rider, non — un pilote local conduit. Pour conduire vous-même, un permis valide est requis."},
-     {q:"Quelle est la meilleure période ?",a:"Septembre–novembre et mars–mai : routes dégagées et plus beaux paysages."},
-     {q:"Est-ce sûr ?",a:"Oui : petits groupes (max 6 par guide), contrôles moto, pilote serre-file, opérateur licencié et assurance pendant le tour."}]
-  : [{q:"Do I need a motorcycle license?",a:"With the easy-rider option, no — a local pilot drives. To self-drive you need a valid license."},
+const seoMap = {
+  en:{ t:"Ha Giang Loop Tour with Local Easy Riders | Tien Tour", d:"Ride the legendary Ha Giang Loop with a trusted local team. Easy rider & self-drive motorbike tours, small groups, homestays. 5.0★ · 300+ reviews. Book direct." },
+  fr:{ t:"Boucle de Ha Giang à moto avec pilotes locaux | Tien Tour", d:"Vivez la boucle de Ha Giang avec une équipe locale de confiance. Tours moto easy rider & self-drive, petits groupes, chez l'habitant. 5,0★ · 300+ avis. Réservez en direct." },
+  vi:{ t:"Tour cung đường Hà Giang cùng người lái bản địa | Tien Tour", d:"Chinh phục cung đường Hà Giang huyền thoại cùng đội ngũ địa phương đáng tin cậy. Tour xe máy easy rider & tự lái, nhóm nhỏ, homestay. 5,0★ · 300+ đánh giá." },
+};
+const seo = seoMap[lang] ?? seoMap.en;
+const faqMap = {
+  en:[{q:"Do I need a motorcycle license?",a:"With the easy-rider option, no — a local pilot drives. To self-drive you need a valid license."},
      {q:"When is the best time to ride?",a:"September–November and March–May: clear roads and the best scenery."},
-     {q:"Is it safe?",a:"Yes: small groups (max 6 per guide), bike checks, a sweeper rider, a licensed operator and insurance during the tour."}];
+     {q:"Is it safe?",a:"Yes: small groups (max 6 per guide), bike checks, a sweeper rider, a licensed operator and insurance during the tour."}],
+  fr:[{q:"Faut-il un permis moto ?",a:"Avec l'option easy rider, non — un pilote local conduit. Pour conduire vous-même, un permis valide est requis."},
+     {q:"Quelle est la meilleure période ?",a:"Septembre–novembre et mars–mai : routes dégagées et plus beaux paysages."},
+     {q:"Est-ce sûr ?",a:"Oui : petits groupes (max 6 par guide), contrôles moto, pilote serre-file, opérateur licencié et assurance pendant le tour."}],
+  vi:[{q:"Tôi có cần bằng lái xe máy không?",a:"Với lựa chọn easy rider thì không — người lái địa phương cầm lái. Để tự lái, bạn cần bằng lái hợp lệ."},
+     {q:"Thời điểm nào đẹp nhất để đi?",a:"Tháng 9–11 và tháng 3–5: đường thông thoáng và cảnh đẹp nhất."},
+     {q:"Có an toàn không?",a:"Có: nhóm nhỏ (tối đa 6 xe/hướng dẫn viên), kiểm tra xe, người lái hỗ trợ cuối đoàn, đơn vị được cấp phép và bảo hiểm trong tour."}],
+};
+const faq = faqMap[lang] ?? faqMap.en;
 const jsonld = { "@context":"https://schema.org","@graph":[
   { "@type":"TravelAgency","name":"Tien Tour","areaServed":"Ha Giang, Vietnam","url":`${site}/${lang}/`,
     "aggregateRating":{"@type":"AggregateRating","ratingValue":"5.0","reviewCount":"300","bestRating":"5"} },

@@ -15,7 +15,7 @@ const sym = (c)=> c==='USD' ? '$' : '€';
     <p class="sub">{t(lang,'tours_sub')}</p>
   )}
   <div class="tour-grid">
-    {list.map((tr)=>{ const d=tr.data[lang]; return (
+    {list.map((tr)=>{ const d=tr.data[lang]??tr.data.en; return (
       <a class="tcard" href={`/${lang}/tours/${tr.slug}`}>
         <div class="img">
           <span class="pill day">{tr.data.durationDays} {t(lang,'days')}</span>

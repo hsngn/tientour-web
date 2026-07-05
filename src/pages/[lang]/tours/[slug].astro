@@ -9,7 +9,7 @@ export async function getStaticPaths(){
 }
 const { lang } = Astro.params;
 const { tr } = Astro.props;
-const d = tr.data[lang];
+const d = tr.data[lang] ?? tr.data.en;
 const site = Astro.site?.toString().replace(/\/$/,'') ?? '';
 const url = `${site}/${lang}/tours/${tr.slug}`;
 const diff = { easy:{en:'Easy',fr:'Facile'}, moderate:{en:'Moderate',fr:'Modéré'}, challenging:{en:'Advanced',fr:'Avancé'} };

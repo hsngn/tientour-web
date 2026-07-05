@@ -5,7 +5,7 @@ import Base from '../../layouts/Base.astro';
 export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
 const { lang } = Astro.params;
 const tours = (await getCollection('tours')).sort((a,b)=>a.data.order-b.data.order);
-const T = tours.map((tr)=>({ slug:tr.slug, price:tr.data.priceFrom, days:tr.data.durationDays, title:tr.data[lang].title }));
+const T = tours.map((tr)=>({ slug:tr.slug, price:tr.data.priceFrom, days:tr.data.durationDays, title:(tr.data[lang]??tr.data.en).title }));
 const opts = [
   ['easy_rider','opt_er_t','opt_er_b','opt_er_d'],
   ['self_drive','opt_sd_t','opt_sd_b','opt_sd_d'],
@@ -17,12 +17,15 @@ const L = {
   insurance:t(lang,'q_insurance'), total:t(lang,'q_total'),
   erSurcharge:`${t(lang,'opt_er_t')} ${t(lang,'q_surcharge')}`,
   privateLabel:`${t(lang,'opt_pv_t')} (+40%)`, rentalLabel:t(lang,'opt_rt_t'),
-  people: lang==='fr' ? 'pers' : 'people',
+  people: lang==='fr' ? 'pers' : (lang==='vi' ? 'khách' : 'people'),
   cta:t(lang,'book_cta'), okMsg:t(lang,'ok_msg'), errMsg:t(lang,'err_msg'), errContact:t(lang,'err_contact'),
 };
-const seo = lang==='fr'
-  ? { t:"Réserver — boucle de Ha Giang | Tien Tour", d:"Composez votre aventure à Ha Giang et obtenez un devis en direct. Aucun paiement avant confirmation des disponibilités." }
-  : { t:"Book — Ha Giang Loop | Tien Tour", d:"Build your Ha Giang adventure and get a live quote. No payment until we confirm availability." };
+const seoMap = {
+  en:{ t:"Book Your Ha Giang Loop Tour — Live Quote | Tien Tour", d:"Build your Ha Giang adventure and get a live quote. No payment until we confirm availability." },
+  fr:{ t:"Réserver votre boucle de Ha Giang — devis en direct | Tien Tour", d:"Composez votre aventure à Ha Giang et obtenez un devis en direct. Aucun paiement avant confirmation des disponibilités." },
+  vi:{ t:"Đặt tour cung đường Hà Giang — báo giá trực tiếp | Tien Tour", d:"Thiết kế hành trình Hà Giang và nhận báo giá trực tiếp. Chưa thanh toán cho đến khi xác nhận lịch trống." },
+};
+const seo = seoMap[lang] ?? seoMap.en;
 ---
 <Base title={seo.t} description={seo.d} lang={lang}>
   <section class="book-hero"><div class="wrap">

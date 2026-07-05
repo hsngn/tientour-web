@@ -1,4 +1,4 @@
-export const LANGS = ['en', 'fr'] as const;
+export const LANGS = ['en', 'fr', 'vi'] as const;
 export type Lang = typeof LANGS[number];
 export const DEFAULT_LANG: Lang = 'en';
 
@@ -82,6 +82,46 @@ export const ui = {
     ok_msg:'Merci ! Nous avons bien reçu votre demande. Nous confirmons les disponibilités sous 24 h et vous envoyons un lien de paiement sécurisé.',
     err_msg:'Une erreur est survenue. Réessayez, ou contactez-nous directement sur WhatsApp.',
     err_contact:'Indiquez votre nom et un email ou un numéro WhatsApp.',
+  },
+  vi: {
+    nav_home:'Trang chủ', nav_tours:'Tour', nav_riders:'Đội ngũ', nav_rental:'Thuê xe', nav_guide:'Cẩm nang',
+    nav_reviews:'Đánh giá', nav_book:'Đặt ngay',
+    hero_eyebrow:'Hà Giang, miền Bắc Việt Nam',
+    hero_1:'Khám phá ', hero_em:'Cung đường', hero_2:' cùng người bản địa',
+    hero_sub:'Trải nghiệm cung đường Hà Giang huyền thoại cùng đội ngũ địa phương đáng tin cậy. Những chuyến phượt xe máy đích thực qua cao nguyên đá, dẫn đường bởi các hướng dẫn viên người Mông, Tày và Dao — những người coi vùng núi này là nhà.',
+    hero_book:'Đặt chuyến đi', hero_tours:'Xem các tour',
+    why_eyebrow:'Vì sao chọn Tien Tour', why_title:'Người lái bản địa. Hà Giang thật.',
+    tours_eyebrow:'Hành trình chọn lọc', tours_all:'Tất cả tour →', tours_title:'Cung đường cho người đam mê',
+    tours_sub:'Chọn nhịp độ phiêu lưu của bạn. Từ cung đường 3 ngày kinh điển đến vùng biên giới cực Bắc.',
+    rental_title:'Bạn muốn đi thế nào?', rental_sub:'Dù bạn muốn tự lái hay được chở, chúng tôi lo hết.',
+    rental_er_t:'Trải nghiệm Easy Rider', rental_er_d:'Ngồi sau tay lái của một người lái địa phương giàu kinh nghiệm. Không lo lắng, tận hưởng mọi khung cảnh — hoàn hảo cho người mê chụp ảnh và người mới.',
+    rental_sd_t:'Thuê xe tự lái', rental_sd_d:'Xe số tự động và xe côn được bảo dưỡng kỹ. Tự lái xe của bạn, đi theo đoàn cùng hướng dẫn viên.',
+    riders_eyebrow:'Gặp gỡ đội ngũ', riders_title:'Chúng tôi không chỉ là hướng dẫn viên. Hà Giang là nhà.',
+    riders_lead:'Đội ngũ của chúng tôi là người Mông, Tày và Dao — những dân tộc đã sống ở vùng núi này qua bao thế hệ. Họ là thợ máy, người kể chuyện và những người bạn sẽ đón bạn vào gia đình trong vài ngày.',
+    reviews_eyebrow:'Nhật ký hành trình', reviews_all:'Tất cả đánh giá →', reviews_title:'Du khách nói gì',
+    guide_eyebrow:'Cẩm nang thực địa', guide_title:'Lên kế hoạch cho cung đường',
+    guide_sub:'Những chia sẻ thiết thực từ đội ngũ — khi nào nên đến, mang theo gì và lái xe an toàn ra sao.',
+    faq_eyebrow:'Câu hỏi thường gặp', faq_title:'Trước khi lên đường',
+    final_title:'Sẵn sàng chinh phục cung đường Hà Giang?', final_sub:'Trò chuyện với người lái địa phương hôm nay — không thanh toán cho đến khi xác nhận lịch trống.',
+    footer_op:'Vận hành bởi Tien Tour, đơn vị lữ hành địa phương được cấp phép · Hà Giang, Việt Nam.',
+    from:'từ', days:'ngày', day:'ngày', details:'Xem chi tiết', itinerary:'Lịch trình',
+    inclusions:'Bao gồm', exclusions:'Không bao gồm', duration:'Thời lượng', difficulty:'Độ khó',
+    book_eyebrow:'Đặt chuyến đi', book_title:'Thiết kế hành trình Hà Giang của bạn.',
+    book_sub:'Chưa thanh toán ở bước này. Chúng tôi xác nhận lịch trống trong vòng 24 giờ, sau đó gửi bạn liên kết thanh toán an toàn.',
+    book_s1:'Bạn muốn đi thế nào?', book_s2:'Chọn tour của bạn', book_travelers:'Bao nhiêu người?',
+    q_live:'Báo giá trực tiếp', q_for:'cho', q_travelers:'khách', q_insurance:'Bảo hiểm du lịch',
+    q_total:'Tổng ước tính', q_surcharge:'phụ thu',
+    q_note:'Giá tham khảo bằng USD, đã gồm thuế. Xác nhận cuối cùng sau khi kiểm tra lịch trống.',
+    book_cta:'Kiểm tra lịch trống',
+    opt_er_t:'Easy Rider', opt_er_b:'+ 60 $ / ngày / người', opt_er_d:'Ngồi sau hướng dẫn viên địa phương. Lý tưởng cho người mê chụp ảnh.',
+    opt_sd_t:'Tự lái', opt_sd_b:'Giá gốc', opt_sd_d:'Bạn tự lái xe, đi theo đoàn cùng hướng dẫn viên.',
+    opt_pv_t:'Tour riêng', opt_pv_b:'+ 40%', opt_pv_d:'Hướng dẫn viên riêng cho nhóm của bạn, nhịp độ tùy chỉnh.',
+    opt_rt_t:'Chỉ thuê xe máy', opt_rt_b:'từ 10 $ / ngày', opt_rt_d:'Cho người lái tự túc có kinh nghiệm. Không hướng dẫn viên, chỉ có xe.',
+    book_s4:'Thông tin của bạn', f_name:'Họ và tên', f_email:'Email', f_whatsapp:'WhatsApp (không bắt buộc)',
+    f_date:'Ngày khởi hành mong muốn (không bắt buộc)', f_message:'Điều gì cần cho chúng tôi biết? (không bắt buộc)',
+    ok_msg:'Cảm ơn bạn! Chúng tôi đã nhận được yêu cầu. Chúng tôi sẽ xác nhận lịch trống trong vòng 24 giờ và gửi bạn liên kết thanh toán an toàn.',
+    err_msg:'Đã có lỗi xảy ra. Vui lòng thử lại, hoặc liên hệ trực tiếp với chúng tôi qua WhatsApp.',
+    err_contact:'Vui lòng nhập tên và một email hoặc số WhatsApp.',
   },
 } as const;
 

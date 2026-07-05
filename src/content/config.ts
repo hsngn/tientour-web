@@ -19,7 +19,7 @@ const tours = defineCollection({
     difficulty: z.enum(['easy', 'moderate', 'challenging']),
     image: z.string(),               // placeholder name -> remplacer par vraies photos
     order: z.number().default(100),
-    en: loc, fr: loc,
+    en: loc, fr: loc, vi: loc.optional(),
   }),
 });
 
