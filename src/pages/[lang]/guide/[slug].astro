@@ -1,0 +1,44 @@
+---
+import { LANGS } from '../../../i18n/ui';
+import Base from '../../../layouts/Base.astro';
+import Longform from '../../../components/Longform.astro';
+import { guides } from '../../../data/guides';
+
+export function getStaticPaths() {
+  return LANGS.flatMap((lang) =>
+    Object.keys(guides).map((slug) => ({ params: { lang, slug } }))
+  );
+}
+
+const { lang, slug } = Astro.params;
+const art = guides[slug];
+const raw = art[lang] ?? art.en;
+const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
+const fix = (s) => (s || '').replaceAll('{L}', '/' + lang);
+
+const data = {
+  eyebrow: raw.eyebrow,
+  h1: raw.h1,
+  intro: fix(raw.intro),
+  sections: raw.sections.map((s) => ({ id: s.id, h: s.h, html: fix(s.html) })),
+  faq: (raw.faq || []).map((f) => ({ q: f.q, a: fix(f.a) })),
+  related: (raw.related || []).map((r) => ({ label: r.label, href: `/${lang}${r.path}` })),
+};
+
+const url = `${site}/${lang}/guide/${slug}/`;
+const jsonld = { '@context': 'https://schema.org', '@graph': [
+  { '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${site}/${lang}/` },
+    { '@type': 'ListItem', position: 2, name: 'Travel guide', item: `${site}/${lang}/guide/` },
+    { '@type': 'ListItem', position: 3, name: raw.h1, item: url },
+  ]},
+  { '@type': 'Article', headline: raw.h1, description: raw.seoDesc, inLanguage: lang,
+    articleSection: (art.category && art.category[lang]) || 'Guide', mainEntityOfPage: url,
+    author: { '@type': 'Organization', name: 'Tien Tour' },
+    publisher: { '@type': 'Organization', name: 'Tien Tour' } },
+  ...(raw.faq && raw.faq.length ? [{ '@type': 'FAQPage', mainEntity: data.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<[^>]+>/g, '') } })) }] : []),
+]};
+---
+<Base title={raw.seoTitle} description={raw.seoDesc} lang={lang} jsonld={jsonld}>
+  <Longform lang={lang} data={data} />
+</Base>

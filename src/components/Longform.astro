@@ -1,0 +1,44 @@
+---
+import { t } from '../i18n/ui';
+const { lang, data } = Astro.props;
+// data: { eyebrow, h1, intro, toc?, sections:[{id,h,html}], faq:[{q,a}], related:[{label,href}] }
+const L = (s) => `/${lang}${s}`;
+const homeLabel = t(lang, 'nav_home');
+---
+<section class="lf-hero"><div class="wrap">
+  <div class="lf-crumb"><a href={L('/')}>{homeLabel}</a> · {data.eyebrow}</div>
+  <div class="eyebrow">{data.eyebrow}</div>
+  <h1 class="serif">{data.h1}</h1>
+  <p class="intro" set:html={data.intro} />
+</div></section>
+
+<section class="lf-body"><div class="wrap"><div class="col">
+  {data.sections && data.sections.length > 3 && (
+    <div class="lf-tOC"><div class="k">{lang==='fr'?'Sommaire':lang==='vi'?'Nội dung':'On this page'}</div>
+      {data.sections.map((s)=> s.h && (<a href={`#${s.id}`}>{s.h}</a>))}
+    </div>
+  )}
+  {data.sections.map((s)=>(
+    <div>
+      {s.h && <h2 id={s.id}>{s.h}</h2>}
+      <div set:html={s.html} />
+    </div>
+  ))}
+
+  {data.faq && data.faq.length > 0 && (
+    <div class="faq" style="padding:0">
+      <h2 style="margin-top:44px">{t(lang,'faq_eyebrow')}</h2>
+      {data.faq.map((f)=>(
+        <details><summary>{f.q}<span class="plus">+</span></summary><p set:html={f.a} /></details>
+      ))}
+    </div>
+  )}
+
+  <div class="lf-related">
+    <div class="k">{lang==='fr'?'À découvrir':lang==='vi'?'Khám phá thêm':'Explore next'}</div>
+    <div class="links">
+      {data.related.map((r)=>(<a href={r.href}>{r.label}</a>))}
+      <a href={L('/book')} style="background:var(--rust);color:#fff;border-color:var(--rust)">{t(lang,'hero_book')} →</a>
+    </div>
+  </div>
+</div></div></section>

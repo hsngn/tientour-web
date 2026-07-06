@@ -240,3 +240,31 @@ footer .lic{font-size:12.5px;color:#7d8f82;margin-top:14px}
 .formmsg.ok{display:block;background:#E6EFE7;color:var(--forest);border:1px solid #BBD3BF}
 .formmsg.err{display:block;background:#F7E6DD;color:var(--rust-d);border:1px solid #E8C5B4}
 @media(max-width:680px){.form .row2{grid-template-columns:1fr}}
+
+/* ===== longform: landing pages & guide articles ===== */
+.lf-hero{padding:64px 0 8px}
+.lf-crumb{font:600 12.5px Inter;color:var(--muted);margin-bottom:18px}
+.lf-crumb a:hover{color:var(--rust)}
+.lf-hero h1{font-size:clamp(38px,5vw,60px);font-weight:600;max-width:18ch;margin-top:14px}
+.lf-hero .intro{font-size:19px;color:var(--muted);max-width:60ch;margin-top:22px}
+.lf-body{padding:36px 0 8px}
+.lf-body .col{max-width:760px}
+.lf-body h2{font-size:clamp(26px,3.2vw,34px);font-weight:600;margin:44px 0 14px}
+.lf-body h3{font-size:21px;font-weight:600;margin:26px 0 8px}
+.lf-body p{font-size:17px;line-height:1.7;color:#33352c;margin:14px 0}
+.lf-body ul{margin:14px 0;padding-left:22px}
+.lf-body li{font-size:17px;line-height:1.7;color:#33352c;margin:6px 0}
+.lf-body a{color:var(--rust);text-decoration:underline;text-underline-offset:2px}
+.lf-body strong{color:var(--ink)}
+.lf-tOC{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin:8px 0 28px}
+.lf-tOC .k{font:700 11px Inter;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.lf-tOC a{display:inline-block;margin:6px 14px 0 0;font-size:15px}
+.lf-related{background:var(--cream-2);border-radius:20px;padding:30px;margin:40px 0}
+.lf-related .k{font:700 12px Inter;letter-spacing:.1em;text-transform:uppercase;color:var(--rust)}
+.lf-related .links{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.lf-related .links a{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:10px 18px;font:600 14px Inter}
+.lf-related .links a:hover{border-color:var(--muted)}
+
+/* guide cards as links */
+a.gcard{text-decoration:none;color:inherit;display:block;transition:transform .15s ease,box-shadow .15s ease}
+a.gcard:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(30,58,43,.10)}

@@ -1,0 +1,40 @@
+---
+import { LANGS } from '../../i18n/ui';
+import Base from '../../layouts/Base.astro';
+import Longform from '../../components/Longform.astro';
+import { landings } from '../../data/landings';
+
+export function getStaticPaths() {
+  return LANGS.flatMap((lang) =>
+    Object.keys(landings).map((landing) => ({ params: { lang, landing } }))
+  );
+}
+
+const { lang, landing } = Astro.params;
+const raw = landings[landing][lang] ?? landings[landing].en;
+const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
+const fix = (s) => (s || '').replaceAll('{L}', '/' + lang);
+
+const data = {
+  eyebrow: raw.eyebrow,
+  h1: raw.h1,
+  intro: fix(raw.intro),
+  sections: raw.sections.map((s) => ({ id: s.id, h: s.h, html: fix(s.html) })),
+  faq: (raw.faq || []).map((f) => ({ q: f.q, a: fix(f.a) })),
+  related: (raw.related || []).map((r) => ({ label: r.label, href: `/${lang}${r.path}` })),
+};
+
+const url = `${site}/${lang}/${landing}/`;
+const jsonld = { '@context': 'https://schema.org', '@graph': [
+  { '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${site}/${lang}/` },
+    { '@type': 'ListItem', position: 2, name: raw.eyebrow, item: url },
+  ]},
+  { '@type': 'Service', serviceType: raw.eyebrow, provider: { '@type': 'TravelAgency', name: 'Tien Tour', areaServed: 'Ha Giang, Vietnam' }, url,
+    aggregateRating: { '@type': 'AggregateRating', ratingValue: '5.0', reviewCount: '300', bestRating: '5' } },
+  ...(raw.faq && raw.faq.length ? [{ '@type': 'FAQPage', mainEntity: data.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<[^>]+>/g, '') } })) }] : []),
+]};
+---
+<Base title={raw.seoTitle} description={raw.seoDesc} lang={lang} jsonld={jsonld}>
+  <Longform lang={lang} data={data} />
+</Base>

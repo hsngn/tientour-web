@@ -13,6 +13,7 @@ const posts = {
       ["An toàn","Cẩm nang an toàn cung đường Hà Giang","Tất cả những gì chúng tôi dặn trong buổi hướng dẫn 1 giờ — viết sẵn cho bạn."]],
 };
 const list = posts[lang] ?? posts.en;
+const slugs = ['ha-giang-loop-complete-guide-2026','best-time-to-visit-ha-giang','ha-giang-loop-safety-guide'];
 ---
 <section class="guide" id="guide"><div class="wrap">
   <div class="eyebrow">{t(lang,'guide_eyebrow')}</div>
@@ -20,10 +21,10 @@ const list = posts[lang] ?? posts.en;
   <p class="sub">{t(lang,'guide_sub')}</p>
   <div class="grid">
     {list.map((p,i)=>(
-      <article class="gcard">
+      <a class="gcard" href={`/${lang}/guide/${slugs[i]}`}>
         <div class="top"><span class="n italic">0{i+1}</span></div>
         <div class="cat">{p[0]}</div><h3>{p[1]}</h3><p>{p[2]}</p>
-      </article>
+      </a>
     ))}
   </div>
 </div></section>
