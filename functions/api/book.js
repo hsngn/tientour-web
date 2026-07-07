@@ -37,6 +37,7 @@ export async function onRequestPost({ request, env }) {
     currency: 'USD',
     status: 'pending',
     source: b.source || 'website',
+    payment_plan: b.payment_plan === 'full' ? 'full' : 'deposit',
     message: b.message || null,
   };
 
@@ -64,6 +65,7 @@ export async function onRequestPost({ request, env }) {
       <p><b>Tour:</b> ${esc(b.tour_title)} (${esc(b.days)} days)</p>
       <p><b>Option:</b> ${esc(b.option)} &nbsp; <b>Travelers:</b> ${esc(b.travelers)}</p>
       <p><b>Estimated total:</b> $${esc(b.amount)}</p>
+      <p><b>Payment plan:</b> ${b.payment_plan === 'full' ? 'Pay in full' : '20% deposit'} &nbsp; <b>Due now:</b> $${esc(b.amount_due != null ? b.amount_due : b.amount)}</p>
       <p><b>Preferred date:</b> ${esc(b.date) || '—'}</p>
       <hr>
       <p><b>Name:</b> ${esc(name)}</p>

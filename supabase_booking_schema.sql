@@ -149,3 +149,6 @@ alter table public.cities enable row level security;
 -- Paiement (partiel/total) + canal
 alter table public.bookings add column if not exists amount_paid numeric default 0;
 alter table public.bookings add column if not exists payment_link text;
+
+-- Plan de paiement choisi par le client sur le site (deposit 20% / full)
+alter table public.bookings add column if not exists payment_plan text default 'deposit';

@@ -19,6 +19,8 @@ const L = {
   privateLabel:`${t(lang,'opt_pv_t')} (+40%)`, rentalLabel:t(lang,'opt_rt_t'),
   people: lang==='fr' ? 'pers' : (lang==='vi' ? 'khách' : 'people'),
   cta:t(lang,'book_cta'), okMsg:t(lang,'ok_msg'), errMsg:t(lang,'err_msg'), errContact:t(lang,'err_contact'),
+  payPlan:t(lang,'pay_plan'), payDeposit:t(lang,'pay_deposit'), payFull:t(lang,'pay_full'),
+  payToday:t(lang,'pay_today'), payBalance:t(lang,'pay_balance'),
 };
 const seoMap = {
   en:{ t:"Book Your Ha Giang Loop Tour — Live Quote | Tien Tour", d:"Build your Ha Giang adventure and get a live quote. No payment until we confirm availability." },
@@ -86,6 +88,15 @@ const seo = seoMap[lang] ?? seoMap.en;
         <div id="qlines"></div>
         <div class="line"></div>
         <div class="total"><span class="l">{t(lang,'q_total')}</span><span class="v" id="qtot">$0</span></div>
+        <div class="payplan">
+          <div class="pp-lbl">{t(lang,'pay_plan')}</div>
+          <div class="pp-opts">
+            <button type="button" class="pp sel" data-plan="deposit">{t(lang,'pay_deposit')}</button>
+            <button type="button" class="pp" data-plan="full">{t(lang,'pay_full')}</button>
+          </div>
+          <div class="pp-row today"><span>{t(lang,'pay_today')}</span><b id="qtoday">$0</b></div>
+          <div class="pp-row bal" id="qbalRow"><span>{t(lang,'pay_balance')}</span><span id="qbal">$0</span></div>
+        </div>
         <p class="note">{t(lang,'q_note')}</p>
         <button class="btn btn-rust btn-block cta" id="submitBtn" type="button">{t(lang,'book_cta')}</button>
         <div class="formmsg" id="formmsg"></div>
@@ -95,7 +106,9 @@ const seo = seoMap[lang] ?? seoMap.en;
 
   <script define:vars={{ T, L }}>
     const fmt = (n)=> '$' + Math.round(n).toLocaleString('en-US');
-    const state = { opt:'easy_rider', slug:T[0].slug, travelers:2 };
+    const DEPOSIT_PCT = 0.20;
+    const state = { opt:'easy_rider', slug:T[0].slug, travelers:2, plan:'deposit' };
+    const dueToday = (total)=> state.plan==='full' ? total : Math.round(total*DEPOSIT_PCT);
     const selTour = ()=> T.find(t=>t.slug===state.slug) || T[0];
     function compute(){
       const tr=selTour(), days=tr.days, pax=state.travelers, lines=[]; let total=0;
@@ -111,12 +124,19 @@ const seo = seoMap[lang] ?? seoMap.en;
     }
     function render(){
       const r=compute();
-      document.getElementById('qbig').textContent=fmt(r.total);
+      const today=dueToday(r.total), bal=r.total-today;
+      document.getElementById('qbig').textContent=fmt(today);
       document.getElementById('qtot').textContent=fmt(r.total);
+      document.getElementById('qtoday').textContent=fmt(today);
+      document.getElementById('qbal').textContent=fmt(bal);
+      document.getElementById('qbalRow').style.display = (state.plan==='full'||bal<=0) ? 'none' : '';
       document.getElementById('qfor').textContent=`${L.for} ${r.pax} ${L.travelers} · ${r.days} ${L.days}`;
       document.getElementById('qlines').innerHTML=r.lines.map(l=>
         `<div class="li"><div class="d">${l.d}${l.s?`<small>${l.s}</small>`:''}</div><div class="a">${fmt(l.a)}</div></div>`).join('');
     }
+    document.querySelectorAll('.pp').forEach(el=>el.addEventListener('click',()=>{
+      state.plan=el.dataset.plan; document.querySelectorAll('.pp').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); render();
+    }));
     document.querySelectorAll('.opt').forEach(el=>el.addEventListener('click',()=>{
       state.opt=el.dataset.opt; document.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); render();
     }));
@@ -133,14 +153,15 @@ const seo = seoMap[lang] ?? seoMap.en;
       const name=val('f_name'), email=val('f_email'), whatsapp=val('f_whatsapp');
       if(!name || (!email && !whatsapp)){ showMsg('err',L.errContact); return; }
       const r=compute(), tr=selTour(), btn=document.getElementById('submitBtn');
+      const today=dueToday(r.total);
       btn.disabled=true; const old=btn.textContent; btn.textContent='…';
       try{
         const resp=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({ name,email,whatsapp, date:val('f_date'), message:val('f_message'),
             tour_slug:tr.slug, tour_title:tr.title, option:state.opt, travelers:r.pax, days:r.days,
-            amount:r.total, language:L.lang, source:'book_page' })});
+            amount:r.total, payment_plan:state.plan, amount_due:today, language:L.lang, source:'book_page' })});
         const data=await resp.json().catch(()=>({}));
-        if(resp.ok && data.ok){ showMsg('ok',L.okMsg);
+        if(resp.ok && data.ok){ showMsg('ok', `${L.okMsg} ${L.payToday}: ${fmt(today)}.`);
           ['f_name','f_email','f_whatsapp','f_date','f_message'].forEach(i=>{const e=document.getElementById(i); if(e) e.value='';});
         } else { showMsg('err',L.errMsg); }
       }catch(e){ showMsg('err',L.errMsg); }

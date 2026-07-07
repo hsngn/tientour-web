@@ -268,3 +268,13 @@ footer .lic{font-size:12.5px;color:#7d8f82;margin-top:14px}
 /* guide cards as links */
 a.gcard{text-decoration:none;color:inherit;display:block;transition:transform .15s ease,box-shadow .15s ease}
 a.gcard:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(30,58,43,.10)}
+
+/* booking: payment plan selector (inside dark quote sidebar) */
+.quote .payplan{margin:18px 0 6px;border-top:1px solid #ffffff22;padding-top:16px}
+.quote .pp-lbl{font:700 12px Inter;letter-spacing:.14em;text-transform:uppercase;color:#A8C0AD;margin-bottom:10px}
+.quote .pp-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.quote .pp{background:#ffffff14;border:1.5px solid #ffffff2e;color:#fff;border-radius:12px;padding:9px 10px;font:600 13px Inter;cursor:pointer;text-align:center}
+.quote .pp.sel{background:var(--rust);border-color:var(--rust);color:#fff}
+.quote .pp-row{display:flex;justify-content:space-between;align-items:baseline;margin:6px 0;font-size:14px;color:#CFE0D2}
+.quote .pp-row.today b{font-family:'Fraunces',serif;font-size:22px;color:#fff}
+.quote .pp-row.bal{color:#A8C0AD;font-size:13px}
