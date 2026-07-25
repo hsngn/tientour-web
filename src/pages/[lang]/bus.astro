@@ -1,0 +1,26 @@
+---
+import { LANGS, t } from '../../i18n/ui';
+import Base from '../../layouts/Base.astro';
+import BusSchedule from '../../components/BusSchedule.astro';
+export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
+const { lang } = Astro.params;
+const seoMap = {
+  en:{ t:'Bus to Ha Giang — Schedule & Prices from Hanoi, Sapa, Ninh Binh | Tien Tour', d:'Bus schedule and ticket prices to and from Ha Giang: Hanoi, Sapa, Ninh Binh, Cat Ba and Ha Long. VIP cabin, sleeper and limousine buses, departure times and duration.' },
+  fr:{ t:'Bus pour Ha Giang — horaires & prix depuis Hanoi, Sapa, Ninh Binh | Tien Tour', d:'Horaires et prix des bus vers et depuis Ha Giang : Hanoi, Sapa, Ninh Binh, Cat Ba et Ha Long. Bus VIP cabine, couchette et limousine, heures de départ et durée.' },
+};
+const seo = seoMap[lang] ?? seoMap.en;
+const heading = lang==='fr' ? 'Bus pour Ha Giang — horaires & trajets' : 'Bus to Ha Giang — schedule & routes';
+const intro = lang==='fr'
+  ? 'Comment rejoindre Ha Giang (et en revenir) depuis les principales villes du nord Vietnam. Horaires, types de bus et prix indicatifs.'
+  : 'How to reach Ha Giang (and get back) from the main cities of northern Vietnam. Departure times, bus types and indicative prices.';
+---
+<Base title={seo.t} description={seo.d} lang={lang}>
+  <section class="book-hero"><div class="wrap">
+    <div class="eyebrow">{lang==='fr'?'Y aller':'Getting there'}</div>
+    <h1>{heading}</h1>
+    <p>{intro}</p>
+  </div></section>
+  <div class="wrap" style="padding-bottom:60px">
+    <BusSchedule lang={lang} />
+  </div>
+</Base>

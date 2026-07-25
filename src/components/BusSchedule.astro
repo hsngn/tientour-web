@@ -1,0 +1,76 @@
+---
+const { lang } = Astro.props;
+// Données du planning bus (source : document opérateur). Prix en VND / passager.
+const CITIES = [
+  { city:'Hanoi',     hours:7,
+    out:[ {t:'VIP Cabin',p:'350,000',x:['9:00','10:00','13:00','19:00','22:00']},
+          {t:'VIP Sleeper Bus',p:'300,000',x:['9:00','18:00','20:00']},
+          {t:'Limousine Bus',p:'300,000',x:['7:00','16:00']},
+          {t:'Sleeper Bus',p:'250,000',x:['22:00']} ],
+    ret:[ {t:'VIP Cabin',p:'350,000',x:['9:00','11:00','14:00','16:00','19:00','22:00']},
+          {t:'VIP Sleeper Bus',p:'300,000',x:['9:00','18:00']},
+          {t:'Limousine Bus',p:'300,000',x:['7:00','16:00']},
+          {t:'Sleeper Bus',p:'250,000',x:['22:00']} ] },
+  { city:'Sapa',      hours:7,
+    out:[ {t:'VIP Cabin',p:'350,000',x:['11:00']},
+          {t:'VIP Sleeper Bus',p:'300,000',x:['9:00','11:00','17:00','18:30']},
+          {t:'Limousine Bus',p:'300,000',x:['8:00','9:00','16:00']} ],
+    ret:[ {t:'VIP Cabin',p:'350,000',x:['17:30']},
+          {t:'VIP Sleeper Bus',p:'300,000',x:['18:00']},
+          {t:'Limousine Bus',p:'300,000',x:['8:00','9:00','16:00']} ] },
+  { city:'Ninh Binh', hours:9,
+    out:[ {t:'VIP Cabin',p:'450,000',x:['19:00']}, {t:'Sleeper Bus',p:'300,000',x:['19:00']} ],
+    ret:[ {t:'VIP Cabin',p:'450,000',x:['19:00']}, {t:'Sleeper Bus',p:'300,000',x:['19:00']} ] },
+  { city:'Cat Ba',    hours:11,
+    out:[ {t:'VIP Cabin',p:'700,000',x:['16:00']}, {t:'VIP Sleeper Bus',p:'550,000',x:['16:00']} ],
+    ret:[ {t:'VIP Cabin',p:'700,000',x:['19:00']}, {t:'VIP Sleeper Bus',p:'550,000',x:['19:00']} ] },
+  { city:'Ha Long',   hours:11,
+    out:[ {t:'VIP Cabin',p:'550,000',x:['19:00']} ],
+    ret:[ {t:'VIP Cabin',p:'550,000',x:['19:00']} ] },
+];
+const L = lang==='fr'
+  ? { out:'Aller', ret:'Retour', outSub:'Départs vers Ha Giang', retSub:'Retours depuis Ha Giang',
+      dur:'Durée', hours:'h', note:'Note :', noteTxt:'Prix indiqués en dongs vietnamiens par passager (VND / pax) ; ils peuvent varier selon la saison ou les jours fériés. Contactez-nous pour confirmer disponibilité et prix final avant le départ.' }
+  : { out:'Outbound', ret:'Return', outSub:'Departing trips to Ha Giang', retSub:'Trips back from Ha Giang',
+      dur:'Duration', hours:'hours', note:'Note:', noteTxt:'Prices are in Vietnamese Dong per passenger (VND / pax) and may vary by season or public holidays. Contact us to confirm seat availability and the final price before departure.' };
+
+const col = (rows) => rows;
+---
+<div class="bussched">
+  {[['out', L.out, L.outSub],['ret', L.ret, L.retSub]].map(([key,head,sub])=>(
+    <div class="bs-col">
+      <div class="bs-dir">{head}<small>{sub}</small></div>
+      {CITIES.map((c)=>(
+        <div class="bs-city">
+          <div class="bs-chead"><span>{c.city}</span><em>{L.dur}: {c.hours} {L.hours}</em></div>
+          {col(key==='out'?c.out:c.ret).map((r)=>(
+            <div class="bs-row">
+              <div class="bs-type">{r.t}</div>
+              <div class="bs-price">{r.p}<small>VND / pax</small></div>
+              <div class="bs-times">{r.x.map((h)=>(<span>{h}</span>))}</div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  ))}
+</div>
+<p class="bs-note"><b>{L.note}</b> {L.noteTxt}</p>
+
+<style is:global>
+  .bussched{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
+  .bs-dir{background:var(--forest,#1E3A2B);color:#fff;border-radius:14px;padding:14px 18px;font:700 18px 'Inter';margin-bottom:14px}
+  .bs-dir small{display:block;font-weight:500;opacity:.8;font-size:12.5px;margin-top:2px}
+  .bs-city{border:1px solid var(--line,#e5ddd0);border-radius:16px;overflow:hidden;margin-bottom:14px;background:#fff}
+  .bs-chead{background:var(--forest,#1E3A2B);color:#fff;padding:11px 16px;display:flex;justify-content:space-between;align-items:center;font:700 16px 'Inter'}
+  .bs-chead em{font:600 11px 'Inter';font-style:normal;background:rgba(255,255,255,.15);padding:3px 9px;border-radius:999px}
+  .bs-row{display:grid;grid-template-columns:1.1fr .9fr 1.6fr;gap:10px;align-items:center;padding:11px 16px;border-top:1px solid var(--line,#eee)}
+  .bs-row:first-child{border-top:0}
+  .bs-type{font:600 14px 'Inter';color:var(--ink,#1b1d17)}
+  .bs-price{font:700 15px 'Inter';color:var(--rust,#C2562E)}
+  .bs-price small{display:block;font-weight:500;color:var(--muted,#8a8577);font-size:10.5px}
+  .bs-times{display:flex;flex-wrap:wrap;gap:6px}
+  .bs-times span{background:#F5ECD8;border-radius:7px;padding:4px 9px;font:600 12.5px 'Inter';color:var(--ink,#1b1d17)}
+  .bs-note{max-width:900px;margin:14px auto 0;font-size:13px;color:var(--muted,#8a8577);line-height:1.6}
+  @media(max-width:820px){ .bussched{grid-template-columns:1fr} .bs-row{grid-template-columns:1fr;gap:6px} .bs-times{margin-top:2px} }
+</style>

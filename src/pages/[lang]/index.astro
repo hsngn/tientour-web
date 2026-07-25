@@ -22,15 +22,18 @@ const seoMap = {
 };
 const seo = seoMap[lang] ?? seoMap.en;
 const faqMap = {
-  en:[{q:"Do I need a motorcycle license?",a:"With the easy-rider option, no — a local pilot drives. To self-drive you need a valid license."},
-     {q:"When is the best time to ride?",a:"September–November and March–May: clear roads and the best scenery."},
-     {q:"Is it safe?",a:"Yes: small groups (max 6 per guide), bike checks, a sweeper rider, a licensed operator and insurance during the tour."}],
-  fr:[{q:"Faut-il un permis moto ?",a:"Avec l'option easy rider, non — un pilote local conduit. Pour conduire vous-même, un permis valide est requis."},
-     {q:"Quelle est la meilleure période ?",a:"Septembre–novembre et mars–mai : routes dégagées et plus beaux paysages."},
-     {q:"Est-ce sûr ?",a:"Oui : petits groupes (max 6 par guide), contrôles moto, pilote serre-file, opérateur licencié et assurance pendant le tour."}],
-  vi:[{q:"Tôi có cần bằng lái xe máy không?",a:"Với lựa chọn easy rider thì không — người lái địa phương cầm lái. Để tự lái, bạn cần bằng lái hợp lệ."},
-     {q:"Thời điểm nào đẹp nhất để đi?",a:"Tháng 9–11 và tháng 3–5: đường thông thoáng và cảnh đẹp nhất."},
-     {q:"Có an toàn không?",a:"Có: nhóm nhỏ (tối đa 6 xe/hướng dẫn viên), kiểm tra xe, người lái hỗ trợ cuối đoàn, đơn vị được cấp phép và bảo hiểm trong tour."}],
+  en:[{q:"Can I bring a suitcase or a large backpack?",a:"Yes, but we recommend traveling light. Luggage space on the motorbike is limited — a 20–30L backpack or duffel is ideal. Larger luggage can be left safely at our office/hostel: free storage, 24/7 CCTV."},
+     {q:"Can I ride a motorbike without a valid license?",a:"To ride legally in Vietnam you need a valid motorcycle licence and an International Driving Permit (IDP, 1968 Vienna Convention). Without one you risk fines, rejected insurance and personal liability. Message us on WhatsApp to check."},
+     {q:"How can I pay for my tour?",a:"Cash (Vietnamese Dong), credit/debit card (4% bank fee), or bank transfer (Revolut). A deposit may be required to confirm; the balance is paid on arrival before the tour."},
+     {q:"What happens if it rains?",a:"The loop is beautiful in all seasons. If it rains we provide high-quality raincoats and adjust the pace to the road. Safety is always our priority."},
+     {q:"What is your cancellation policy?",a:"Free cancellation up to 48 hours before the tour. Within 48 hours a fee may apply, and no refunds once the tour has started."},
+     {q:"Are there ATMs along the route?",a:"They are limited outside the main towns. Withdraw enough cash in Ha Giang City before the tour — many small shops and markets don't accept cards."}],
+  fr:[{q:"Puis-je apporter une valise ou un grand sac à dos ?",a:"Oui, mais voyagez léger. L'espace bagage sur la moto est limité — un sac de 20–30 L est idéal. Les gros bagages se laissent en sécurité à notre bureau/hostel : stockage gratuit, vidéosurveillance 24h/24."},
+     {q:"Puis-je conduire sans permis valide ?",a:"Pour conduire légalement au Vietnam, il faut un permis moto valide et un permis international (IDP, Convention de Vienne 1968). Sans, vous risquez amendes, refus d'assurance et responsabilité. Écrivez-nous sur WhatsApp pour vérifier."},
+     {q:"Comment puis-je payer mon circuit ?",a:"Espèces (dongs), carte (frais bancaires 4 %) ou virement (Revolut). Un acompte peut être demandé pour confirmer ; le solde se règle à l'arrivée avant le départ."},
+     {q:"Que se passe-t-il s'il pleut ?",a:"La boucle est magnifique en toute saison. En cas de pluie, nous fournissons des imperméables de qualité et adaptons l'allure. La sécurité reste la priorité."},
+     {q:"Quelle est votre politique d'annulation ?",a:"Annulation gratuite jusqu'à 48 h avant le tour. Dans les 48 h, des frais peuvent s'appliquer, et aucun remboursement une fois le tour commencé."},
+     {q:"Y a-t-il des distributeurs sur le parcours ?",a:"Ils sont limités hors des villes principales. Retirez assez d'espèces à Ha Giang City avant le tour — beaucoup de petites boutiques et marchés n'acceptent pas la carte."}],
 };
 const faq = faqMap[lang] ?? faqMap.en;
 const jsonld = { "@context":"https://schema.org","@graph":[

@@ -131,10 +131,12 @@ const seo = seoMap[lang] ?? seoMap.en;
         `<div class="li"><div class="d">${l.d}${l.s?`<small>${l.s}</small>`:''}</div><div class="a">${fmt(l.a)}</div></div>`).join('');
     }
     const backpaxEl = document.getElementById('backpax');
+    const MAX_GROUP = 10; // voyageurs max (easy riders non comptés)
+    const backMax = ()=> Math.min(state.travelers, MAX_GROUP - state.travelers);
     function syncBack(){
-      if(state.backPax>state.travelers) state.backPax=state.travelers;
+      if(state.backPax>backMax()) state.backPax=Math.max(0,backMax());
       document.getElementById('bval').textContent=state.backPax;
-      document.getElementById('bpHint').textContent = `${L.backHint} (${state.travelers})`;
+      document.getElementById('bpHint').textContent = `${L.backHint} (${Math.max(0,backMax())})`;
     }
     function refreshOptUI(){
       backpaxEl.style.display = state.opt==='self_drive' ? '' : 'none';
@@ -148,9 +150,9 @@ const seo = seoMap[lang] ?? seoMap.en;
       state.slug=el.dataset.slug; document.querySelectorAll('.tour-opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); render();
     }));
     document.getElementById('tmin').addEventListener('click',()=>{ state.travelers=Math.max(1,state.travelers-1); document.getElementById('tval').textContent=state.travelers; syncBack(); render(); });
-    document.getElementById('tplus').addEventListener('click',()=>{ state.travelers=Math.min(8,state.travelers+1); document.getElementById('tval').textContent=state.travelers; syncBack(); render(); });
+    document.getElementById('tplus').addEventListener('click',()=>{ state.travelers=Math.min(MAX_GROUP,state.travelers+1); document.getElementById('tval').textContent=state.travelers; syncBack(); render(); });
     document.getElementById('bmin').addEventListener('click',()=>{ state.backPax=Math.max(0,state.backPax-1); document.getElementById('bval').textContent=state.backPax; render(); });
-    document.getElementById('bplus').addEventListener('click',()=>{ state.backPax=Math.min(state.travelers,state.backPax+1); document.getElementById('bval').textContent=state.backPax; render(); });
+    document.getElementById('bplus').addEventListener('click',()=>{ state.backPax=Math.min(backMax(),state.backPax+1); document.getElementById('bval').textContent=state.backPax; render(); });
 
     const val=(id)=>(document.getElementById(id)?.value||'').trim();
     const msgEl=document.getElementById('formmsg');

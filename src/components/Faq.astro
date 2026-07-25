@@ -2,21 +2,18 @@
 import { t } from '../i18n/ui';
 const { lang, faq } = Astro.props;
 const def = {
-  en:[["Do I need a motorcycle license?","With the easy-rider option, no — a local pilot drives. To self-drive legally you need a valid license; we'll advise you honestly."],
-      ["When is the best time to ride the loop?","September–November and March–May offer clear roads and the best scenery. We ride year-round with the right gear."],
-      ["What bikes do you provide?","Well-maintained semi-automatic and manual bikes suited to the terrain, with full-spec helmets included."],
-      ["Is it safe?","Yes. Small groups (max 6 per guide), 12-point bike checks, a sweeper rider, a licensed operator and insurance during the tour."],
-      ["What's included in the price?","Your rider/guide, homestay nights, meals on tour, fuel, permits and insurance during the tour. Transport to Ha Giang and drinks are extra."]],
-  fr:[["Faut-il un permis moto ?","Avec l’option easy rider, non — un pilote local conduit. Pour conduire vous-même légalement, il faut un permis valide ; on vous conseille honnêtement."],
-      ["Quelle est la meilleure période ?","Septembre–novembre et mars–mai offrent des routes dégagées et les plus beaux paysages. On roule toute l’année avec le bon équipement."],
-      ["Quelles motos fournissez-vous ?","Des motos semi-automatiques et manuelles bien entretenues, adaptées au terrain, casques complets inclus."],
-      ["Est-ce sûr ?","Oui. Petits groupes (max 6 par guide), contrôle moto en 12 points, pilote serre-file, opérateur licencié et assurance pendant le tour."],
-      ["Qu’est-ce qui est inclus ?","Votre pilote/guide, les nuits chez l’habitant, les repas pendant le tour, l’essence, les permis et l’assurance pendant le tour. Le transport jusqu’à Ha Giang et les boissons sont en supplément."]],
-  vi:[["Tôi có cần bằng lái xe máy không?","Với lựa chọn easy rider thì không — người lái địa phương sẽ cầm lái. Để tự lái hợp pháp, bạn cần bằng lái hợp lệ; chúng tôi sẽ tư vấn trung thực."],
-      ["Thời điểm nào đẹp nhất để chạy cung đường?","Tháng 9–11 và tháng 3–5 có đường thông thoáng và cảnh đẹp nhất. Chúng tôi chạy quanh năm với trang bị phù hợp."],
-      ["Các bạn cung cấp loại xe nào?","Xe số tự động và xe côn được bảo dưỡng kỹ, phù hợp địa hình, kèm mũ bảo hiểm đạt chuẩn."],
-      ["Có an toàn không?","Có. Nhóm nhỏ (tối đa 6 xe mỗi hướng dẫn viên), kiểm tra xe 12 điểm, người lái hỗ trợ cuối đoàn, đơn vị được cấp phép và bảo hiểm trong suốt tour."],
-      ["Giá đã bao gồm những gì?","Người lái/hướng dẫn viên, các đêm homestay, bữa ăn trong tour, xăng, giấy phép và bảo hiểm trong tour. Di chuyển đến Hà Giang và đồ uống tính riêng."]],
+  en:[["Can I bring a suitcase or a large backpack?","Yes, but we recommend traveling light. As we travel by motorbike, luggage space is limited — a small backpack or duffel bag (20–30L) is ideal. Larger luggage can be left safely at our office/hostel: storage is free, monitored by 24/7 CCTV, and ready for you when you return."],
+      ["Can I ride a motorbike without a valid license?","To legally ride in Vietnam you must carry a valid motorcycle licence from your home country and an International Driving Permit (IDP) under the 1968 Vienna Convention with the motorcycle category. Riding without one may lead to fines, rejected insurance claims and personal liability. Unsure? Contact us on WhatsApp before booking and we'll help you check."],
+      ["How can I pay for my tour?","We offer several options: cash (Vietnamese Dong), credit/debit card (4% bank processing fee), and bank transfer (Revolut). Depending on the tour, we may require a deposit to confirm your booking; the balance can be paid on arrival before the tour starts. Any questions? Message us on WhatsApp."],
+      ["What happens if it rains?","The Ha Giang Loop is beautiful in all seasons. If it rains, we provide high-quality raincoats and adjust the riding speed to the road conditions. Safety is always our highest priority."],
+      ["What is your cancellation policy?","Free cancellation up to 48 hours before the tour starts. Cancellations within 48 hours may be subject to a fee, and no refunds are available once the tour has started. Please let us know as soon as possible if your plans change."],
+      ["Are there ATMs along the route?","Yes, but they are limited outside the main towns. We recommend withdrawing enough cash in Ha Giang City before the tour, as many small shops, cafés and local markets do not accept cards."]],
+  fr:[["Puis-je apporter une valise ou un grand sac à dos ?","Oui, mais nous recommandons de voyager léger. Comme nous voyageons à moto, l'espace bagage est limité — un petit sac à dos ou sac de voyage (20–30 L) est idéal. Les gros bagages peuvent être laissés en sécurité à notre bureau/hostel : le stockage est gratuit, sous vidéosurveillance 24h/24, et vous attend à votre retour."],
+      ["Puis-je conduire une moto sans permis valide ?","Pour conduire légalement au Vietnam, vous devez avoir un permis moto valide de votre pays et un Permis de conduire international (IDP) selon la Convention de Vienne de 1968, avec la catégorie moto. Conduire sans peut entraîner amendes, refus d'indemnisation et responsabilité personnelle. Un doute ? Contactez-nous sur WhatsApp avant de réserver, on vérifie avec vous."],
+      ["Comment puis-je payer mon circuit ?","Plusieurs options : espèces (dongs vietnamiens), carte de crédit/débit (frais bancaires de 4 %) et virement (Revolut). Selon le circuit, un acompte peut être demandé pour confirmer ; le solde se règle à l'arrivée avant le départ. Une question ? Écrivez-nous sur WhatsApp."],
+      ["Que se passe-t-il s'il pleut ?","La boucle de Ha Giang est magnifique en toute saison. En cas de pluie, nous fournissons des imperméables de qualité et adaptons l'allure aux conditions de route. La sécurité reste notre priorité absolue."],
+      ["Quelle est votre politique d'annulation ?","Annulation gratuite jusqu'à 48 h avant le départ. Les annulations dans les 48 h peuvent être soumises à des frais, et aucun remboursement n'est possible une fois le tour commencé. Prévenez-nous dès que possible si vos plans changent."],
+      ["Y a-t-il des distributeurs le long du parcours ?","Oui, mais ils sont limités hors des villes principales. Nous recommandons de retirer assez d'espèces à Ha Giang City avant le tour, car beaucoup de petites boutiques, cafés et marchés locaux n'acceptent pas la carte."]],
 };
 const list = faq ?? def[lang] ?? def.en;
 const norm = list.map((x)=> Array.isArray(x) ? {q:x[0],a:x[1]} : x);
