@@ -1,6 +1,7 @@
 ---
 durationDays: 3
 priceFrom: 220
+route: "Ha Giang → Quan Ba → Yen Minh → Dong Van → Ha Giang"
 currency: "USD"
 difficulty: "easy"
 image: "hmong-market"

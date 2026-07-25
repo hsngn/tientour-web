@@ -1,6 +1,7 @@
 ---
 durationDays: 4
 priceFrom: 295
+route: "Ha Giang → Du Gia → Dong Van → Meo Vac → Ha Giang"
 currency: "USD"
 difficulty: "moderate"
 image: "frontier"

@@ -5,22 +5,21 @@ import Base from '../../layouts/Base.astro';
 export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
 const { lang } = Astro.params;
 const tours = (await getCollection('tours')).sort((a,b)=>a.data.order-b.data.order);
-const T = tours.map((tr)=>({ slug:tr.slug, price:tr.data.priceFrom, days:tr.data.durationDays, title:(tr.data[lang]??tr.data.en).title }));
+const T = tours.map((tr)=>({ slug:tr.slug, price:tr.data.priceFrom, days:tr.data.durationDays, route:tr.data.route||'', title:(tr.data[lang]??tr.data.en).title }));
 const opts = [
   ['easy_rider','opt_er_t','opt_er_b','opt_er_d'],
   ['self_drive','opt_sd_t','opt_sd_b','opt_sd_d'],
-  ['private','opt_pv_t','opt_pv_b','opt_pv_d'],
-  ['rental_only','opt_rt_t','opt_rt_b','opt_rt_d'],
+  ['private_car','opt_pc_t','opt_pc_b','opt_pc_d'],
+  ['private_bike','opt_pb_t','opt_pb_b','opt_pb_d'],
 ].map(([k,a,b,c])=>({ key:k, title:t(lang,a), badge:t(lang,b), desc:t(lang,c) }));
 const L = {
   lang, for:t(lang,'q_for'), travelers:t(lang,'q_travelers'), days:t(lang,'days'),
   insurance:t(lang,'q_insurance'), total:t(lang,'q_total'),
   erSurcharge:`${t(lang,'opt_er_t')} ${t(lang,'q_surcharge')}`,
-  privateLabel:`${t(lang,'opt_pv_t')} (+40%)`, rentalLabel:t(lang,'opt_rt_t'),
+  carLabel:`${t(lang,'opt_pc_t')} (+50%)`, bikeLabel:`${t(lang,'opt_pb_t')} (+40%)`,
+  backLabel:t(lang,'book_back'), backHint:t(lang,'book_back_hint'),
   people: lang==='fr' ? 'pers' : (lang==='vi' ? 'khách' : 'people'),
   cta:t(lang,'book_cta'), okMsg:t(lang,'ok_msg'), errMsg:t(lang,'err_msg'), errContact:t(lang,'err_contact'),
-  payPlan:t(lang,'pay_plan'), payDeposit:t(lang,'pay_deposit'), payFull:t(lang,'pay_full'),
-  payToday:t(lang,'pay_today'), payBalance:t(lang,'pay_balance'),
 };
 const seoMap = {
   en:{ t:"Book Your Ha Giang Loop Tour — Live Quote | Tien Tour", d:"Build your Ha Giang adventure and get a live quote. No payment until we confirm availability." },
@@ -55,6 +54,7 @@ const seo = seoMap[lang] ?? seoMap.en;
             <div class="th"></div>
             <div><h3>{tr.title}</h3>
               <div class="meta">{tr.days} {t(lang,'days')} · {t(lang,'from')} ${tr.price}/pers.</div>
+              {tr.route && <div class="route">{tr.route}</div>}
             </div>
           </div>
         ))}
@@ -65,6 +65,14 @@ const seo = seoMap[lang] ?? seoMap.en;
         <button id="tmin" type="button" aria-label="-">−</button>
         <span class="v" id="tval">2</span>
         <button id="tplus" type="button" aria-label="+">+</button>
+      </div>
+      <div class="backpax" id="backpax" style="display:none">
+        <div class="bp-label">{t(lang,'book_back')} <small id="bpHint">{t(lang,'book_back_hint')}</small></div>
+        <div class="travelers">
+          <button id="bmin" type="button" aria-label="-">−</button>
+          <span class="v" id="bval">0</span>
+          <button id="bplus" type="button" aria-label="+">+</button>
+        </div>
       </div>
 
       <div class="step-h"><span class="n italic">04</span><h2>{t(lang,'book_s4')}</h2></div>
@@ -88,15 +96,6 @@ const seo = seoMap[lang] ?? seoMap.en;
         <div id="qlines"></div>
         <div class="line"></div>
         <div class="total"><span class="l">{t(lang,'q_total')}</span><span class="v" id="qtot">$0</span></div>
-        <div class="payplan">
-          <div class="pp-lbl">{t(lang,'pay_plan')}</div>
-          <div class="pp-opts">
-            <button type="button" class="pp sel" data-plan="deposit">{t(lang,'pay_deposit')}</button>
-            <button type="button" class="pp" data-plan="full">{t(lang,'pay_full')}</button>
-          </div>
-          <div class="pp-row today"><span>{t(lang,'pay_today')}</span><b id="qtoday">$0</b></div>
-          <div class="pp-row bal" id="qbalRow"><span>{t(lang,'pay_balance')}</span><span id="qbal">$0</span></div>
-        </div>
         <p class="note">{t(lang,'q_note')}</p>
         <button class="btn btn-rust btn-block cta" id="submitBtn" type="button">{t(lang,'book_cta')}</button>
         <div class="formmsg" id="formmsg"></div>
@@ -106,45 +105,52 @@ const seo = seoMap[lang] ?? seoMap.en;
 
   <script define:vars={{ T, L }}>
     const fmt = (n)=> '$' + Math.round(n).toLocaleString('en-US');
-    const DEPOSIT_PCT = 0.20;
-    const state = { opt:'easy_rider', slug:T[0].slug, travelers:2, plan:'deposit' };
-    const dueToday = (total)=> state.plan==='full' ? total : Math.round(total*DEPOSIT_PCT);
+    // Prix ajustables ici :
+    const PRICE = { easyRiderPerDay:60, insurancePerDay:8, privateCarPct:0.50, privateBikePct:0.40 };
+    const state = { opt:'easy_rider', slug:T[0].slug, travelers:2, backPax:0 };
     const selTour = ()=> T.find(t=>t.slug===state.slug) || T[0];
     function compute(){
-      const tr=selTour(), days=tr.days, pax=state.travelers, lines=[]; let total=0;
-      if(state.opt==='rental_only'){ const r=10*days*pax;
-        lines.push({d:L.rentalLabel,s:`$10 × ${days} ${L.days} × ${pax}`,a:r}); total+=r;
-      } else {
-        const base=tr.price*pax; lines.push({d:tr.title,s:`$${tr.price} × ${pax} ${L.people}`,a:base}); total+=base;
-        if(state.opt==='easy_rider'){ const s=60*days*pax; lines.push({d:L.erSurcharge,s:`$60 × ${days} ${L.days} × ${pax}`,a:s}); total+=s; }
-        if(state.opt==='private'){ const s=Math.round(base*0.40); lines.push({d:L.privateLabel,s:'',a:s}); total+=s; }
-      }
-      const ins=8*days*pax; lines.push({d:L.insurance,s:'',a:ins}); total+=ins;
-      return { days, pax, total, lines };
+      const tr=selTour(), days=tr.days, pax=state.travelers, base=tr.price, lines=[]; let total=0;
+      const back = state.opt==='self_drive' ? state.backPax : 0;
+      const drive=base*pax; lines.push({d:tr.title, s:`$${base} × ${pax} ${L.people}`, a:drive}); total+=drive;
+      if(state.opt==='self_drive' && back>0){ const bc=base*back; lines.push({d:L.backLabel, s:`$${base} × ${back}`, a:bc}); total+=bc; }
+      if(state.opt==='easy_rider'){ const s=PRICE.easyRiderPerDay*days*pax; lines.push({d:L.erSurcharge, s:`$${PRICE.easyRiderPerDay} × ${days} ${L.days} × ${pax}`, a:s}); total+=s; }
+      if(state.opt==='private_car'){ const s=Math.round(drive*PRICE.privateCarPct); lines.push({d:L.carLabel, s:'', a:s}); total+=s; }
+      if(state.opt==='private_bike'){ const s=Math.round(drive*PRICE.privateBikePct); lines.push({d:L.bikeLabel, s:'', a:s}); total+=s; }
+      const people=pax+back; const ins=PRICE.insurancePerDay*days*people; lines.push({d:L.insurance, s:'', a:ins}); total+=ins;
+      return { days, pax, back, people, total, lines };
     }
     function render(){
       const r=compute();
-      const today=dueToday(r.total), bal=r.total-today;
-      document.getElementById('qbig').textContent=fmt(today);
+      document.getElementById('qbig').textContent=fmt(r.total);
       document.getElementById('qtot').textContent=fmt(r.total);
-      document.getElementById('qtoday').textContent=fmt(today);
-      document.getElementById('qbal').textContent=fmt(bal);
-      document.getElementById('qbalRow').style.display = (state.plan==='full'||bal<=0) ? 'none' : '';
-      document.getElementById('qfor').textContent=`${L.for} ${r.pax} ${L.travelers} · ${r.days} ${L.days}`;
+      document.getElementById('qfor').textContent = r.back>0
+        ? `${r.pax} + ${r.back} (${L.backLabel}) · ${r.days} ${L.days}`
+        : `${L.for} ${r.pax} ${L.travelers} · ${r.days} ${L.days}`;
       document.getElementById('qlines').innerHTML=r.lines.map(l=>
         `<div class="li"><div class="d">${l.d}${l.s?`<small>${l.s}</small>`:''}</div><div class="a">${fmt(l.a)}</div></div>`).join('');
     }
-    document.querySelectorAll('.pp').forEach(el=>el.addEventListener('click',()=>{
-      state.plan=el.dataset.plan; document.querySelectorAll('.pp').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); render();
-    }));
+    const backpaxEl = document.getElementById('backpax');
+    function syncBack(){
+      if(state.backPax>state.travelers) state.backPax=state.travelers;
+      document.getElementById('bval').textContent=state.backPax;
+      document.getElementById('bpHint').textContent = `${L.backHint} (${state.travelers})`;
+    }
+    function refreshOptUI(){
+      backpaxEl.style.display = state.opt==='self_drive' ? '' : 'none';
+      if(state.opt!=='self_drive'){ state.backPax=0; document.getElementById('bval').textContent=0; }
+      else syncBack();
+    }
     document.querySelectorAll('.opt').forEach(el=>el.addEventListener('click',()=>{
-      state.opt=el.dataset.opt; document.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); render();
+      state.opt=el.dataset.opt; document.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); refreshOptUI(); render();
     }));
     document.querySelectorAll('.tour-opt').forEach(el=>el.addEventListener('click',()=>{
       state.slug=el.dataset.slug; document.querySelectorAll('.tour-opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); render();
     }));
-    document.getElementById('tmin').addEventListener('click',()=>{ state.travelers=Math.max(1,state.travelers-1); document.getElementById('tval').textContent=state.travelers; render(); });
-    document.getElementById('tplus').addEventListener('click',()=>{ state.travelers=Math.min(8,state.travelers+1); document.getElementById('tval').textContent=state.travelers; render(); });
+    document.getElementById('tmin').addEventListener('click',()=>{ state.travelers=Math.max(1,state.travelers-1); document.getElementById('tval').textContent=state.travelers; syncBack(); render(); });
+    document.getElementById('tplus').addEventListener('click',()=>{ state.travelers=Math.min(8,state.travelers+1); document.getElementById('tval').textContent=state.travelers; syncBack(); render(); });
+    document.getElementById('bmin').addEventListener('click',()=>{ state.backPax=Math.max(0,state.backPax-1); document.getElementById('bval').textContent=state.backPax; render(); });
+    document.getElementById('bplus').addEventListener('click',()=>{ state.backPax=Math.min(state.travelers,state.backPax+1); document.getElementById('bval').textContent=state.backPax; render(); });
 
     const val=(id)=>(document.getElementById(id)?.value||'').trim();
     const msgEl=document.getElementById('formmsg');
@@ -153,15 +159,14 @@ const seo = seoMap[lang] ?? seoMap.en;
       const name=val('f_name'), email=val('f_email'), whatsapp=val('f_whatsapp');
       if(!name || (!email && !whatsapp)){ showMsg('err',L.errContact); return; }
       const r=compute(), tr=selTour(), btn=document.getElementById('submitBtn');
-      const today=dueToday(r.total);
       btn.disabled=true; const old=btn.textContent; btn.textContent='…';
       try{
         const resp=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({ name,email,whatsapp, date:val('f_date'), message:val('f_message'),
-            tour_slug:tr.slug, tour_title:tr.title, option:state.opt, travelers:r.pax, days:r.days,
-            amount:r.total, payment_plan:state.plan, amount_due:today, language:L.lang, source:'book_page' })});
+            tour_slug:tr.slug, tour_title:tr.title, option:state.opt, travelers:r.people, back_pax:r.back, days:r.days,
+            amount:r.total, language:L.lang, source:'book_page' })});
         const data=await resp.json().catch(()=>({}));
-        if(resp.ok && data.ok){ showMsg('ok', `${L.okMsg} ${L.payToday}: ${fmt(today)}.`);
+        if(resp.ok && data.ok){ showMsg('ok', L.okMsg);
           ['f_name','f_email','f_whatsapp','f_date','f_message'].forEach(i=>{const e=document.getElementById(i); if(e) e.value='';});
         } else { showMsg('err',L.errMsg); }
       }catch(e){ showMsg('err',L.errMsg); }

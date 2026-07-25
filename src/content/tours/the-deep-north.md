@@ -1,6 +1,7 @@
 ---
 durationDays: 5
 priceFrom: 380
+route: "Ha Giang → Yen Minh → Dong Van → Lung Cu → Meo Vac → Ha Giang"
 currency: "USD"
 difficulty: "challenging"
 image: "dong-van"

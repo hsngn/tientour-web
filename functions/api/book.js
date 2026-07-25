@@ -63,9 +63,8 @@ export async function onRequestPost({ request, env }) {
     const html = `
       <h2>New booking request — Tien Tour</h2>
       <p><b>Tour:</b> ${esc(b.tour_title)} (${esc(b.days)} days)</p>
-      <p><b>Option:</b> ${esc(b.option)} &nbsp; <b>Travelers:</b> ${esc(b.travelers)}</p>
+      <p><b>Option:</b> ${esc(b.option)} &nbsp; <b>Travelers:</b> ${esc(b.travelers)}${Number(b.back_pax) > 0 ? ` (incl. ${esc(b.back_pax)} on the back of a friend)` : ''}</p>
       <p><b>Estimated total:</b> $${esc(b.amount)}</p>
-      <p><b>Payment plan:</b> ${b.payment_plan === 'full' ? 'Pay in full' : '20% deposit'} &nbsp; <b>Due now:</b> $${esc(b.amount_due != null ? b.amount_due : b.amount)}</p>
       <p><b>Preferred date:</b> ${esc(b.date) || '—'}</p>
       <hr>
       <p><b>Name:</b> ${esc(name)}</p>

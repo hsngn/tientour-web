@@ -15,6 +15,7 @@ const tours = defineCollection({
   schema: z.object({
     durationDays: z.number(),
     priceFrom: z.number(),
+    route: z.string().optional(),
     currency: z.string().default('EUR'),
     difficulty: z.enum(['easy', 'moderate', 'challenging']),
     image: z.string(),               // placeholder name -> remplacer par vraies photos

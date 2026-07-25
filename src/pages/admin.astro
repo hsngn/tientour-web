@@ -525,8 +525,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       $('mInfo').innerHTML=[
         ['Tour',esc(pretty(b.tour_slug))],['Option',esc(pretty(b.option))],
         ['Travelers',esc(b.travelers)],['Preferred date',esc(b.date||'—')],
-        ['Channel',srcLabel(b.source)],['Plan',b.payment_plan==='full'?'Pay in full':'Deposit 20%'],
-        ['Language',esc((b.language||'').toUpperCase())],
+        ['Channel',srcLabel(b.source)],['Language',esc((b.language||'').toUpperCase())],
         ['Email',esc(b.email||'—')],['WhatsApp',esc(b.whatsapp||'—')],
       ].map(([k,v])=>`<div><div class="k">${k}</div><div class="val">${v}</div></div>`).join('');
       const has=!!(b.message&&b.message.trim());
