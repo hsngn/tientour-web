@@ -83,6 +83,7 @@ const seo = seoMap[lang] ?? seoMap.en;
           <div class="field"><label for="f_whatsapp">{t(lang,'f_whatsapp')}</label><input id="f_whatsapp" type="tel" /></div>
         </div>
         <div class="field"><label for="f_date">{t(lang,'f_date')}</label><input id="f_date" type="date" /></div>
+        <div class="field"><label for="f_country">{t(lang,'f_country')}</label><input id="f_country" type="text" autocomplete="country-name" /></div>
         <div class="field"><label for="f_message">{t(lang,'f_message')}</label><textarea id="f_message"></textarea></div>
       </div>
 
@@ -127,6 +128,15 @@ const seo = seoMap[lang] ?? seoMap.en;
         <div class="formmsg" id="formmsg"></div>
       </div>
     </aside>
+  </div>
+
+  <div id="okOverlay" class="ok-overlay hidden">
+    <div class="ok-modal">
+      <div class="ok-check">✓</div>
+      <h3>{t(lang,'ok_title')}</h3>
+      <p>{t(lang,'ok_msg')}</p>
+      <button type="button" class="btn btn-rust" id="okClose">{t(lang,'ok_close')}</button>
+    </div>
   </div>
 
   <script define:vars={{ T, L }}>
@@ -194,14 +204,18 @@ const seo = seoMap[lang] ?? seoMap.en;
           body:JSON.stringify({ name,email,whatsapp, date:val('f_date'), message:val('f_message'),
             tour_slug:tr.slug, tour_title:tr.title, option:state.opt, travelers:r.people, back_pax:r.back, days:r.days,
             amount:r.total, bus_booking:document.getElementById('busWanted').checked, bus_out:(document.getElementById('busOut')?.value||''), bus_return:(document.getElementById('busRet')?.value||''),
+            country:val('f_country'),
             language:L.lang, source:'book_page' })});
         const data=await resp.json().catch(()=>({}));
-        if(resp.ok && data.ok){ showMsg('ok', L.okMsg);
-          ['f_name','f_email','f_whatsapp','f_date','f_message'].forEach(i=>{const e=document.getElementById(i); if(e) e.value='';});
-        } else { showMsg('err',L.errMsg); }
-      }catch(e){ showMsg('err',L.errMsg); }
+        if(resp.ok && data.ok){ document.getElementById('okOverlay').classList.remove('hidden');
+          ['f_name','f_email','f_whatsapp','f_date','f_country','f_message'].forEach(i=>{const e=document.getElementById(i); if(e) e.value='';});
+        } else { const code = data && data.error ? data.error : ('HTTP '+resp.status); const det = data && data.detail ? (' — '+String(data.detail).slice(0,160)) : ''; console.error('Booking failed:', resp.status, data); showMsg('err', L.errMsg+' ['+code+det+']'); }
+      }catch(e){ console.error('Booking exception:', e); showMsg('err', L.errMsg+' [network]'); }
       btn.disabled=false; btn.textContent=old;
     });
+    const okOv=document.getElementById('okOverlay');
+    document.getElementById('okClose').addEventListener('click',()=>okOv.classList.add('hidden'));
+    okOv.addEventListener('click',(e)=>{ if(e.target===okOv) okOv.classList.add('hidden'); });
     render();
   </script>
 </Base>

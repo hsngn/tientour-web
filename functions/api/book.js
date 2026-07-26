@@ -37,6 +37,11 @@ export async function onRequestPost({ request, env }) {
     currency: 'USD',
     status: 'pending',
     source: b.source || 'website',
+    bus_booking: !!b.bus_booking,
+    bus_out: b.bus_out || null,
+    bus_return: b.bus_return || null,
+    back_pax: Number(b.back_pax) || 0,
+    country: b.country || null,
     message: b.message || null,
   };
 

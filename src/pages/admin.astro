@@ -14,6 +14,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
   <style is:global>
     :root{--bg:#F4EFE6;--panel:#FBF8F2;--ink:#1B1D17;--muted:#6E6C61;--line:#E4DCCB;
       --forest:#1E3A2B;--rust:#C2562E;--amber:#9A5B12;--blue:#274B6E;--green:#1E6B36}
@@ -209,11 +210,17 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
             <select class="fsel" id="fSource">
               <option value="">All channels</option><option value="website">Website</option><option value="manual">Manual</option>
             </select>
+            <select class="fsel" id="fStatus">
+              <option value="">All statuses</option>
+              <option value="pending">Pending</option><option value="confirmed">Confirmed</option>
+              <option value="paid">Paid</option><option value="cancelled">Cancelled</option>
+            </select>
             <button class="btn" id="fClear">Clear</button>
             <button class="btn" id="fAttn">⚠ To handle</button>
           </div>
           <div class="listbar-right">
             <span class="em" id="listCount"></span>
+            <button class="btn" id="exportXlsx">⬇ Excel</button>
             <button class="btn pri" id="newRes">+ New reservation</button>
           </div>
         </div>
@@ -489,27 +496,32 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       const cur=$('fYear').value;
       $('fYear').innerHTML='<option value="">All years</option>'+years.map(y=>`<option value="${y}"${y===cur?' selected':''}>${y}</option>`).join('');
     }
-    function renderList(){
+    const fmtDMY=(d)=>{ if(!d) return ''; const s=String(d).slice(0,10); const m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/); return m?`${m[3]}/${m[2]}/${m[1]}`:s; };
+    function filteredRows(){
       const q=($('search').value||'').toLowerCase();
-      const fy=$('fYear').value, fm=$('fMonth').value, fd=$('fDate').value, fs=$('fSource').value;
-      let rows=ALL.filter(b=>{
+      const fy=$('fYear').value, fm=$('fMonth').value, fd=$('fDate').value, fs=$('fSource').value, fst=$('fStatus').value;
+      return ALL.filter(b=>{
         if(fAttn && b.status!=='pending') return false;
-        if(q && ![b.customer_name,b.email,b.whatsapp,b.tour_slug,b.departure_city,b.return_city].some(x=>String(x||'').toLowerCase().includes(q))) return false;
+        if(fst && b.status!==fst) return false;
+        if(q && ![b.customer_name,b.email,b.whatsapp,b.tour_slug,b.departure_city,b.return_city,b.country].some(x=>String(x||'').toLowerCase().includes(q))) return false;
         const d=tripDate(b);
         if(fd){ if(d!==fd) return false; }
         else { if(fy && d.slice(0,4)!==fy) return false; if(fm && d.slice(5,7)!==fm) return false; }
         if(fs){ const isManual=b.source==='manual'; if(fs==='manual'&&!isManual) return false; if(fs==='website'&&isManual) return false; }
         return true;
       }).sort((a,b)=>(tripDate(b)||'').localeCompare(tripDate(a)||''));
+    }
+    function renderList(){
+      const rows=filteredRows();
       $('listCount').textContent=rows.length+' reservation'+(rows.length!==1?'s':'');
       if(!rows.length){ $('listTable').innerHTML='<div class="empty">No reservations match.</div>'; return; }
       $('listTable').innerHTML=`<table><thead><tr>
         <th>Trip dates</th><th>Route</th><th>Customer</th><th>Tour / option</th><th>Pax</th><th>Payment</th><th>Status</th><th>Channel</th><th></th>
         </tr></thead><tbody>`+
         rows.map(b=>{ const p=payInfo(b); const rc=b.status==='pending'?' attn-pending':(b.status==='cancelled'?' attn-cancelled':''); return `<tr class="brow${rc}" data-id="${b.id}">
-          <td>${b.start_date?esc(b.start_date):(b.date?esc(b.date):'<span class="sub">—</span>')}${b.end_date?'<div class="sub">→ '+esc(b.end_date)+'</div>':''}</td>
+          <td>${b.start_date?esc(fmtDMY(b.start_date)):(b.date?esc(fmtDMY(b.date)):'<span class="sub">—</span>')}${b.end_date?'<div class="sub">→ '+esc(fmtDMY(b.end_date))+'</div>':''}</td>
           <td>${b.departure_city||b.return_city?esc((b.departure_city||'?')+' → '+(b.return_city||'?')):'<span class="sub">—</span>'}</td>
-          <td><b>${esc(b.customer_name)}</b><div class="sub">${esc(b.email||b.whatsapp||'')}</div></td>
+          <td><b>${esc(b.customer_name)}</b><div class="sub">${esc(b.email||b.whatsapp||'')}</div>${b.country?'<div class="sub">🌍 '+esc(b.country)+'</div>':''}</td>
           <td>${esc(pretty(b.tour_slug))}<div class="sub">${esc(pretty(b.option))}</div></td>
           <td>${esc(b.travelers)}</td>
           <td>${money(p.paid)} / ${money(p.total)}${p.rem>0?`<div class="sub">left ${money(p.rem)}</div>`:''}<span class="pill pay-${p.st}" style="margin-top:4px;display:inline-block">${p.st}</span></td>
@@ -517,15 +529,34 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
           <td><span class="tag tag-${b.source==='manual'?'manual':'web'}">${srcLabel(b.source)}</span></td>
           <td>${(NOTES[b.id]&&NOTES[b.id].length)?'📝':''}</td></tr>`;}).join('')+`</tbody></table>`;
     }
+    function exportXlsx(){
+      const rows=filteredRows();
+      if(!rows.length){ alert('No reservations to export.'); return; }
+      const data=rows.map(b=>{ const p=payInfo(b); return {
+        'Trip start': fmtDMY(b.start_date||b.date), 'Trip end': fmtDMY(b.end_date),
+        'Customer': b.customer_name||'', 'Country': b.country||'', 'Email': b.email||'', 'WhatsApp': b.whatsapp||'',
+        'Tour': pretty(b.tour_slug), 'Option': pretty(b.option), 'Pax': b.travelers||'', 'On the back': b.back_pax||0,
+        'Pickup': b.departure_city||'', 'Drop-off': b.return_city||'',
+        'Bus': b.bus_booking?'Yes':'No', 'Bus outbound': b.bus_out||'', 'Bus return': b.bus_return||'',
+        'Total ($)': p.total, 'Paid ($)': p.paid, 'Remaining ($)': p.rem,
+        'Status': b.status||'', 'Channel': srcLabel(b.source), 'Requested': fmtDMY(b.created_at),
+      };});
+      const ws=XLSX.utils.json_to_sheet(data); const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,'Reservations');
+      const today=fmtDMY(new Date().toISOString().slice(0,10)).replace(/\//g,'-');
+      XLSX.writeFile(wb,`tientour-reservations-${today}.xlsx`);
+    }
 
     function openDetail(id){
       const b=ALL.find(x=>x.id===id); if(!b) return; current=id;
       $('mName').textContent=b.customer_name||'—';
-      $('mMeta').textContent='Requested '+(b.created_at?new Date(b.created_at).toLocaleString():'');
+      $('mMeta').textContent='Requested '+(b.created_at?fmtDMY(b.created_at):'');
       $('mInfo').innerHTML=[
         ['Tour',esc(pretty(b.tour_slug))],['Option',esc(pretty(b.option))],
-        ['Travelers',esc(b.travelers)],['Preferred date',esc(b.date||'—')],
-        ['Channel',srcLabel(b.source)],['Language',esc((b.language||'').toUpperCase())],
+        ['Travelers',esc(b.travelers)+(Number(b.back_pax)>0?' (+'+esc(b.back_pax)+' on the back)':'')],['Preferred date',esc(fmtDMY(b.date)||'—')],
+        ['Country',esc(b.country||'—')],['Channel',srcLabel(b.source)],
+        ['Bus',b.bus_booking?('Yes — '+esc(b.bus_out||'?')+' → '+esc(b.bus_return||'?')+' (not incl.)'):'No'],
+        ['Language',esc((b.language||'').toUpperCase())],
         ['Email',esc(b.email||'—')],['WhatsApp',esc(b.whatsapp||'—')],
       ].map(([k,v])=>`<div><div class="k">${k}</div><div class="val">${v}</div></div>`).join('');
       const has=!!(b.message&&b.message.trim());
@@ -605,8 +636,9 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     $('mEnd').addEventListener('change',calcNights);
     $('mAmount').addEventListener('input',calcRemain);
     $('mPaid').addEventListener('input',calcRemain);
-    ['fYear','fMonth','fDate','fSource'].forEach(id=>$(id).addEventListener('change',renderList));
-    $('fClear').addEventListener('click',()=>{$('search').value='';$('fYear').value='';$('fMonth').value='';$('fDate').value='';$('fSource').value='';fAttn=false;$('fAttn').classList.remove('on');renderList();});
+    ['fYear','fMonth','fDate','fSource','fStatus'].forEach(id=>$(id).addEventListener('change',renderList));
+    $('fClear').addEventListener('click',()=>{$('search').value='';$('fYear').value='';$('fMonth').value='';$('fDate').value='';$('fSource').value='';$('fStatus').value='';fAttn=false;$('fAttn').classList.remove('on');renderList();});
+    $('exportXlsx').addEventListener('click',exportXlsx);
     $('fAttn').addEventListener('click',()=>{ fAttn=!fAttn; $('fAttn').classList.toggle('on',fAttn); if(fAttn&&view!=='list')setTab('list'); else renderList(); });
     $('newRes').addEventListener('click',openCreate);
     $('cClose').addEventListener('click',closeCreate);
