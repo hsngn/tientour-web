@@ -65,6 +65,7 @@ export async function onRequestPost({ request, env }) {
       <p><b>Tour:</b> ${esc(b.tour_title)} (${esc(b.days)} days)</p>
       <p><b>Option:</b> ${esc(b.option)} &nbsp; <b>Travelers:</b> ${esc(b.travelers)}${Number(b.back_pax) > 0 ? ` (incl. ${esc(b.back_pax)} on the back of a friend)` : ''}</p>
       <p><b>Estimated total:</b> $${esc(b.amount)}</p>
+      ${b.bus_booking ? `<p><b>Bus requested:</b> Yes${b.bus_city ? ` — from/to ${esc(b.bus_city)}` : ''} &nbsp;<i>(bus price NOT included in tour — confirm schedule & cost separately)</i></p>` : ''}
       <p><b>Preferred date:</b> ${esc(b.date) || '—'}</p>
       <hr>
       <p><b>Name:</b> ${esc(name)}</p>

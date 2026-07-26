@@ -85,6 +85,20 @@ const seo = seoMap[lang] ?? seoMap.en;
         <div class="field"><label for="f_date">{t(lang,'f_date')}</label><input id="f_date" type="date" /></div>
         <div class="field"><label for="f_message">{t(lang,'f_message')}</label><textarea id="f_message"></textarea></div>
       </div>
+
+      <div class="step-h"><span class="n italic">05</span><h2>{t(lang,'book_bus_title')}</h2></div>
+      <div class="bus-book">
+        <label class="bus-check"><input type="checkbox" id="busWanted" /> <span>{t(lang,'book_bus_label')}</span></label>
+        <div class="bus-city-wrap" id="busCityWrap" style="display:none">
+          <label for="busCity">{t(lang,'book_bus_city')}</label>
+          <select id="busCity">
+            <option value="">—</option>
+            <option>Hanoi</option><option>Sapa</option><option>Ninh Binh</option><option>Cat Ba</option><option>Ha Long</option>
+          </select>
+        </div>
+        <p class="bus-warn">⚠ {t(lang,'book_bus_note')}</p>
+        <a class="bus-link" href={`/${lang}/bus`}>{t(lang,'book_bus_see')} →</a>
+      </div>
     </div>
 
     <aside>
@@ -97,6 +111,7 @@ const seo = seoMap[lang] ?? seoMap.en;
         <div class="line"></div>
         <div class="total"><span class="l">{t(lang,'q_total')}</span><span class="v" id="qtot">$0</span></div>
         <p class="note">{t(lang,'q_note')}</p>
+        <div class="q-bus-excl">{t(lang,'q_bus_excl')}</div>
         <button class="btn btn-rust btn-block cta" id="submitBtn" type="button">{t(lang,'book_cta')}</button>
         <div class="formmsg" id="formmsg"></div>
       </div>
@@ -153,6 +168,7 @@ const seo = seoMap[lang] ?? seoMap.en;
     document.getElementById('tplus').addEventListener('click',()=>{ state.travelers=Math.min(MAX_GROUP,state.travelers+1); document.getElementById('tval').textContent=state.travelers; syncBack(); render(); });
     document.getElementById('bmin').addEventListener('click',()=>{ state.backPax=Math.max(0,state.backPax-1); document.getElementById('bval').textContent=state.backPax; render(); });
     document.getElementById('bplus').addEventListener('click',()=>{ state.backPax=Math.min(backMax(),state.backPax+1); document.getElementById('bval').textContent=state.backPax; render(); });
+    document.getElementById('busWanted').addEventListener('change',(e)=>{ document.getElementById('busCityWrap').style.display = e.target.checked ? '' : 'none'; });
 
     const val=(id)=>(document.getElementById(id)?.value||'').trim();
     const msgEl=document.getElementById('formmsg');
@@ -166,7 +182,8 @@ const seo = seoMap[lang] ?? seoMap.en;
         const resp=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({ name,email,whatsapp, date:val('f_date'), message:val('f_message'),
             tour_slug:tr.slug, tour_title:tr.title, option:state.opt, travelers:r.people, back_pax:r.back, days:r.days,
-            amount:r.total, language:L.lang, source:'book_page' })});
+            amount:r.total, bus_booking:document.getElementById('busWanted').checked, bus_city:(document.getElementById('busCity')?.value||''),
+            language:L.lang, source:'book_page' })});
         const data=await resp.json().catch(()=>({}));
         if(resp.ok && data.ok){ showMsg('ok', L.okMsg);
           ['f_name','f_email','f_whatsapp','f_date','f_message'].forEach(i=>{const e=document.getElementById(i); if(e) e.value='';});

@@ -3,14 +3,14 @@ import { getCollection } from 'astro:content';
 import { LANGS, t } from '../../../i18n/ui';
 import Base from '../../../layouts/Base.astro';
 import TourGrid from '../../../components/TourGrid.astro';
+import BusSchedule from '../../../components/BusSchedule.astro';
 import FinalCta from '../../../components/FinalCta.astro';
 export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
 const { lang } = Astro.params;
 const tours = (await getCollection('tours')).sort((a,b)=>a.data.order-b.data.order);
 const seoMap = {
-  en:{ t:"Ha Giang Loop Tours — Easy Rider & Adventure | Tien Tour", d:"All our Ha Giang Loop motorbike tours: 3 to 5 days, easy rider or self-drive. Small groups, licensed local operator, 5.0★." },
-  fr:{ t:"Circuits boucle de Ha Giang — easy rider & aventure | Tien Tour", d:"Tous nos circuits moto de la boucle de Ha Giang : 3 à 5 jours, easy rider ou self-drive. Petits groupes, opérateur local licencié, 5,0★." },
-  vi:{ t:"Các tour cung đường Hà Giang — Easy Rider & Phiêu lưu | Tien Tour", d:"Tất cả các tour xe máy cung đường Hà Giang: 3 đến 5 ngày, easy rider hoặc tự lái. Nhóm nhỏ, đơn vị địa phương được cấp phép, 5,0★." },
+  en:{ t:"Ha Giang Loop Tours — Easy Rider & Adventure | Tien Tour", d:"All our Ha Giang Loop motorbike tours: 2 to 4 days, easy rider or self-drive. Small groups, licensed local operator, 5.0★." },
+  fr:{ t:"Circuits boucle de Ha Giang — easy rider & aventure | Tien Tour", d:"Tous nos circuits moto de la boucle de Ha Giang : 2 à 4 jours, easy rider ou self-drive. Petits groupes, opérateur local licencié, 5,0★." },
 };
 const seo = seoMap[lang] ?? seoMap.en;
 ---
@@ -21,5 +21,13 @@ const seo = seoMap[lang] ?? seoMap.en;
     <p class="sub">{t(lang,'tours_sub')}</p>
   </div></section>
   <TourGrid lang={lang} tours={tours} showHead={false} />
+
+  <section class="bus-section"><div class="wrap">
+    <div class="eyebrow">{lang==='fr'?'Y aller':'Getting there'}</div>
+    <h2 class="title">{t(lang,'bus_tours_title')}</h2>
+    <p class="bus-callout">🚌 {t(lang,'bus_tours_note')}</p>
+    <BusSchedule lang={lang} />
+  </div></section>
+
   <FinalCta lang={lang} />
 </Base>
