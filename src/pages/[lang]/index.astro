@@ -11,6 +11,7 @@ import Reviews from '../../components/Reviews.astro';
 import Guide from '../../components/Guide.astro';
 import Faq from '../../components/Faq.astro';
 import FinalCta from '../../components/FinalCta.astro';
+import Gallery from '../../components/Gallery.astro';
 export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
 const { lang } = Astro.params;
 const tours = (await getCollection('tours')).sort((a,b)=>a.data.order-b.data.order);
@@ -48,6 +49,7 @@ const jsonld = { "@context":"https://schema.org","@graph":[
   <TourGrid lang={lang} tours={tours} limit={3} />
   <Rental lang={lang} />
   <Riders lang={lang} />
+  <Gallery lang={lang} />
   <Reviews lang={lang} />
   <Guide lang={lang} />
   <Faq lang={lang} faq={faq} />

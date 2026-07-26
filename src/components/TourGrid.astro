@@ -18,6 +18,7 @@ const sym = (c)=> c==='USD' ? '$' : '€';
     {list.map((tr)=>{ const d=tr.data[lang]??tr.data.en; return (
       <a class="tcard" href={`/${lang}/tours/${tr.slug}`}>
         <div class="img">
+          {tr.data.image && <img src={tr.data.image} alt={d.title} width="800" height="1000" loading="lazy" />}
           <span class="pill day">{tr.data.durationDays} {t(lang,'days')}</span>
           <span class="pill diff">{diff[tr.data.difficulty][lang]}</span>
         </div>

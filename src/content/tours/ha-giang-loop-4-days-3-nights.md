@@ -4,7 +4,7 @@ priceFrom: 290
 route: "Ha Giang → Du Gia → Dong Van → Lung Cu → Ma Pi Leng → Meo Vac → Ha Giang"
 currency: "USD"
 difficulty: "moderate"
-image: "lung-cu"
+image: "/photos/p10.jpg"
 order: 3
 en:
   title: "4 Days – 3 Nights Ha Giang Loop Tour"

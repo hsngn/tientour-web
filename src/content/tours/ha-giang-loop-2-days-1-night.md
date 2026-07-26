@@ -4,7 +4,7 @@ priceFrom: 190
 route: "Ha Giang → Yen Minh → Dong Van → Ma Pi Leng → Meo Vac → Ha Giang"
 currency: "USD"
 difficulty: "moderate"
-image: "ma-pi-leng"
+image: "/photos/p9.jpg"
 order: 1
 en:
   title: "2 Days – 1 Night Ha Giang Loop Tour"
