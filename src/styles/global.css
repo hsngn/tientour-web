@@ -309,3 +309,9 @@ footer.site .flinks a:hover{color:var(--rust);text-decoration:underline}
 /* tours page: bus section callout */
 .bus-section{padding-top:24px;padding-bottom:24px}
 .bus-callout{max-width:840px;margin:8px 0 22px;padding:14px 18px;background:#FBEAD2;border-radius:12px;color:#9A5B12;font:600 15px 'Inter';line-height:1.55}
+
+/* book page: bus outbound/return two-column legs */
+.bus-legs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.bus-leg label{display:block;font:600 11px 'Inter';text-transform:uppercase;letter-spacing:.05em;color:var(--muted,#8a8577);margin-bottom:6px}
+.bus-leg select{width:100%;border:1.5px solid var(--line,#e5ddd0);border-radius:12px;padding:10px 12px;font:400 14px 'Inter';background:#fff}
+@media(max-width:560px){.bus-legs{grid-template-columns:1fr}}

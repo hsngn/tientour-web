@@ -90,11 +90,22 @@ const seo = seoMap[lang] ?? seoMap.en;
       <div class="bus-book">
         <label class="bus-check"><input type="checkbox" id="busWanted" /> <span>{t(lang,'book_bus_label')}</span></label>
         <div class="bus-city-wrap" id="busCityWrap" style="display:none">
-          <label for="busCity">{t(lang,'book_bus_city')}</label>
-          <select id="busCity">
-            <option value="">—</option>
-            <option>Hanoi</option><option>Sapa</option><option>Ninh Binh</option><option>Cat Ba</option><option>Ha Long</option>
-          </select>
+          <div class="bus-legs">
+            <div class="bus-leg">
+              <label for="busOut">{t(lang,'book_bus_out')}</label>
+              <select id="busOut">
+                <option value="">—</option>
+                <option>Hanoi</option><option>Sapa</option><option>Ninh Binh</option><option>Cat Ba</option><option>Ha Long</option>
+              </select>
+            </div>
+            <div class="bus-leg">
+              <label for="busRet">{t(lang,'book_bus_ret')}</label>
+              <select id="busRet">
+                <option value="">—</option>
+                <option>Hanoi</option><option>Sapa</option><option>Ninh Binh</option><option>Cat Ba</option><option>Ha Long</option>
+              </select>
+            </div>
+          </div>
         </div>
         <p class="bus-warn">⚠ {t(lang,'book_bus_note')}</p>
         <a class="bus-link" href={`/${lang}/bus`}>{t(lang,'book_bus_see')} →</a>
@@ -182,7 +193,7 @@ const seo = seoMap[lang] ?? seoMap.en;
         const resp=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({ name,email,whatsapp, date:val('f_date'), message:val('f_message'),
             tour_slug:tr.slug, tour_title:tr.title, option:state.opt, travelers:r.people, back_pax:r.back, days:r.days,
-            amount:r.total, bus_booking:document.getElementById('busWanted').checked, bus_city:(document.getElementById('busCity')?.value||''),
+            amount:r.total, bus_booking:document.getElementById('busWanted').checked, bus_out:(document.getElementById('busOut')?.value||''), bus_return:(document.getElementById('busRet')?.value||''),
             language:L.lang, source:'book_page' })});
         const data=await resp.json().catch(()=>({}));
         if(resp.ok && data.ok){ showMsg('ok', L.okMsg);
