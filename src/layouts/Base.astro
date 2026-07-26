@@ -20,7 +20,7 @@ const items = [
   <body>
     <header class="site">
       <div class="wrap bar">
-        <a class="brand" href={L('/')}>TIEN<b>.</b></a>
+        <a class="brand" href={L('/')} aria-label="Tien Tour Ha Giang Loop"><img src="/logo.png" alt="Tien Tour Ha Giang Loop" class="logo-img" width="203" height="34" /></a>
         <nav class="main">
           {items.map(([k,href])=>(<a class="lk" href={href}>{t(lang,k)}</a>))}
           <span class="langsw">
@@ -42,7 +42,7 @@ const items = [
     </header>
     <main><slot /></main>
     <footer class="site"><div class="wrap">
-      <div class="brand">TIEN<b style="color:var(--rust)">.</b></div>
+      <img src="/logo-white.png" alt="Tien Tour Ha Giang Loop" class="logo-img foot" width="200" height="34" />
       <p>{t(lang,'footer_op')}</p>
       <div class="social">
         <a href="https://wa.me/84865246989" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp">

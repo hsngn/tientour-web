@@ -315,3 +315,9 @@ footer.site .flinks a:hover{color:var(--rust);text-decoration:underline}
 .bus-leg label{display:block;font:600 11px 'Inter';text-transform:uppercase;letter-spacing:.05em;color:var(--muted,#8a8577);margin-bottom:6px}
 .bus-leg select{width:100%;border:1.5px solid var(--line,#e5ddd0);border-radius:12px;padding:10px 12px;font:400 14px 'Inter';background:#fff}
 @media(max-width:560px){.bus-legs{grid-template-columns:1fr}}
+
+/* brand logo images */
+.logo-img{height:34px;width:auto;display:block}
+.logo-img.foot{height:30px;margin-bottom:6px}
+header.site .brand{display:inline-flex;align-items:center}
+@media(max-width:560px){.logo-img{height:28px}.logo-img.foot{height:26px}}
