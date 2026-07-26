@@ -37,7 +37,6 @@ export async function onRequestPost({ request, env }) {
     currency: 'USD',
     status: 'pending',
     source: b.source || 'website',
-    payment_plan: b.payment_plan === 'full' ? 'full' : 'deposit',
     message: b.message || null,
   };
 
