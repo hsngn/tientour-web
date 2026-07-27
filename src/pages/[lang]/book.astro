@@ -18,6 +18,7 @@ const L = {
   erSurcharge:`${t(lang,'opt_er_t')} ${t(lang,'q_surcharge')}`,
   carLabel:`${t(lang,'opt_pc_t')} (+50%)`, bikeLabel:`${t(lang,'opt_pb_t')} (+40%)`,
   backLabel:t(lang,'book_back'), backHint:t(lang,'book_back_hint'),
+  accomHint:t(lang,'accom_rooms_hint'), accomDorm:t(lang,'accom_dorm'), accomDormNote:t(lang,'accom_dorm_note'),
   people: lang==='fr' ? 'pers' : (lang==='vi' ? 'khách' : 'people'),
   cta:t(lang,'book_cta'), okMsg:t(lang,'ok_msg'), errMsg:t(lang,'err_msg'), errContact:t(lang,'err_contact'),
 };
@@ -73,6 +74,23 @@ const seo = seoMap[lang] ?? seoMap.en;
           <span class="v" id="bval">0</span>
           <button id="bplus" type="button" aria-label="+">+</button>
         </div>
+      </div>
+
+      <div class="accom">
+        <div class="ac-title">{t(lang,'accom_title')}</div>
+        <div class="ac-opts">
+          <button type="button" class="ac sel" data-ac="private">{t(lang,'accom_private')}</button>
+          <button type="button" class="ac" data-ac="dorm">{t(lang,'accom_dorm')}</button>
+        </div>
+        <div class="ac-rooms" id="acRooms">
+          <div class="bp-label">{t(lang,'accom_rooms')} <small id="roomsHint">{t(lang,'accom_rooms_hint')}</small></div>
+          <div class="travelers">
+            <button id="rmin" type="button" aria-label="-">−</button>
+            <span class="v" id="rval">1</span>
+            <button id="rplus" type="button" aria-label="+">+</button>
+          </div>
+        </div>
+        <div class="ac-dorm" id="acDorm" style="display:none"><p class="ac-note">🛏️ <span id="dormNote"></span></p></div>
       </div>
 
       <div class="step-h"><span class="n italic">04</span><h2>{t(lang,'book_s4')}</h2></div>
@@ -143,7 +161,7 @@ const seo = seoMap[lang] ?? seoMap.en;
     const fmt = (n)=> '$' + Math.round(n).toLocaleString('en-US');
     // Prix ajustables ici :
     const PRICE = { easyRiderPerDay:60, insurancePerDay:8, privateCarPct:0.50, privateBikePct:0.40 };
-    const state = { opt:'easy_rider', slug:T[0].slug, travelers:2, backPax:0 };
+    const state = { opt:'easy_rider', slug:T[0].slug, travelers:2, backPax:0, accom:'private', rooms:1 };
     const selTour = ()=> T.find(t=>t.slug===state.slug) || T[0];
     function compute(){
       const tr=selTour(), days=tr.days, pax=state.travelers, base=tr.price, lines=[]; let total=0;
@@ -178,17 +196,33 @@ const seo = seoMap[lang] ?? seoMap.en;
       backpaxEl.style.display = state.opt==='self_drive' ? '' : 'none';
       if(state.opt!=='self_drive'){ state.backPax=0; document.getElementById('bval').textContent=0; }
       else syncBack();
+      syncRooms();
     }
+    const peopleCount = ()=> state.travelers + (state.opt==='self_drive' ? state.backPax : 0);
+    function syncRooms(){
+      const max=peopleCount();
+      if(state.rooms>max) state.rooms=max; if(state.rooms<1) state.rooms=1;
+      document.getElementById('rval').textContent=state.rooms;
+      document.getElementById('roomsHint').textContent = `${L.accomHint} (${max})`;
+      document.getElementById('dormNote').textContent = `${max} ${L.accomDorm.toLowerCase()} — ${L.accomDormNote}`;
+      document.getElementById('acRooms').style.display = state.accom==='private' ? '' : 'none';
+      document.getElementById('acDorm').style.display  = state.accom==='dorm' ? '' : 'none';
+    }
+    document.querySelectorAll('.ac').forEach(el=>el.addEventListener('click',()=>{
+      state.accom=el.dataset.ac; document.querySelectorAll('.ac').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); syncRooms();
+    }));
+    document.getElementById('rmin').addEventListener('click',()=>{ state.rooms=Math.max(1,state.rooms-1); syncRooms(); });
+    document.getElementById('rplus').addEventListener('click',()=>{ state.rooms=Math.min(peopleCount(),state.rooms+1); syncRooms(); });
     document.querySelectorAll('.opt').forEach(el=>el.addEventListener('click',()=>{
       state.opt=el.dataset.opt; document.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); refreshOptUI(); render();
     }));
     document.querySelectorAll('.tour-opt').forEach(el=>el.addEventListener('click',()=>{
       state.slug=el.dataset.slug; document.querySelectorAll('.tour-opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); render();
     }));
-    document.getElementById('tmin').addEventListener('click',()=>{ state.travelers=Math.max(1,state.travelers-1); document.getElementById('tval').textContent=state.travelers; syncBack(); render(); });
-    document.getElementById('tplus').addEventListener('click',()=>{ state.travelers=Math.min(MAX_GROUP,state.travelers+1); document.getElementById('tval').textContent=state.travelers; syncBack(); render(); });
-    document.getElementById('bmin').addEventListener('click',()=>{ state.backPax=Math.max(0,state.backPax-1); document.getElementById('bval').textContent=state.backPax; render(); });
-    document.getElementById('bplus').addEventListener('click',()=>{ state.backPax=Math.min(backMax(),state.backPax+1); document.getElementById('bval').textContent=state.backPax; render(); });
+    document.getElementById('tmin').addEventListener('click',()=>{ state.travelers=Math.max(1,state.travelers-1); document.getElementById('tval').textContent=state.travelers; syncBack(); syncRooms(); render(); });
+    document.getElementById('tplus').addEventListener('click',()=>{ state.travelers=Math.min(MAX_GROUP,state.travelers+1); document.getElementById('tval').textContent=state.travelers; syncBack(); syncRooms(); render(); });
+    document.getElementById('bmin').addEventListener('click',()=>{ state.backPax=Math.max(0,state.backPax-1); document.getElementById('bval').textContent=state.backPax; syncRooms(); render(); });
+    document.getElementById('bplus').addEventListener('click',()=>{ state.backPax=Math.min(backMax(),state.backPax+1); document.getElementById('bval').textContent=state.backPax; syncRooms(); render(); });
     document.getElementById('busWanted').addEventListener('change',(e)=>{ document.getElementById('busCityWrap').style.display = e.target.checked ? '' : 'none'; });
 
     const val=(id)=>(document.getElementById(id)?.value||'').trim();
@@ -204,6 +238,7 @@ const seo = seoMap[lang] ?? seoMap.en;
           body:JSON.stringify({ name,email,whatsapp, date:val('f_date'), message:val('f_message'),
             tour_slug:tr.slug, tour_title:tr.title, option:state.opt, travelers:r.people, back_pax:r.back, days:r.days,
             amount:r.total, bus_booking:document.getElementById('busWanted').checked, bus_out:(document.getElementById('busOut')?.value||''), bus_return:(document.getElementById('busRet')?.value||''),
+            accommodation:state.accom, rooms:(state.accom==='private'?state.rooms:0),
             country:val('f_country'),
             language:L.lang, source:'book_page' })});
         const data=await resp.json().catch(()=>({}));
@@ -216,6 +251,7 @@ const seo = seoMap[lang] ?? seoMap.en;
     const okOv=document.getElementById('okOverlay');
     document.getElementById('okClose').addEventListener('click',()=>okOv.classList.add('hidden'));
     okOv.addEventListener('click',(e)=>{ if(e.target===okOv) okOv.classList.add('hidden'); });
+    syncRooms();
     render();
   </script>
 </Base>

@@ -266,9 +266,6 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
           <div class="fld"><label>Total ($)</label><input type="number" min="0" id="mAmount"></div>
           <div class="fld"><label>Amount paid ($)</label><input type="number" min="0" id="mPaid"></div>
           <div class="fld"><label>Remaining</label><div class="nights" id="mRemain">—</div></div>
-          <div class="fld"></div>
-          <div class="fld" style="grid-column:1/-1"><label>Payment link (Stripe / local — optional)</label>
-            <input type="text" id="mPayLink" placeholder="Paste a payment link to send to the customer…"></div>
         </div>
       </div>
       <div class="fld"><label>Comments</label>
@@ -553,6 +550,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
         'Trip start': fmtDMY(b.start_date||b.date), 'Trip end': fmtDMY(b.end_date),
         'Customer': b.customer_name||'', 'Country': b.country||'', 'Email': b.email||'', 'WhatsApp': b.whatsapp||'',
         'Tour': pretty(b.tour_slug), 'Option': pretty(b.option), 'Pax': b.travelers||'', 'On the back': b.back_pax||0,
+        'Accommodation': b.accommodation==='dorm'?('Dorm beds x'+(b.travelers||0)):('Private room x'+(b.rooms||1)),
         'Pickup (bus to HG)': b.departure_city||'', 'Drop-off (bus from HG)': b.return_city||'',
         'Bus requested': b.bus_booking?'Yes':'No',
         'Total ($)': p.total, 'Paid ($)': p.paid, 'Remaining ($)': p.rem,
@@ -571,7 +569,8 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       $('mInfo').innerHTML=[
         ['Tour',esc(pretty(b.tour_slug))],['Option',esc(pretty(b.option))],
         ['Travelers',esc(b.travelers)+(Number(b.back_pax)>0?' (incl. '+esc(b.back_pax)+' on the back)':'')],['Preferred date',esc(fmtDMY(b.date)||'—')],
-        ['Bus',b.bus_booking?'Requested — price not included':'No'],['Channel',srcLabel(b.source)],
+        ['Accommodation',b.accommodation==='dorm'?('Dorm beds \u00d7'+esc(b.travelers)):('Private room \u00d7'+esc(b.rooms||1))],['Bus',b.bus_booking?'Requested — price not included':'No'],
+        ['Channel',srcLabel(b.source)],
         ['Language',esc((b.language||'').toUpperCase())],
         ['Email',esc(b.email||'—')],['WhatsApp',esc(b.whatsapp||'—')],
       ].map(([k,v])=>`<div><div class="k">${k}</div><div class="val">${v}</div></div>`).join('');
@@ -583,7 +582,6 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       $('mDep').innerHTML=cityOptions(b.departure_city||''); $('mRet').innerHTML=cityOptions(b.return_city||'');
       $('mCountry').value=b.country||'';
       $('mAmount').value=b.amount!=null?b.amount:''; $('mPaid').value=b.amount_paid!=null?b.amount_paid:0;
-      $('mPayLink').value=b.payment_link||'';
       calcNights(); calcRemain();
       $('overlay').classList.remove('hidden');
     }
@@ -599,7 +597,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
         status:$('mStatus').value, tour_slug:$('mTour').value, country:$('mCountry').value||null,
         start_date:$('mStart').value||null, end_date:$('mEnd').value||null,
         departure_city:$('mDep').value||null, return_city:$('mRet').value||null,
-        amount:$('mAmount').value||null, amount_paid:$('mPaid').value||0, payment_link:$('mPayLink').value||null });
+        amount:$('mAmount').value||null, amount_paid:$('mPaid').value||0 });
       if(ok){ closeModal(); renderActive(); }
     }
 
