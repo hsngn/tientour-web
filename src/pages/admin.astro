@@ -144,6 +144,20 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     <label for="lp">Password</label><input id="lp" type="password" autocomplete="current-password" />
     <button class="btn" id="loginBtn">Sign in</button>
     <div class="err" id="loginErr"></div>
+    <a href="#" id="forgotLink" style="display:inline-block;margin-top:16px;font:600 13px Inter;color:var(--rust)">Forgot password?</a>
+    <div id="resetBox" class="hidden">
+      <label for="re">Your admin email</label><input id="re" type="email" autocomplete="username" />
+      <button class="btn" id="resetBtn" style="background:var(--rust);border-color:var(--rust)">Send reset link</button>
+      <div class="err" id="resetMsg"></div>
+    </div>
+  </div>
+
+  <div id="setpw" class="login hidden">
+    <h1>Set a new password</h1>
+    <p>Choose a new password for your admin account.</p>
+    <label for="np">New password (min 8 characters)</label><input id="np" type="password" autocomplete="new-password" />
+    <button class="btn" id="setPwBtn">Update password</button>
+    <div class="err" id="setPwMsg"></div>
   </div>
 
   <div id="app" class="hidden">
@@ -242,7 +256,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
         <div class="fld"><label>Start date</label><input type="date" id="mStart"></div>
         <div class="fld"><label>End date</label><input type="date" id="mEnd"></div>
         <div class="fld"><label>Nights</label><div class="nights" id="mNights">—</div></div>
-        <div class="fld"></div>
+        <div class="fld"><label>Country of residence</label><input type="text" id="mCountry" placeholder="e.g. France"></div>
         <div class="fld"><label>Pickup city — bus to Ha Giang</label><div class="city"><select id="mDep"></select><button class="btn mini" data-add="mDep" title="Add a city">＋</button></div></div>
         <div class="fld"><label>Drop-off city — bus from Ha Giang</label><div class="city"><select id="mRet"></select><button class="btn mini" data-add="mRet" title="Add a city">＋</button></div></div>
       </div>
@@ -281,6 +295,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
           <option value="easy_rider">Easy Rider</option><option value="self_drive">Self-drive</option>
           <option value="private">Private tour</option><option value="rental_only">Rental only</option></select></div>
         <div class="fld"><label>Travelers</label><input type="number" min="1" id="cPax" value="2"></div>
+        <div class="fld"><label>Country of residence</label><input type="text" id="cCountry" placeholder="e.g. France"></div>
         <div class="fld"><label>Status</label><select id="cStatus">
           <option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="paid">Paid</option></select></div>
         <div class="fld"><label>Start date</label><input type="date" id="cStart"></div>
@@ -360,8 +375,10 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       const html=TOURS.map(t=>`<option value="${t.slug}">${esc(t.title)}</option>`).join('');
       $('mTour').innerHTML=html; if($('cTour')) $('cTour').innerHTML=html;
     }
+    const BUS_CITIES=['Hanoi','Sapa','Ninh Binh','Cat Ba','Ha Long'];
     function cityOptions(sel){
-      return '<option value="">— None —</option>'+CITIES.map(c=>`<option value="${esc(c)}"${c===sel?' selected':''}>${esc(c)}</option>`).join('');
+      const list=[...new Set([...BUS_CITIES, ...CITIES, ...(sel?[sel]:[])])];
+      return '<option value="">— None —</option>'+list.map(c=>`<option value="${esc(c)}"${c===sel?' selected':''}>${esc(c)}</option>`).join('');
     }
     function populateCitySelects(){
       ['mDep','mRet','cDep','cRet'].forEach(id=>{ const el=$(id); if(el){ const v=el.value; el.innerHTML=cityOptions(v); } });
@@ -523,7 +540,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
           <td>${b.departure_city||b.return_city?esc((b.departure_city||'?')+' → '+(b.return_city||'?')):'<span class="sub">—</span>'}</td>
           <td><b>${esc(b.customer_name)}</b><div class="sub">${esc(b.email||b.whatsapp||'')}</div>${b.country?'<div class="sub">🌍 '+esc(b.country)+'</div>':''}</td>
           <td>${esc(pretty(b.tour_slug))}<div class="sub">${esc(pretty(b.option))}</div></td>
-          <td>${esc(b.travelers)}</td>
+          <td>${esc(b.travelers)}${Number(b.back_pax)>0?'<div class="sub">'+esc(b.back_pax)+' on back</div>':''}</td>
           <td>${money(p.paid)} / ${money(p.total)}${p.rem>0?`<div class="sub">left ${money(p.rem)}</div>`:''}<span class="pill pay-${p.st}" style="margin-top:4px;display:inline-block">${p.st}</span></td>
           <td><span class="pill ${b.status}">${pretty(b.status)}</span></td>
           <td><span class="tag tag-${b.source==='manual'?'manual':'web'}">${srcLabel(b.source)}</span></td>
@@ -536,8 +553,8 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
         'Trip start': fmtDMY(b.start_date||b.date), 'Trip end': fmtDMY(b.end_date),
         'Customer': b.customer_name||'', 'Country': b.country||'', 'Email': b.email||'', 'WhatsApp': b.whatsapp||'',
         'Tour': pretty(b.tour_slug), 'Option': pretty(b.option), 'Pax': b.travelers||'', 'On the back': b.back_pax||0,
-        'Pickup': b.departure_city||'', 'Drop-off': b.return_city||'',
-        'Bus': b.bus_booking?'Yes':'No', 'Bus outbound': b.bus_out||'', 'Bus return': b.bus_return||'',
+        'Pickup (bus to HG)': b.departure_city||'', 'Drop-off (bus from HG)': b.return_city||'',
+        'Bus requested': b.bus_booking?'Yes':'No',
         'Total ($)': p.total, 'Paid ($)': p.paid, 'Remaining ($)': p.rem,
         'Status': b.status||'', 'Channel': srcLabel(b.source), 'Requested': fmtDMY(b.created_at),
       };});
@@ -553,9 +570,8 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       $('mMeta').textContent='Requested '+(b.created_at?fmtDMY(b.created_at):'');
       $('mInfo').innerHTML=[
         ['Tour',esc(pretty(b.tour_slug))],['Option',esc(pretty(b.option))],
-        ['Travelers',esc(b.travelers)+(Number(b.back_pax)>0?' (+'+esc(b.back_pax)+' on the back)':'')],['Preferred date',esc(fmtDMY(b.date)||'—')],
-        ['Country',esc(b.country||'—')],['Channel',srcLabel(b.source)],
-        ['Bus',b.bus_booking?('Yes — '+esc(b.bus_out||'?')+' → '+esc(b.bus_return||'?')+' (not incl.)'):'No'],
+        ['Travelers',esc(b.travelers)+(Number(b.back_pax)>0?' (incl. '+esc(b.back_pax)+' on the back)':'')],['Preferred date',esc(fmtDMY(b.date)||'—')],
+        ['Bus',b.bus_booking?'Requested — price not included':'No'],['Channel',srcLabel(b.source)],
         ['Language',esc((b.language||'').toUpperCase())],
         ['Email',esc(b.email||'—')],['WhatsApp',esc(b.whatsapp||'—')],
       ].map(([k,v])=>`<div><div class="k">${k}</div><div class="val">${v}</div></div>`).join('');
@@ -565,6 +581,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       $('mTour').value=b.tour_slug||''; 
       $('mStart').value=b.start_date||b.date||''; $('mEnd').value=b.end_date||'';
       $('mDep').innerHTML=cityOptions(b.departure_city||''); $('mRet').innerHTML=cityOptions(b.return_city||'');
+      $('mCountry').value=b.country||'';
       $('mAmount').value=b.amount!=null?b.amount:''; $('mPaid').value=b.amount_paid!=null?b.amount_paid:0;
       $('mPayLink').value=b.payment_link||'';
       calcNights(); calcRemain();
@@ -579,7 +596,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     function closeModal(){ $('overlay').classList.add('hidden'); current=null; }
     async function saveDetail(){
       if(!current) return; const ok=await update(current,{
-        status:$('mStatus').value, tour_slug:$('mTour').value,
+        status:$('mStatus').value, tour_slug:$('mTour').value, country:$('mCountry').value||null,
         start_date:$('mStart').value||null, end_date:$('mEnd').value||null,
         departure_city:$('mDep').value||null, return_city:$('mRet').value||null,
         amount:$('mAmount').value||null, amount_paid:$('mPaid').value||0, payment_link:$('mPayLink').value||null });
@@ -588,7 +605,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
 
     function openCreate(){
       $('createErr').textContent='';
-      ['cName','cEmail','cWa','cStart','cEnd','cAmount','cMsg'].forEach(i=>{const e=$(i);if(e)e.value='';});
+      ['cName','cEmail','cWa','cStart','cEnd','cAmount','cMsg','cCountry'].forEach(i=>{const e=$(i);if(e)e.value='';});
       $('cPax').value='2'; $('cPaid').value='0'; $('cStatus').value='pending'; $('cOption').value='easy_rider'; $('cLang').value='en';
       if($('cTour')&&TOURS[0]) $('cTour').value=TOURS[0].slug;
       $('cDep').innerHTML=cityOptions(''); $('cRet').innerHTML=cityOptions('');
@@ -604,7 +621,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
         const r=await fetch(API+'/create',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token()},
           body:JSON.stringify({ customer_name:name, email, whatsapp:wa, tour_slug:$('cTour').value, option:$('cOption').value,
             travelers:$('cPax').value, status:$('cStatus').value, start_date:$('cStart').value||null, end_date:$('cEnd').value||null,
-            departure_city:$('cDep').value||null, return_city:$('cRet').value||null, amount:$('cAmount').value||null,
+            departure_city:$('cDep').value||null, return_city:$('cRet').value||null, amount:$('cAmount').value||null, country:$('cCountry').value||null,
             amount_paid:$('cPaid').value||0, language:$('cLang').value, message:$('cMsg').value||null })});
         if(r.status===401){ logout(); return; }
         const d=await r.json().catch(()=>({}));
@@ -616,6 +633,27 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
 
     $('loginBtn').addEventListener('click',login);
     $('lp').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+    $('forgotLink').addEventListener('click',(e)=>{ e.preventDefault(); $('resetBox').classList.toggle('hidden'); });
+    $('resetBtn').addEventListener('click',async()=>{
+      const email=$('re').value.trim(); const m=$('resetMsg'); m.style.color='';
+      if(!email){ m.textContent='Enter your email.'; return; }
+      $('resetBtn').disabled=true;
+      try{ await fetch(API+'/recover',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+        m.style.color='var(--forest)'; m.textContent='If this email is an admin, a reset link has been sent. Check your inbox.';
+      }catch(e){ m.textContent='Network error.'; }
+      $('resetBtn').disabled=false;
+    });
+    $('setPwBtn').addEventListener('click',async()=>{
+      const pw=$('np').value; const m=$('setPwMsg'); m.style.color='';
+      if(!pw||pw.length<8){ m.textContent='Password must be at least 8 characters.'; return; }
+      $('setPwBtn').disabled=true;
+      try{ const r=await fetch(API+'/set-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:window.__recoveryToken,password:pw})});
+        const d=await r.json().catch(()=>({}));
+        if(d.ok){ $('setpw').classList.add('hidden'); show('login'); const le=$('loginErr'); le.style.color='var(--forest)'; le.textContent='Password updated. Please sign in.'; }
+        else m.textContent='Link invalid or expired. Request a new reset link.';
+      }catch(e){ m.textContent='Network error.'; }
+      $('setPwBtn').disabled=false;
+    });
     $('refresh').addEventListener('click',loadBookings);
     $('logout').addEventListener('click',logout);
     document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>setTab(t.dataset.view)));
@@ -649,7 +687,16 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     $('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))closeModal();});
 
     setPeriod('90');
-    if(token()) loadBookings(); else show('login');
+    (function(){
+      const h=new URLSearchParams((location.hash||'').replace(/^#/,''));
+      if(h.get('type')==='recovery' && h.get('access_token')){
+        window.__recoveryToken=h.get('access_token');
+        $('login').classList.add('hidden'); $('app').classList.add('hidden'); $('setpw').classList.remove('hidden');
+        history.replaceState(null,'',location.pathname);
+        return;
+      }
+      if(token()) loadBookings(); else show('login');
+    })();
   </script>
 </body>
 </html>

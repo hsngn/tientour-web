@@ -2,7 +2,7 @@
 import { adminEmail } from './_guard.js';
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json' } });
 const TEXT = ['status','tour_slug','start_date','end_date','departure_city','return_city',
-  'admin_notes','payment_link','customer_name','email','whatsapp','option','language','message','date'];
+  'admin_notes','payment_link','customer_name','email','whatsapp','option','language','message','date','country'];
 const NUM = ['amount','amount_paid','travelers'];
 
 export async function onRequestPost({ request, env }) {

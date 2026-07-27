@@ -16,6 +16,7 @@ export async function onRequestPost({ request, env }) {
     amount_paid: b.amount_paid ? Number(b.amount_paid) : 0,
     currency: 'USD', language: b.language || 'en',
     status: b.status || 'pending', source: 'manual', message: b.message || null,
+    country: b.country || null,
   };
   const r = await fetch(`${env.SUPABASE_URL}/rest/v1/bookings`, {
     method: 'POST',
