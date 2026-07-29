@@ -2,15 +2,15 @@
 import { t } from '../i18n/ui';
 const { lang, head = true } = Astro.props;
 const data = {
-  en:[["“The best thing I did in Southeast Asia. Tien knows every bend in the road. We stayed in a homestay where we actually felt like guests, not tourists.”","🇬🇧 James T. · United Kingdom"],
-      ["“An incredible experience. The landscapes are breathtaking and the team is rare in their kindness. Thank you Hoang!”","🇫🇷 Marie L. · France"],
-      ["“I've ridden all over the world but the hospitality of the Tien Tour team is unmatched. Local expertise at its finest.”","🇦🇺 Sarah K. · Australia"]],
-  fr:[["« La meilleure chose que j’ai faite en Asie du Sud-Est. Tien connaît chaque virage. Dans le homestay, on se sentait invités, pas touristes. »","🇬🇧 James T. · Royaume-Uni"],
-      ["« Une expérience incroyable. Les paysages sont à couper le souffle et l’équipe d’une gentillesse rare. Merci Hoang ! »","🇫🇷 Marie L. · France"],
-      ["« J’ai roulé partout dans le monde, mais l’accueil de l’équipe Tien Tour est inégalé. L’expertise locale à son meilleur. »","🇦🇺 Sarah K. · Australie"]],
-  vi:[["“Điều tuyệt nhất tôi làm ở Đông Nam Á. Tien thuộc từng khúc cua. Chúng tôi ở homestay và thực sự cảm thấy như khách quý, không phải khách du lịch.”","🇬🇧 James T. · Vương quốc Anh"],
-      ["“Một trải nghiệm khó tin. Cảnh quan ngoạn mục và cả đội tử tế hiếm có. Cảm ơn Hoang!”","🇫🇷 Marie L. · Pháp"],
-      ["“Tôi đã phượt khắp thế giới nhưng sự hiếu khách của đội Tien Tour là vô song. Am hiểu địa phương ở đẳng cấp cao nhất.”","🇦🇺 Sarah K. · Úc"]],
+  en:[["“The Ha Giang Loop is an adventure that will stay forever in our hearts. We had very good drivers who knew the road by heart — special thanks to Dak, I felt completely safe the entire journey. The food was great and the evenings memorable.”","🇬🇧 Juliette K. · Google review"],
+      ["“Truly one of the best experiences of my life. As a solo traveler I was stressed, but the group was amazing and every driver was kind and drove safely. The homestays and hotel were lovely and the food beyond expectations.”","🇫🇷 Nadège E. · Google review"],
+      ["“Clearly one of the best parts of my trip to Vietnam. They organised my arrival from Sapa perfectly and even booked my bus to Cao Bang. Special mention to Thinh, my driver and guide — always smiling and caring.”","🇫🇷 Philippine L. · Google review"]],
+  fr:[["« Clairement une des meilleures expériences de mon voyage au Vietnam ! Ils ont parfaitement organisé mon arrivée depuis Sapa et même réservé mon bus pour Cao Bang. Mention spéciale à Thinh, mon driver et guide, toujours souriant et bienveillant. »","🇫🇷 Philippine L. · Avis Google"],
+      ["« La boucle de Ha Giang est une aventure qui restera à jamais dans nos cœurs. Nos drivers connaissaient la route par cœur — merci à Dak, je me suis sentie totalement en sécurité. La nourriture était excellente et les soirées mémorables. »","🇬🇧 Juliette K. · Avis Google"],
+      ["« Vraiment l’une des meilleures expériences de ma vie. Solo et un peu stressée au départ, j’ai eu un groupe génial et des drivers adorables et prudents. Les homestays et l’hôtel étaient superbes et la cuisine au-delà de mes attentes. »","🇫🇷 Nadège E. · Avis Google"]],
+  vi:[["“The Ha Giang Loop is an adventure that will stay forever in our hearts. Special thanks to my driver Dak — I felt completely safe the entire journey.”","🇬🇧 Juliette K. · Google review"],
+      ["“Truly one of the best experiences of my life. Every driver was kind and drove safely, the homestays were lovely and the food beyond expectations.”","🇫🇷 Nadège E. · Google review"],
+      ["“One of the best parts of my trip to Vietnam. Special mention to Thinh, my driver and guide — always smiling and caring.”","🇫🇷 Philippine L. · Google review"]],
 };
 const list = data[lang] ?? data.en;
 ---

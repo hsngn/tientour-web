@@ -23,6 +23,13 @@ const seo = seoMap[lang] ?? seoMap.en;
   </div></section>
   <TourGrid lang={lang} tours={tours} showHead={false} />
 
+  <section class="map-section"><div class="wrap">
+    <div class="eyebrow">{lang==='fr'?'L\u2019itinéraire':'The route'}</div>
+    <h2 class="title">{lang==='fr'?'La carte de la boucle':'The Ha Giang Loop map'}</h2>
+    <p class="sub">{lang==='fr'?'Tous les temps forts que nous traversons — cols, villages, rivières et points de vue.':'Every highlight we ride through — passes, villages, rivers and viewpoints.'}</p>
+    <figure class="route-map"><img src="/route-map.jpg" alt="Tien Tour Ha Giang Loop route map" width="1542" height="1255" loading="lazy" /></figure>
+  </div></section>
+
   <Includes lang={lang} />
 
   <section class="bus-section"><div class="wrap">

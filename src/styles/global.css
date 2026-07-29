@@ -359,3 +359,8 @@ header.site .brand{display:inline-flex;align-items:center}
 .travelers.sm{gap:10px}
 .travelers.sm button{width:34px;height:34px;font-size:18px}
 .travelers.sm .v{min-width:22px;font-size:17px}
+
+/* tours page: route map */
+.map-section{padding-top:28px;padding-bottom:12px}
+.route-map{margin:28px 0 0;border:1px solid var(--line,#e5ddd0);border-radius:20px;overflow:hidden;background:#FCF9F4}
+.route-map img{display:block;width:100%;height:auto}
