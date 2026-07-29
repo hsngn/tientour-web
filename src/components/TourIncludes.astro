@@ -1,0 +1,58 @@
+---
+const { lang } = Astro.props;
+const D = lang==='fr' ? {
+  eyebrow:'Ce qui est prévu', title:'Ce que le tour comprend',
+  incT:'Inclus dans le tour', excT:'Non inclus',
+  inc:[
+    'Hébergement','Easy riders et guide local (pilote moto)','Frais d’entrée & billets des sites',
+    'Eau filtrée (1,5 L/jour)','Repas (petit-déjeuner, déjeuner, dîner)',
+    'Équipement de protection (casques, coudières, genouillères)','T-shirt Ha Giang Loop OFFERT',
+    'Nuit OFFERTE avant le tour + consigne à bagages',
+  ],
+  exc:[
+    'Billets de bus','Pourboires pour le pilote et le guide','Assurance voyage',
+    'Permis de frontière (260k/pers., payé directement à l’autorité locale)',
+  ],
+} : {
+  eyebrow:'What to expect', title:'What the tour includes',
+  incT:'Tour includes', excT:'Tour excludes',
+  inc:[
+    'Accommodation','Easy riders and local tourguide (motorbike driver)','Entrance fees & sightseeing tickets',
+    'Filtered water (1.5L per day)','Meals (breakfast, lunch, dinner)',
+    'Protective gear (helmets, elbow pads, knee pads)','FREE Ha Giang Loop T-shirt',
+    'FREE night before the tour + luggage storage',
+  ],
+  exc:[
+    'Bus tickets','Tips for the driver and guide','Travel insurance',
+    'Border Permit (260k/person, paid directly to the local authority)',
+  ],
+};
+---
+<section class="incl-sec"><div class="wrap">
+  <div class="eyebrow">{D.eyebrow}</div>
+  <h2 class="title">{D.title}</h2>
+  <div class="incl-grid">
+    <div class="incl-card inc">
+      <h3>{D.incT}</h3>
+      <ul>{D.inc.map((i)=>(<li><span class="ic">✔</span>{i}</li>))}</ul>
+    </div>
+    <div class="incl-card exc">
+      <h3>{D.excT}</h3>
+      <ul>{D.exc.map((i)=>(<li><span class="ic">✕</span>{i}</li>))}</ul>
+    </div>
+  </div>
+</div></section>
+
+<style is:global>
+  .incl-sec{padding-top:40px;padding-bottom:40px}
+  .incl-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:40px}
+  .incl-card{background:var(--paper,#fbf8f2);border:1px solid var(--line,#e5ddd0);border-radius:20px;padding:28px 30px}
+  .incl-card h3{font:600 22px 'Fraunces',serif;margin:0 0 18px}
+  .incl-card ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+  .incl-card li{display:flex;gap:12px;align-items:flex-start;font-size:15.5px;line-height:1.5;color:var(--ink,#1b1d17)}
+  .incl-card .ic{flex:0 0 auto;font-weight:800;margin-top:1px}
+  .incl-card.inc .ic{color:#2F6E58}
+  .incl-card.exc .ic{color:#C2562E}
+  .incl-card.exc li{color:#5c574d}
+  @media(max-width:760px){ .incl-grid{grid-template-columns:1fr} }
+</style>

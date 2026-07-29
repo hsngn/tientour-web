@@ -1,0 +1,70 @@
+---
+const { lang } = Astro.props;
+const D = {
+  en: {
+    inc: 'Tour includes', exc: 'Tour excludes',
+    includes: [
+      'Accommodation',
+      'Easy riders and local tour guide (motorbike driver)',
+      'Entrance fees & sightseeing tickets',
+      'Filtered water (1.5L per day)',
+      'Meals (breakfast, lunch, dinner)',
+      'Protective gear (helmets, elbow pads, knee pads)',
+      'FREE Ha Giang Loop T-shirt',
+      'FREE night before the tour & luggage storage',
+    ],
+    excludes: [
+      'Bus tickets',
+      'Tips for the driver and guide',
+      'Travel insurance',
+      'Border permit (260,000₫/person, paid directly to the local authority)',
+    ],
+  },
+  fr: {
+    inc: 'Le circuit comprend', exc: 'Le circuit ne comprend pas',
+    includes: [
+      'Hébergement',
+      'Easy riders et guide local (chauffeur moto)',
+      'Droits d’entrée & billets des sites',
+      'Eau filtrée (1,5 L/jour)',
+      'Repas (petit-déjeuner, déjeuner, dîner)',
+      'Équipement de protection (casques, coudières, genouillères)',
+      'T-shirt Ha Giang Loop OFFERT',
+      'Nuit OFFERTE avant le tour & consigne à bagages',
+    ],
+    excludes: [
+      'Billets de bus',
+      'Pourboires pour le chauffeur et le guide',
+      'Assurance voyage',
+      'Permis de frontière (260 000₫/pers., payé directement à l’autorité locale)',
+    ],
+  },
+};
+const c = D[lang] ?? D.en;
+---
+<section class="incexc"><div class="wrap">
+  <div class="ie-grid">
+    <div class="ie-col ie-inc">
+      <h3>{c.inc}</h3>
+      <ul>{c.includes.map((i)=>(<li><span class="ie-ic ok">✔</span><span>{i}</span></li>))}</ul>
+    </div>
+    <div class="ie-col ie-exc">
+      <h3>{c.exc}</h3>
+      <ul>{c.excludes.map((i)=>(<li><span class="ie-ic no">✕</span><span>{i}</span></li>))}</ul>
+    </div>
+  </div>
+</div></section>
+
+<style is:global>
+  .incexc{padding-top:16px;padding-bottom:8px}
+  .ie-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  .ie-col{background:var(--paper,#fbf8f2);border:1px solid var(--line,#e5ddd0);border-radius:18px;padding:26px 28px}
+  .ie-col h3{margin:0 0 16px;font:600 22px 'Fraunces',serif;color:var(--forest,#1E3A2B)}
+  .ie-exc h3{color:var(--rust,#C2562E)}
+  .ie-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px}
+  .ie-col li{display:flex;gap:12px;align-items:flex-start;font:400 15.5px 'Inter';line-height:1.45;color:var(--ink,#1b1d17)}
+  .ie-ic{flex:0 0 auto;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;margin-top:1px}
+  .ie-ic.ok{background:#E2EFE6;color:#2F6E58}
+  .ie-ic.no{background:#F6E2DB;color:#C2562E}
+  @media(max-width:760px){ .ie-grid{grid-template-columns:1fr;gap:18px} }
+</style>

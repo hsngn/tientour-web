@@ -4,6 +4,7 @@ import { LANGS, t } from '../../../i18n/ui';
 import Base from '../../../layouts/Base.astro';
 import TourGrid from '../../../components/TourGrid.astro';
 import BusSchedule from '../../../components/BusSchedule.astro';
+import Includes from '../../../components/Includes.astro';
 import FinalCta from '../../../components/FinalCta.astro';
 export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
 const { lang } = Astro.params;
@@ -21,6 +22,8 @@ const seo = seoMap[lang] ?? seoMap.en;
     <p class="sub">{t(lang,'tours_sub')}</p>
   </div></section>
   <TourGrid lang={lang} tours={tours} showHead={false} />
+
+  <Includes lang={lang} />
 
   <section class="bus-section"><div class="wrap">
     <div class="eyebrow">{lang==='fr'?'Y aller':'Getting there'}</div>

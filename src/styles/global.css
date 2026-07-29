@@ -341,3 +341,21 @@ header.site .brand{display:inline-flex;align-items:center}
 .ac{background:#fff;border:1.5px solid var(--line,#e5ddd0);border-radius:12px;padding:9px 16px;font:600 14px 'Inter';cursor:pointer}
 .ac.sel{background:var(--forest,#1E3A2B);border-color:var(--forest,#1E3A2B);color:#fff}
 .ac-note{margin:6px 0 0;padding:10px 14px;background:#EAF0EA;border-radius:10px;color:#2F6E58;font:600 13px 'Inter'}
+
+/* quote: readable highlighted summary + currency */
+.quote .q-cur{font:600 14px 'Inter';color:#CFE0D2;margin:2px 0 8px}
+.quote .q-sum{display:flex;flex-direction:column;gap:10px;margin:6px 0}
+.quote .qs-row{display:flex;justify-content:space-between;gap:14px;align-items:baseline;font-size:14px;line-height:1.4}
+.quote .qs-row .qs-k{color:#A8C0AD;white-space:nowrap;flex:0 0 auto}
+.quote .qs-row .qs-v{color:#fff;text-align:right}
+.quote .qs-row .qs-v b{color:#fff;font-weight:800}
+.quote .qs-row .qs-v small{color:#CFE0D2;font-weight:500}
+/* accommodation: two rows (private rooms + dorm beds) */
+.accom{margin-top:16px;padding-top:16px;border-top:1px dashed var(--line,#e5ddd0)}
+.accom .ac-title{font:700 12px 'Inter';letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#8a8577);margin-bottom:6px}
+.accom .ac-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px}
+.accom .ac-lbl{font:600 14px 'Inter';color:var(--ink,#1b1d17)}
+.accom .ac-lbl small{color:var(--muted,#8a8577);font-weight:500;font-size:12px;margin-left:4px}
+.travelers.sm{gap:10px}
+.travelers.sm button{width:34px;height:34px;font-size:18px}
+.travelers.sm .v{min-width:22px;font-size:17px}

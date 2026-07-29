@@ -550,7 +550,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
         'Trip start': fmtDMY(b.start_date||b.date), 'Trip end': fmtDMY(b.end_date),
         'Customer': b.customer_name||'', 'Country': b.country||'', 'Email': b.email||'', 'WhatsApp': b.whatsapp||'',
         'Tour': pretty(b.tour_slug), 'Option': pretty(b.option), 'Pax': b.travelers||'', 'On the back': b.back_pax||0,
-        'Accommodation': b.accommodation==='dorm'?('Dorm beds x'+(b.travelers||0)):('Private room x'+(b.rooms||1)),
+        'Private rooms': b.rooms||0, 'Dorm beds': b.dorm_beds||0,
         'Pickup (bus to HG)': b.departure_city||'', 'Drop-off (bus from HG)': b.return_city||'',
         'Bus requested': b.bus_booking?'Yes':'No',
         'Total ($)': p.total, 'Paid ($)': p.paid, 'Remaining ($)': p.rem,
@@ -569,7 +569,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       $('mInfo').innerHTML=[
         ['Tour',esc(pretty(b.tour_slug))],['Option',esc(pretty(b.option))],
         ['Travelers',esc(b.travelers)+(Number(b.back_pax)>0?' (incl. '+esc(b.back_pax)+' on the back)':'')],['Preferred date',esc(fmtDMY(b.date)||'—')],
-        ['Accommodation',b.accommodation==='dorm'?('Dorm beds \u00d7'+esc(b.travelers)):('Private room \u00d7'+esc(b.rooms||1))],['Bus',b.bus_booking?'Requested — price not included':'No'],
+        ['Accommodation', (((Number(b.rooms)||0)>0?('Private \u00d7'+esc(b.rooms)):'')+((Number(b.rooms)||0)>0&&(Number(b.dorm_beds)||0)>0?' \u00b7 ':'')+((Number(b.dorm_beds)||0)>0?('Dorm \u00d7'+esc(b.dorm_beds)):''))||'\u2014'],['Bus',b.bus_booking?'Requested — price not included':'No'],
         ['Channel',srcLabel(b.source)],
         ['Language',esc((b.language||'').toUpperCase())],
         ['Email',esc(b.email||'—')],['WhatsApp',esc(b.whatsapp||'—')],
