@@ -13,8 +13,8 @@ en:
   itinerary:
     - { title: "Day 1 — Ha Giang → Dong Van", text: "Bac Sum Pass, Quan Ba Heaven Gate, the Tham Ma Pass and the H'Mong King's Palace, then a night in Dong Van town." }
     - { title: "Day 2 — Dong Van → Ha Giang", text: "Ma Pi Leng Pass, Meo Vac, Yen Minh, Mau Due, Thai An and Thuan Hoa on the scenic ride back to Ha Giang." }
-  inclusions: ["Local rider or self-drive bike", "1 night homestay", "Meals on tour", "Fuel & permits", "Insurance during tour"]
-  exclusions: ["Transport to Ha Giang", "Personal travel insurance", "Drinks", "Tips"]
+  inclusions: ["Local rider or self-drive bike", "1 night homestay", "Meals on tour", "Fuel"]
+  exclusions: ["Transport to Ha Giang", "Personal travel insurance", "Tips"]
   faq:
     - { q: "Is 2 days enough for the loop?", a: "Yes — the 2-day tour covers the essential highlights at a steady pace. For a more relaxed rhythm, choose the 3-day tour." }
     - { q: "Do I need a license?", a: "Not with the easy-rider option — a local pilot drives. To self-drive you need a valid motorcycle licence and an IDP." }
@@ -27,8 +27,8 @@ fr:
   itinerary:
     - { title: "Jour 1 — Ha Giang → Dong Van", text: "Col de Bac Sum, Porte du ciel de Quan Ba, col de Tham Ma et palais du roi H'Mong, puis nuit à Dong Van." }
     - { title: "Jour 2 — Dong Van → Ha Giang", text: "Col de Ma Pi Leng, Meo Vac, Yen Minh, Mau Due, Thai An et Thuan Hoa lors du retour panoramique à Ha Giang." }
-  inclusions: ["Pilote local ou moto self-drive", "1 nuit chez l'habitant", "Repas pendant le tour", "Essence & permis", "Assurance pendant le tour"]
-  exclusions: ["Transport jusqu'à Ha Giang", "Assurance voyage personnelle", "Boissons", "Pourboires"]
+  inclusions: ["Pilote local ou moto self-drive", "1 nuit chez l'habitant", "Repas pendant le tour", "Essence"]
+  exclusions: ["Transport jusqu'à Ha Giang", "Assurance voyage personnelle", "Pourboires"]
   faq:
     - { q: "2 jours suffisent-ils pour la boucle ?", a: "Oui — le circuit de 2 jours couvre les incontournables à un bon rythme. Pour plus de tranquillité, choisissez le circuit de 3 jours." }
     - { q: "Faut-il un permis ?", a: "Pas avec l'option easy rider — un pilote local conduit. Pour conduire vous-même, un permis moto valide et un IDP sont requis." }
