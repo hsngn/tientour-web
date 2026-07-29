@@ -34,7 +34,7 @@ export async function onRequestPost({ request, env }) {
     whatsapp: whatsapp || null,
     language: b.language || 'en',
     amount: b.amount != null ? Number(b.amount) : null,
-    currency: 'USD',
+    currency: 'VND',
     status: 'pending',
     source: b.source || 'website',
     bus_booking: !!b.bus_booking,
@@ -71,7 +71,7 @@ export async function onRequestPost({ request, env }) {
       <h2>New booking request — Tien Tour</h2>
       <p><b>Tour:</b> ${esc(b.tour_title)} (${esc(b.days)} days)</p>
       <p><b>Option:</b> ${esc(b.option)} &nbsp; <b>Travelers:</b> ${esc(b.travelers)}${Number(b.back_pax) > 0 ? ` (incl. ${esc(b.back_pax)} on the back of a friend)` : ''}</p>
-      <p><b>Estimated total:</b> $${esc(b.amount)}</p>
+      <p><b>Estimated total:</b> ${Number(b.amount||0).toLocaleString('en-US')} VND</p>
       <p><b>Accommodation:</b> ${(Number(b.rooms)||0)>0?`${esc(b.rooms)} private room(s)`:''}${(Number(b.rooms)||0)>0&&(Number(b.dorm_beds)||0)>0?' + ':''}${(Number(b.dorm_beds)||0)>0?`${esc(b.dorm_beds)} dorm bed(s)`:''}${(Number(b.rooms)||0)===0&&(Number(b.dorm_beds)||0)===0?'—':''}</p>
       ${b.bus_booking ? `<p><b>Bus requested:</b> Yes${b.bus_out ? ` — Outbound from ${esc(b.bus_out)}` : ''}${b.bus_return ? `, Return to ${esc(b.bus_return)}` : ''} &nbsp;<i>(bus price NOT included in tour — confirm schedule & cost separately)</i></p>` : ''}
       <p><b>Preferred date:</b> ${esc(b.date) || '—'}</p>

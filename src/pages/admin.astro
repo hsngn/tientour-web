@@ -319,7 +319,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     const token=()=>localStorage.getItem(TKEY);
     const esc=(s)=>String(s??'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
     const pretty=(s)=>String(s||'').replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-    const money=(n)=>n==null?'—':'$'+Math.round(n).toLocaleString('en-US');
+    const money=(n)=>n==null?'—':Math.round(n).toLocaleString('en-US').replace(/,/g,'\u00a0')+'\u00a0VND';
     const dstr=(d)=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');};
     const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
     let ALL=[], NOTES={}, CITIES=[], view='dash', charts={}, current=null, fAttn=false;
@@ -553,7 +553,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
         'Private rooms': b.rooms||0, 'Dorm beds': b.dorm_beds||0,
         'Pickup (bus to HG)': b.departure_city||'', 'Drop-off (bus from HG)': b.return_city||'',
         'Bus requested': b.bus_booking?'Yes':'No',
-        'Total ($)': p.total, 'Paid ($)': p.paid, 'Remaining ($)': p.rem,
+        'Total (VND)': p.total, 'Paid (VND)': p.paid, 'Remaining (VND)': p.rem,
         'Status': b.status||'', 'Channel': srcLabel(b.source), 'Requested': fmtDMY(b.created_at),
       };});
       const ws=XLSX.utils.json_to_sheet(data); const wb=XLSX.utils.book_new();

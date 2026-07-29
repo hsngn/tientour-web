@@ -9,8 +9,6 @@ const T = tours.map((tr)=>({ slug:tr.slug, price:tr.data.priceFrom, days:tr.data
 const opts = [
   ['easy_rider','opt_er_t','opt_er_b','opt_er_d'],
   ['self_drive','opt_sd_t','opt_sd_b','opt_sd_d'],
-  ['private_car','opt_pc_t','opt_pc_b','opt_pc_d'],
-  ['private_bike','opt_pb_t','opt_pb_b','opt_pb_d'],
 ].map(([k,a,b,c])=>({ key:k, title:t(lang,a), badge:t(lang,b), desc:t(lang,c) }));
 const L = {
   lang, for:t(lang,'q_for'), travelers:t(lang,'q_travelers'), days:t(lang,'days'),
@@ -56,7 +54,7 @@ const seo = seoMap[lang] ?? seoMap.en;
           <div class={"tour-opt"+(i===0?" sel":"")} data-slug={tr.slug} data-price={tr.price} data-days={tr.days}>
             <div class="th"></div>
             <div><h3>{tr.title}</h3>
-              <div class="meta">{tr.days} {t(lang,'days')} · {t(lang,'from')} ${tr.price}/pers.</div>
+              <div class="meta">{tr.days} {t(lang,'days')} · {t(lang,'from')} {tr.price.toLocaleString('en-US').replace(/,/g,'\u00a0')} VND/pers.</div>
               {tr.route && <div class="route">{tr.route}</div>}
             </div>
           </div>
@@ -162,36 +160,45 @@ const seo = seoMap[lang] ?? seoMap.en;
   </div>
 
   <script define:vars={{ T, L }}>
-    const fmt = (n)=> '$' + Math.round(n).toLocaleString('en-US');
-    // Prix ajustables ici :
-    const PRICE = { easyRiderPerDay:60, insurancePerDay:8, privateCarPct:0.50, privateBikePct:0.40 };
-    const state = { opt:'easy_rider', slug:T[0].slug, travelers:2, backPax:0, rooms:1, beds:0 };
-    const FX = { eur:0.92, vnd:25400 }; // taux indicatifs USD-> (à ajuster ponctuellement)
+    // ---- Grille tarifaire (VND en milliers, USD exact) — source: doc Tien Tour, 1$ = 26 000 VND ----
+    const PRICES = {
+      2: { easy_rider:{dorm:{vnd:2700,usd:100}, private:{vnd:2900,usd:110}}, self_driving:{dorm:{vnd:2300,usd:88}, private:{vnd:2500,usd:96}}, on_the_back:{dorm:{vnd:1700,usd:65}, private:{vnd:1900,usd:73}} },
+      3: { easy_rider:{dorm:{vnd:3360,usd:129}, private:{vnd:3680,usd:140}}, self_driving:{dorm:{vnd:2950,usd:113}, private:{vnd:3300,usd:127}}, on_the_back:{dorm:{vnd:2350,usd:90}, private:{vnd:2650,usd:102}} },
+      4: { easy_rider:{dorm:{vnd:4500,usd:173}, private:{vnd:4800,usd:185}}, self_driving:{dorm:{vnd:3950,usd:152}, private:{vnd:4460,usd:172}}, on_the_back:{dorm:{vnd:3350,usd:129}, private:{vnd:3850,usd:148}} },
+    };
+    const FX = { usdToEur: 0.92 }; // taux indicatif pour l'affichage EUR (ajustable)
+    const fmtVND = (n)=> Math.round(n).toLocaleString('en-US').replace(/,/g,'\u00a0') + '\u00a0VND';
+    const state = { opt:'easy_rider', slug:T[0].slug, travelers:2, backPax:0, rooms:0, beds:2 };
     const selTour = ()=> T.find(t=>t.slug===state.slug) || T[0];
     function compute(){
-      const tr=selTour(), days=tr.days, pax=state.travelers, base=tr.price, lines=[]; let total=0;
-      const back = state.opt==='self_drive' ? state.backPax : 0;
-      const drive=base*pax; lines.push({d:tr.title, s:`$${base} × ${pax} ${L.people}`, a:drive}); total+=drive;
-      if(state.opt==='self_drive' && back>0){ const bc=base*back; lines.push({d:L.backLabel, s:`$${base} × ${back}`, a:bc}); total+=bc; }
-      if(state.opt==='easy_rider'){ const s=PRICE.easyRiderPerDay*days*pax; lines.push({d:L.erSurcharge, s:`$${PRICE.easyRiderPerDay} × ${days} ${L.days} × ${pax}`, a:s}); total+=s; }
-      if(state.opt==='private_car'){ const s=Math.round(drive*PRICE.privateCarPct); lines.push({d:L.carLabel, s:'', a:s}); total+=s; }
-      if(state.opt==='private_bike'){ const s=Math.round(drive*PRICE.privateBikePct); lines.push({d:L.bikeLabel, s:'', a:s}); total+=s; }
-      const people=pax+back;
-      return { days, pax, back, people, total, lines };
+      const tr=selTour(), days=tr.days, P=PRICES[days] || PRICES[2];
+      const pax=state.travelers, back = state.opt==='self_drive' ? state.backPax : 0;
+      const mainRole = state.opt==='easy_rider' ? 'easy_rider' : 'self_driving';
+      const people = pax + back;
+      // hébergement : rooms personnes en privé, beds personnes en dortoir (rooms+beds = people)
+      const priv = Math.min(state.rooms, people), dorm = people - priv;
+      // on affecte le privé d'abord aux voyageurs principaux, puis aux passagers arrière
+      const privMain = Math.min(priv, pax), privBack = priv - privMain;
+      const dormMain = pax - privMain, dormBack = back - privBack;
+      let vnd=0, usd=0;
+      const add=(n,role,acc)=>{ if(n>0){ vnd += n*P[role][acc].vnd; usd += n*P[role][acc].usd; } };
+      add(privMain, mainRole, 'private'); add(dormMain, mainRole, 'dorm');
+      add(privBack, 'on_the_back', 'private'); add(dormBack, 'on_the_back', 'dorm');
+      return { days, pax, back, people, priv, dorm, vnd: vnd*1000, usd };
     }
     function render(){
       const r=compute();
-      document.getElementById('qbig').textContent=fmt(r.total);
-      const eur=Math.round(r.total*FX.eur), vnd=Math.round(r.total*FX.vnd/1000)*1000;
-      document.getElementById('qcur').innerHTML = `≈ €${eur.toLocaleString('en-US')} · ≈ ${vnd.toLocaleString('en-US')}₫`;
+      document.getElementById('qbig').textContent = fmtVND(r.vnd);
+      const eur=Math.round(r.usd*FX.usdToEur);
+      document.getElementById('qcur').innerHTML = `≈ $${r.usd.toLocaleString('en-US')} · ≈ €${eur.toLocaleString('en-US')}`;
       const rows=[];
       rows.push(['Tour', `<b>${selTour().title}</b>`]);
       let paxTxt = `<b>${r.people}</b> ${L.pax}`;
       if(r.back>0) paxTxt += ` <small>(${L.inclBack} <b>${r.back}</b> ${L.backLabel.toLowerCase()})</small>`;
       rows.push([L.travelers.charAt(0).toUpperCase()+L.travelers.slice(1), paxTxt]);
       const acc=[];
-      if(state.rooms>0) acc.push(`<b>${state.rooms}</b> ${L.accomPrivate.toLowerCase()}`);
-      if(state.beds>0) acc.push(`<b>${state.beds}</b> ${L.accomDorm.toLowerCase()}`);
+      if(r.priv>0) acc.push(`<b>${r.priv}</b> ${L.accomPrivate.toLowerCase()}`);
+      if(r.dorm>0) acc.push(`<b>${r.dorm}</b> ${L.accomDorm.toLowerCase()}`);
       rows.push([L.accomTitle, acc.length?acc.join(' · '):'—']);
       const busOn=document.getElementById('busWanted').checked;
       const bo=document.getElementById('busOut').value, br=document.getElementById('busRet').value;
@@ -215,8 +222,8 @@ const seo = seoMap[lang] ?? seoMap.en;
     const peopleCount = ()=> state.travelers + (state.opt==='self_drive' ? state.backPax : 0);
     function syncRooms(){
       const max=peopleCount();
-      if(state.rooms>max) state.rooms=max; if(state.rooms<0) state.rooms=0;
-      if(state.beds>max)  state.beds=max;  if(state.beds<0)  state.beds=0;
+      if(state.rooms<0) state.rooms=0; if(state.rooms>max) state.rooms=max;
+      state.beds = max - state.rooms;               // chaque personne a un couchage : rooms + beds = personnes
       document.getElementById('rval').textContent=state.rooms;
       document.getElementById('dval').textContent=state.beds;
       document.getElementById('roomsHint').textContent = `${L.accomHint} ${max}`;
@@ -224,8 +231,8 @@ const seo = seoMap[lang] ?? seoMap.en;
     }
     document.getElementById('rmin').addEventListener('click',()=>{ state.rooms=Math.max(0,state.rooms-1); syncRooms(); render(); });
     document.getElementById('rplus').addEventListener('click',()=>{ state.rooms=Math.min(peopleCount(),state.rooms+1); syncRooms(); render(); });
-    document.getElementById('dmin').addEventListener('click',()=>{ state.beds=Math.max(0,state.beds-1); syncRooms(); render(); });
-    document.getElementById('dplus').addEventListener('click',()=>{ state.beds=Math.min(peopleCount(),state.beds+1); syncRooms(); render(); });
+    document.getElementById('dmin').addEventListener('click',()=>{ state.rooms=Math.min(peopleCount(),state.rooms+1); syncRooms(); render(); });   // − dorm bed = + private room
+    document.getElementById('dplus').addEventListener('click',()=>{ state.rooms=Math.max(0,state.rooms-1); syncRooms(); render(); });               // + dorm bed = − private room
     document.querySelectorAll('.opt').forEach(el=>el.addEventListener('click',()=>{
       state.opt=el.dataset.opt; document.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); refreshOptUI(); render();
     }));
@@ -252,7 +259,7 @@ const seo = seoMap[lang] ?? seoMap.en;
         const resp=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({ name,email,whatsapp, date:val('f_date'), message:val('f_message'),
             tour_slug:tr.slug, tour_title:tr.title, option:state.opt, travelers:r.people, back_pax:r.back, days:r.days,
-            amount:r.total, bus_booking:document.getElementById('busWanted').checked, bus_out:(document.getElementById('busOut')?.value||''), bus_return:(document.getElementById('busRet')?.value||''),
+            amount:r.vnd, bus_booking:document.getElementById('busWanted').checked, bus_out:(document.getElementById('busOut')?.value||''), bus_return:(document.getElementById('busRet')?.value||''),
             accommodation:(state.rooms>0&&state.beds>0?'mixed':(state.beds>0?'dorm':'private')), rooms:state.rooms, dorm_beds:state.beds,
             country:val('f_country'),
             language:L.lang, source:'book_page' })});

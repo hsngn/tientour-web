@@ -1,8 +1,8 @@
 ---
 durationDays: 3
-priceFrom: 240
+priceFrom: 2950000
 route: "Ha Giang → Yen Minh → Dong Van → Ma Pi Leng → Meo Vac → Ha Giang"
-currency: "USD"
+currency: "VND"
 difficulty: "moderate"
 image: "/photos/p4.jpg"
 order: 2
@@ -11,9 +11,9 @@ en:
   summary: "The classic 3-day loop at a relaxed pace: Ma Pi Leng, a boat on the Nho Que river and two nights in local homestays."
   highlights: ["Quan Ba Heaven Gate", "Dong Van Old Town", "Ma Pi Leng Pass", "Nho Que river boat", "Two homestay nights"]
   itinerary:
-    - { title: "Day 1 — Ha Giang → Yen Minh", text: "Quan Ba Heaven Gate, the first mountain passes and Hmong villages, welcome dinner at a family homestay." }
-    - { title: "Day 2 — Yen Minh → Dong Van → Meo Vac", text: "The Dong Van karst plateau, the legendary Ma Pi Leng pass and a boat on the turquoise Nho Que river." }
-    - { title: "Day 3 — Meo Vac → Ha Giang", text: "A scenic return through ethnic-minority villages and rice terraces." }
+    - { title: "Day 1 — Ha Giang → Yen Minh (105 km)", text: "Bac Sum Pass, Quan Ba Heaven Gate, the Twin Mountains, Lung Khuy Cave and Lung Tam weaving village, then Yen Minh town." }
+    - { title: "Day 2 — Yen Minh → Meo Vac (110 km)", text: "Tham Ma Pass, the H'Mong King's Palace, Ma Pi Leng Pass and the Nho Que river, ending in Meo Vac town." }
+    - { title: "Day 3 — Meo Vac → Ha Giang (135 km)", text: "H'Mong Cafe, the M-shaped slope, Mau Due, Ngam La tea hill, Thai An and Thuan Hoa communes, back to Ha Giang city." }
   inclusions: ["Local rider or self-drive bike", "2 nights homestay", "Meals on tour", "Fuel & permits", "Insurance during tour"]
   exclusions: ["Transport to Ha Giang", "Personal travel insurance", "Drinks", "Tips"]
   faq:
@@ -26,9 +26,9 @@ fr:
   summary: "La boucle classique de 3 jours à un rythme détendu : Ma Pi Leng, un bateau sur la Nho Què et deux nuits chez l'habitant."
   highlights: ["Porte du ciel de Quan Ba", "Vieille ville de Dong Van", "Col de Ma Pi Leng", "Bateau sur la Nho Què", "Deux nuits chez l'habitant"]
   itinerary:
-    - { title: "Jour 1 — Ha Giang → Yen Minh", text: "Porte du ciel de Quan Ba, premiers cols et villages Hmong, dîner d'accueil chez l'habitant." }
-    - { title: "Jour 2 — Yen Minh → Dong Van → Meo Vac", text: "Le plateau karstique de Dong Van, le légendaire col de Ma Pi Leng et un bateau sur la rivière turquoise Nho Què." }
-    - { title: "Jour 3 — Meo Vac → Ha Giang", text: "Retour panoramique à travers villages des minorités et rizières en terrasses." }
+    - { title: "Jour 1 — Ha Giang → Yen Minh (105 km)", text: "Col de Bac Sum, Porte du ciel de Quan Ba, les Montagnes Jumelles, grotte de Lung Khuy et village de tissage de Lung Tam, puis Yen Minh." }
+    - { title: "Jour 2 — Yen Minh → Meo Vac (110 km)", text: "Col de Tham Ma, palais du roi H'Mong, col de Ma Pi Leng et rivière Nho Què, arrivée à Meo Vac." }
+    - { title: "Jour 3 — Meo Vac → Ha Giang (135 km)", text: "H'Mong Cafe, la pente en M, Mau Due, colline de thé de Ngam La, communes de Thai An et Thuan Hoa, retour à Ha Giang." }
   inclusions: ["Pilote local ou moto self-drive", "2 nuits chez l'habitant", "Repas pendant le tour", "Essence & permis", "Assurance pendant le tour"]
   exclusions: ["Transport jusqu'à Ha Giang", "Assurance voyage personnelle", "Boissons", "Pourboires"]
   faq:

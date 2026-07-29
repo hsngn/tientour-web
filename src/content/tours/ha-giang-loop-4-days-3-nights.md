@@ -1,8 +1,8 @@
 ---
 durationDays: 4
-priceFrom: 290
+priceFrom: 3950000
 route: "Ha Giang → Du Gia → Dong Van → Lung Cu → Ma Pi Leng → Meo Vac → Ha Giang"
-currency: "USD"
+currency: "VND"
 difficulty: "moderate"
 image: "/photos/p10.jpg"
 order: 3
@@ -11,10 +11,10 @@ en:
   summary: "The full loop in 4 days: the quieter Du Gia valley, the northernmost point at Lung Cu, Ma Pi Leng and three homestay nights."
   highlights: ["Du Gia waterfall & valley", "Lung Cu Flag Tower (northernmost point)", "Dong Van Karst Plateau", "Ma Pi Leng Pass", "Nho Que river boat", "Three homestay nights"]
   itinerary:
-    - { title: "Day 1 — Ha Giang → Du Gia", text: "Off the main loop into the peaceful Du Gia valley, with a swim at the waterfall and a village homestay." }
-    - { title: "Day 2 — Du Gia → Dong Van", text: "Remote back-roads, Hmong markets and the Dong Van karst plateau." }
-    - { title: "Day 3 — Dong Van → Lung Cu → Meo Vac", text: "The Lung Cu Flag Tower at Vietnam's northern tip, then Ma Pi Leng and a boat on the Nho Que river." }
-    - { title: "Day 4 — Meo Vac → Ha Giang", text: "A final scenic ride back through terraced valleys to Ha Giang." }
+    - { title: "Day 1 — Ha Giang → Yen Minh (105 km)", text: "Bac Sum Slope, Quan Ba Heaven Gate, the Twin Mountains, Lung Khuy Cave and Lung Tam weaving village, then Yen Minh town." }
+    - { title: "Day 2 — Yen Minh → Meo Vac (110 km)", text: "Tham Ma Pass, Lung Cu Flag Tower, the H'Mong King's Palace, Ma Pi Leng Pass and the Nho Que river, ending in Meo Vac." }
+    - { title: "Day 3 — Meo Vac → Du Gia (100 km)", text: "H'Mong Cafe, the M-shaped slope, Ban An stream and on to Du Gia village." }
+    - { title: "Day 4 — Du Gia → Ha Giang (100 km)", text: "Duong Thuong, Mau Due, Thai An and Thuan Hoa on the final ride back to Ha Giang." }
   inclusions: ["Local rider or self-drive bike", "3 nights homestay", "Meals on tour", "Fuel & permits", "Insurance during tour"]
   exclusions: ["Transport to Ha Giang", "Personal travel insurance", "Drinks", "Tips"]
   faq:
@@ -27,10 +27,10 @@ fr:
   summary: "La boucle complète en 4 jours : la vallée plus calme de Du Gia, le point le plus au nord à Lung Cu, Ma Pi Leng et trois nuits chez l'habitant."
   highlights: ["Cascade et vallée de Du Gia", "Tour du drapeau de Lung Cu (extrême nord)", "Plateau karstique de Dong Van", "Col de Ma Pi Leng", "Bateau sur la Nho Què", "Trois nuits chez l'habitant"]
   itinerary:
-    - { title: "Jour 1 — Ha Giang → Du Gia", text: "Hors de la boucle principale vers la paisible vallée de Du Gia, baignade à la cascade et nuit chez l'habitant." }
-    - { title: "Jour 2 — Du Gia → Dong Van", text: "Routes reculées, marchés Hmong et plateau karstique de Dong Van." }
-    - { title: "Jour 3 — Dong Van → Lung Cu → Meo Vac", text: "La tour du drapeau de Lung Cu à l'extrême nord du Vietnam, puis Ma Pi Leng et un bateau sur la rivière Nho Què." }
-    - { title: "Jour 4 — Meo Vac → Ha Giang", text: "Dernière route panoramique de retour à travers les vallées en terrasses jusqu'à Ha Giang." }
+    - { title: "Jour 1 — Ha Giang → Yen Minh (105 km)", text: "Pente de Bac Sum, Porte du ciel de Quan Ba, les Montagnes Jumelles, grotte de Lung Khuy et village de tissage de Lung Tam, puis Yen Minh." }
+    - { title: "Jour 2 — Yen Minh → Meo Vac (110 km)", text: "Col de Tham Ma, tour du drapeau de Lung Cu, palais du roi H'Mong, col de Ma Pi Leng et rivière Nho Què, arrivée à Meo Vac." }
+    - { title: "Jour 3 — Meo Vac → Du Gia (100 km)", text: "H'Mong Cafe, la pente en M, ruisseau de Ban An, puis village de Du Gia." }
+    - { title: "Jour 4 — Du Gia → Ha Giang (100 km)", text: "Duong Thuong, Mau Due, Thai An et Thuan Hoa lors du retour final à Ha Giang." }
   inclusions: ["Pilote local ou moto self-drive", "3 nuits chez l'habitant", "Repas pendant le tour", "Essence & permis", "Assurance pendant le tour"]
   exclusions: ["Transport jusqu'à Ha Giang", "Assurance voyage personnelle", "Boissons", "Pourboires"]
   faq:
