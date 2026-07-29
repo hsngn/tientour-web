@@ -364,3 +364,16 @@ header.site .brand{display:inline-flex;align-items:center}
 .map-section{padding-top:28px;padding-bottom:12px}
 .route-map{margin:28px 0 0;border:1px solid var(--line,#e5ddd0);border-radius:20px;overflow:hidden;background:#FCF9F4}
 .route-map img{display:block;width:100%;height:auto}
+
+/* book: motorbike rental card + rates modal */
+.opt-rental{display:block;width:100%;text-align:left;margin-top:12px;padding:18px 20px;background:#FFF6EE;border:1.5px dashed var(--rust,#C2562E);border-radius:16px;cursor:pointer;transition:.15s}
+.opt-rental:hover{background:#FDEEE0}
+.opt-rental .t{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.opt-rental h3{margin:0;font:600 18px 'Fraunces',serif}
+.opt-rental p{margin:0;color:var(--muted,#8a8577);font-size:14.5px}
+.badge.rent{background:var(--rust,#C2562E);color:#fff}
+.rental-link{display:inline-block;margin-top:10px;font:600 14px 'Inter';color:var(--rust,#C2562E)}
+.rental-modal{background:#fff;border-radius:18px;max-width:min(920px,94vw);max-height:92vh;overflow:auto;padding:16px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.rental-modal img{display:block;width:100%;height:auto;border-radius:10px}
+.rental-modal .rm-note{margin:14px 4px;color:var(--ink);font:500 14px 'Inter';line-height:1.5}
+.rm-close{position:absolute;top:10px;right:12px;width:38px;height:38px;border-radius:50%;border:none;background:rgba(0,0,0,.55);color:#fff;font-size:24px;line-height:1;cursor:pointer;z-index:2}
