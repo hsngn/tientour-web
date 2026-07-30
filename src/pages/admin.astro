@@ -263,8 +263,8 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       <div class="paysec">
         <div class="paytitle">Payment <span id="mPayState"></span></div>
         <div class="edit-grid">
-          <div class="fld"><label>Total ($)</label><input type="number" min="0" id="mAmount"></div>
-          <div class="fld"><label>Amount paid ($)</label><input type="number" min="0" id="mPaid"></div>
+          <div class="fld"><label>Total (VND)</label><input type="number" min="0" id="mAmount"></div>
+          <div class="fld"><label>Amount paid (VND)</label><input type="number" min="0" id="mPaid"></div>
           <div class="fld"><label>Remaining</label><div class="nights" id="mRemain">—</div></div>
         </div>
       </div>
@@ -299,8 +299,8 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
         <div class="fld"><label>End date</label><input type="date" id="cEnd"></div>
         <div class="fld"><label>Pickup city</label><select id="cDep"></select></div>
         <div class="fld"><label>Drop-off city</label><select id="cRet"></select></div>
-        <div class="fld"><label>Total ($)</label><input type="number" min="0" id="cAmount"></div>
-        <div class="fld"><label>Amount paid ($)</label><input type="number" min="0" id="cPaid" value="0"></div>
+        <div class="fld"><label>Total (VND)</label><input type="number" min="0" id="cAmount"></div>
+        <div class="fld"><label>Amount paid (VND)</label><input type="number" min="0" id="cPaid" value="0"></div>
         <div class="fld"><label>Language</label><select id="cLang"><option value="en">EN</option><option value="fr">FR</option></select></div>
         <div class="fld" style="grid-column:1/-1"><label>Note</label><textarea id="cMsg"></textarea></div>
       </div>

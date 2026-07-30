@@ -1,21 +1,11 @@
 ---
 import { t } from '../i18n/ui';
 const { lang } = Astro.props;
-const riders = {
-  en:[["TI","Tien","Founder & Lead Guide",["VN","EN","FR"]],
-      ["HG","Hoang","Senior Navigator",["VN","EN"]],
-      ["MH","Minh","Safety Officer",["VN","EN"]],
-      ["LH","Linh","Cultural Guide & Fleet Manager",["VN","EN","FR"]]],
-  fr:[["TI","Tien","Fondateur & guide principal",["VN","EN","FR"]],
-      ["HG","Hoang","Navigateur senior",["VN","EN"]],
-      ["MH","Minh","Responsable sécurité",["VN","EN"]],
-      ["LH","Linh","Guide culturelle & resp. flotte",["VN","EN","FR"]]],
-  vi:[["TI","Tien","Người sáng lập & hướng dẫn chính",["VN","EN","FR"]],
-      ["HG","Hoang","Dẫn đường kỳ cựu",["VN","EN"]],
-      ["MH","Minh","Phụ trách an toàn",["VN","EN"]],
-      ["LH","Linh","Hướng dẫn văn hóa & quản lý đội xe",["VN","EN","FR"]]],
-};
-const list = riders[lang] ?? riders.en;
+const roleEN='Easy Rider & Guide', roleFR='Easy Rider & guide', roleVI='Tài xế & hướng dẫn';
+const names=['bao','den','thang','thinh','tuan'];
+const disp={bao:'Bảo', den:'Dền', thang:'Thắng', thinh:'Thịnh', tuan:'Tuấn'};
+const roles={en:roleEN, fr:roleFR, vi:roleVI};
+const role=roles[lang] ?? roleEN;
 ---
 <section class="riders" id="riders"><div class="wrap">
   <div class="lead">
@@ -24,11 +14,11 @@ const list = riders[lang] ?? riders.en;
     <p>{t(lang,'riders_lead')}</p>
   </div>
   <div class="row">
-    {list.map((r)=>(
+    {names.map((n)=>(
       <div class="rider">
-        <div class="av"><span class="ini">{r[0]}</span>
-          <span class="langs">{r[3].map((l)=>(<span>{l}</span>))}</span></div>
-        <h3>{r[1]}</h3><div class="role">{r[2]}</div>
+        <div class="av"><img src={`/riders/${n}.jpg`} alt={disp[n]} loading="lazy" />
+          <span class="langs"><span>EN</span><span>VN</span></span></div>
+        <h3>{disp[n]}</h3><div class="role">{role}</div>
       </div>
     ))}
   </div>

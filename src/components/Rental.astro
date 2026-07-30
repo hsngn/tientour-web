@@ -10,5 +10,43 @@ const { lang } = Astro.props;
       <h3>{t(lang,'rental_er_t')}</h3><p>{t(lang,'rental_er_d')}</p></div></div>
     <div class="card"><div class="img"></div><div class="b">
       <h3>{t(lang,'rental_sd_t')}</h3><p>{t(lang,'rental_sd_d')}</p></div></div>
+    <button type="button" class="card card-moto" id="motoCard"><div class="b">
+      <span class="moto-badge">{t(lang,'moto_badge')}</span>
+      <h3>{t(lang,'moto_title')}</h3>
+      <p>{t(lang,'moto_sub')}</p>
+      <span class="moto-link">{t(lang,'moto_cta')}</span>
+    </div></button>
   </div>
-</div></section>
+</div>
+
+<div id="motoOverlay" class="moto-overlay hidden">
+  <div class="moto-modal">
+    <button class="mm-close" id="motoClose" type="button" aria-label="Close">×</button>
+    <img src="/rental-rates.jpg" alt="Tien Tour motorbike rental daily rates" />
+    <p class="mm-note">{t(lang,'moto_note')}</p>
+    <a class="btn btn-rust btn-block" href="https://wa.me/84865246989" target="_blank" rel="noopener">{t(lang,'moto_book')}</a>
+  </div>
+</div>
+</section>
+
+<script>
+  const ov = document.getElementById('motoOverlay');
+  if (ov) {
+    document.getElementById('motoCard').addEventListener('click', () => ov.classList.remove('hidden'));
+    document.getElementById('motoClose').addEventListener('click', () => ov.classList.add('hidden'));
+    ov.addEventListener('click', (e) => { if (e.target === ov) ov.classList.add('hidden'); });
+  }
+</script>
+
+<style is:global>
+  .rental .card-moto{cursor:pointer;text-align:left;border:1.5px dashed var(--rust,#C2562E);background:#FFF6EE;transition:.15s;display:flex;flex-direction:column;justify-content:center}
+  .rental .card-moto:hover{background:#FDEEE0}
+  .moto-badge{align-self:flex-start;display:inline-block;background:var(--rust,#C2562E);color:#fff;font:700 10px 'Inter',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:10px}
+  .moto-link{display:inline-block;margin-top:12px;font:600 14px 'Inter',sans-serif;color:var(--rust,#C2562E)}
+  .moto-overlay{position:fixed;inset:0;background:rgba(20,25,20,.72);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+  .moto-overlay.hidden{display:none}
+  .moto-modal{background:#fff;border-radius:18px;max-width:min(920px,94vw);max-height:92vh;overflow:auto;padding:16px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  .moto-modal img{display:block;width:100%;height:auto;border-radius:10px}
+  .moto-modal .mm-note{margin:14px 4px;color:var(--ink);font:500 14px 'Inter',sans-serif;line-height:1.5}
+  .mm-close{position:absolute;top:10px;right:12px;width:38px;height:38px;border-radius:50%;border:none;background:rgba(0,0,0,.55);color:#fff;font-size:24px;line-height:1;cursor:pointer;z-index:2}
+</style>
