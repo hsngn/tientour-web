@@ -271,13 +271,12 @@ const seo = seoMap[lang] ?? seoMap.en;
     // régime alimentaire : nb. de végétariens + nb. de végans ≤ nb. total de personnes
     function syncDiet(){
       const max=peopleCount();
-      if(state.veg<0) state.veg=0; if(state.vegan<0) state.vegan=0;
-      if(state.veg>max) state.veg=max;
-      if(state.veg+state.vegan>max) state.vegan=Math.max(0,max-state.veg);
+      state.veg   = Math.max(0, Math.min(state.veg, max));
+      state.vegan = Math.max(0, Math.min(state.vegan, max - state.veg)); // veg + vegan ≤ personnes
       document.getElementById('vgval').textContent=state.veg;
       document.getElementById('vnval').textContent=state.vegan;
-      document.getElementById('vegHint').textContent   = `${L.accomHint} ${max}`;
-      document.getElementById('veganHint').textContent = `${L.accomHint} ${Math.max(0,max-state.veg)}`;
+      document.getElementById('vegHint').textContent   = `${L.accomHint} ${Math.max(0, max - state.vegan)}`;
+      document.getElementById('veganHint').textContent = `${L.accomHint} ${Math.max(0, max - state.veg)}`;
     }
     document.getElementById('vgmin').addEventListener('click',()=>{ state.veg=Math.max(0,state.veg-1); syncDiet(); render(); });
     document.getElementById('vgplus').addEventListener('click',()=>{ if(state.veg+state.vegan<peopleCount()) state.veg++; syncDiet(); render(); });
