@@ -14,7 +14,7 @@ const homeLabel = t(lang, 'nav_home');
 
 <section class="lf-body"><div class="wrap"><div class="col">
   {data.sections && data.sections.length > 3 && (
-    <div class="lf-tOC"><div class="k">{lang==='fr'?'Sommaire':lang==='vi'?'Nội dung':'On this page'}</div>
+    <div class="lf-tOC"><div class="k">{lang==='fr'?'Sommaire':'On this page'}</div>
       {data.sections.map((s)=> s.h && (<a href={`#${s.id}`}>{s.h}</a>))}
     </div>
   )}
@@ -35,7 +35,7 @@ const homeLabel = t(lang, 'nav_home');
   )}
 
   <div class="lf-related">
-    <div class="k">{lang==='fr'?'À découvrir':lang==='vi'?'Khám phá thêm':'Explore next'}</div>
+    <div class="k">{lang==='fr'?'À découvrir':'Explore next'}</div>
     <div class="links">
       {data.related.map((r)=>(<a href={r.href}>{r.label}</a>))}
       <a href={L('/book')} style="background:var(--rust);color:#fff;border-color:var(--rust)">{t(lang,'hero_book')} →</a>

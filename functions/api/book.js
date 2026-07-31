@@ -24,6 +24,13 @@ export async function onRequestPost({ request, env }) {
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY)
     return json({ ok: false, error: 'server_not_configured' }, 500);
 
+  // Régime alimentaire : pas de colonne dédiée en base -> on replie dans `message`
+  // (et dans l'e-mail ci-dessous) pour ne pas exiger de migration Supabase.
+  const dietParts = [];
+  if (Number(b.veg) > 0) dietParts.push(`${Number(b.veg)} vegetarian`);
+  if (Number(b.vegan) > 0) dietParts.push(`${Number(b.vegan)} vegan`);
+  const dietNote = dietParts.length ? `Diet: ${dietParts.join(', ')}` : '';
+
   const row = {
     tour_slug: b.tour_slug || null,
     option: b.option || 'easy_rider',
@@ -45,7 +52,7 @@ export async function onRequestPost({ request, env }) {
     accommodation: ['dorm','mixed','private'].includes(b.accommodation) ? b.accommodation : 'private',
     rooms: Number(b.rooms) || 0,
     dorm_beds: Number(b.dorm_beds) || 0,
-    message: b.message || null,
+    message: [dietNote, (b.message || '').trim()].filter(Boolean).join('\n') || null,
   };
 
   // 1) Insert into Supabase
@@ -73,6 +80,7 @@ export async function onRequestPost({ request, env }) {
       <p><b>Option:</b> ${esc(b.option)} &nbsp; <b>Travelers:</b> ${esc(b.travelers)}${Number(b.back_pax) > 0 ? ` (incl. ${esc(b.back_pax)} on the back of a friend)` : ''}</p>
       <p><b>Estimated total:</b> ${Number(b.amount||0).toLocaleString('en-US')} VND</p>
       <p><b>Accommodation:</b> ${(Number(b.rooms)||0)>0?`${esc(b.rooms)} private room(s)`:''}${(Number(b.rooms)||0)>0&&(Number(b.dorm_beds)||0)>0?' + ':''}${(Number(b.dorm_beds)||0)>0?`${esc(b.dorm_beds)} dorm bed(s)`:''}${(Number(b.rooms)||0)===0&&(Number(b.dorm_beds)||0)===0?'—':''}</p>
+      ${dietNote ? `<p><b>Diet:</b> ${esc(dietParts.join(', '))}</p>` : ''}
       ${b.bus_booking ? `<p><b>Bus requested:</b> Yes${b.bus_out ? ` — Outbound from ${esc(b.bus_out)}` : ''}${b.bus_return ? `, Return to ${esc(b.bus_return)}` : ''} &nbsp;<i>(bus price NOT included in tour — confirm schedule & cost separately)</i></p>` : ''}
       <p><b>Preferred date:</b> ${esc(b.date) || '—'}</p>
       <hr>
