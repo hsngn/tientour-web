@@ -35,7 +35,6 @@ const items = [
       </div>
       <div id="mnav">
         {items.map(([k,href])=>(<a href={href}>{t(lang,k)}</a>))}
-        <a href={L('/reviews')}>{t(lang,'nav_reviews')}</a>
         <a href={L('/book')} style="color:var(--rust)">{t(lang,'nav_book')}</a>
         <a href={enPath}>EN</a><a href={frPath}>FR</a>
       </div>
