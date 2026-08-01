@@ -5,7 +5,7 @@ import Base from '../../layouts/Base.astro';
 export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
 const { lang } = Astro.params;
 const tours = (await getCollection('tours')).sort((a,b)=>a.data.order-b.data.order);
-const T = tours.map((tr)=>({ slug:tr.slug, price:tr.data.priceFrom, days:tr.data.durationDays, route:tr.data.route||'', title:(tr.data[lang]??tr.data.en).title }));
+const T = tours.map((tr)=>({ slug:tr.slug, price:tr.data.priceFrom, days:tr.data.durationDays, route:tr.data.route||'', image:tr.data.image||'', title:(tr.data[lang]??tr.data.en).title }));
 const opts = [
   ['easy_rider','opt_er_t','opt_er_b','opt_er_d'],
   ['self_drive','opt_sd_t','opt_sd_b','opt_sd_d'],
@@ -22,6 +22,10 @@ const L = {
   inclBack:t(lang,'q_incl_back'), busShort:t(lang,'q_bus_short'), pax:t(lang,'q_pax'),
   dietTitle:t(lang,'diet_title'), dietVeg:t(lang,'diet_veg'), dietVegan:t(lang,'diet_vegan'), dietSum:t(lang,'diet_sum'),
   people: lang==='fr' ? 'pers' : 'people',
+  optEr:t(lang,'opt_er_t'), optSd:t(lang,'opt_sd_t'), optPt:t(lang,'opt_pt_t'),
+  lblTourRate: lang==='fr' ? 'Tarif circuit' : 'Tour rate',
+  lblPrivRoom: lang==='fr' ? 'Chambre privée' : 'Private room',
+  lblPrivTour: lang==='fr' ? 'Supplément tour privé' : 'Private tour',
   cta:t(lang,'book_cta'), okMsg:t(lang,'ok_msg'), errMsg:t(lang,'err_msg'), errContact:t(lang,'err_contact'),
 };
 const seoMap = {
@@ -54,7 +58,7 @@ const seo = seoMap[lang] ?? seoMap.en;
       <div id="tourlist">
         {T.map((tr,i)=>(
           <div class={"tour-opt"+(i===0?" sel":"")} data-slug={tr.slug} data-price={tr.price} data-days={tr.days}>
-            <div class="th"></div>
+            <div class="th">{tr.image && <img src={tr.image} alt={tr.title} loading="lazy" />}</div>
             <div><h3>{tr.title}</h3>
               <div class="meta">{tr.days} {t(lang,'days')} · {t(lang,'from')} {tr.price.toLocaleString('en-US').replace(/,/g,'\u00a0')} VND/pers.</div>
               {tr.route && <div class="route">{tr.route}</div>}
@@ -215,7 +219,11 @@ const seo = seoMap[lang] ?? seoMap.en;
       add(privBack, 'on_the_back', 'private'); add(dormBack, 'on_the_back', 'dorm');
       // Tour privé : supplément par personne, quel que soit l'hébergement choisi
       if(state.opt==='private'){ vnd += people*PRIVATE_TOUR.surchargeVnd; usd += people*PRIVATE_TOUR.surchargeUsd; }
-      return { days, pax, back, people, priv, dorm, vnd: vnd*1000, usd };
+      // décomposition pour le devis : base (tarif dortoir) + supplément chambre privée + supplément tour privé
+      const baseDorm = (pax>0? pax*P[mainRole].dorm.vnd:0) + (back>0? back*P['on_the_back'].dorm.vnd:0);
+      const privSupp = privMain*(P[mainRole].private.vnd-P[mainRole].dorm.vnd) + privBack*(P['on_the_back'].private.vnd-P['on_the_back'].dorm.vnd);
+      const privTour = state.opt==='private' ? people*PRIVATE_TOUR.surchargeVnd : 0;
+      return { days, pax, back, people, priv, dorm, vnd: vnd*1000, usd, baseVnd: baseDorm*1000, privSuppVnd: privSupp*1000, surchargeVnd: privTour*1000, mainRole };
     }
     function render(){
       const r=compute();
@@ -238,7 +246,14 @@ const seo = seoMap[lang] ?? seoMap.en;
       const busOn=document.getElementById('busWanted').checked;
       const bo=document.getElementById('busOut').value, br=document.getElementById('busRet').value;
       if(busOn && (bo||br)) rows.push(['Bus', `<b>${bo||'?'}</b> → Ha Giang · Ha Giang → <b>${br||'?'}</b> <small>(${L.busShort})</small>`]);
-      document.getElementById('qsum').innerHTML = rows.map(([k,v])=>`<div class="qs-row"><span class="qs-k">${k}</span><span class="qs-v">${v}</span></div>`).join('');
+      const sumHtml = rows.map(([k,v])=>`<div class="qs-row"><span class="qs-k">${k}</span><span class="qs-v">${v}</span></div>`).join('');
+      const optName = state.opt==='self_drive' ? L.optSd : state.opt==='private' ? L.optPt : L.optEr;
+      const pr=[];
+      pr.push([`${optName} <small>× ${r.people}</small>`, fmtVND(r.baseVnd)]);
+      if(r.priv>0) pr.push([`${L.lblPrivRoom} <small>× ${r.priv}</small>`, '+ '+fmtVND(r.privSuppVnd)]);
+      if(state.opt==='private' && r.surchargeVnd>0) pr.push([L.lblPrivTour, '+ '+fmtVND(r.surchargeVnd)]);
+      const prHtml = pr.map(([k,v])=>`<div class="qs-row qs-price"><span class="qs-k">${k}</span><span class="qs-v">${v}</span></div>`).join('');
+      document.getElementById('qsum').innerHTML = sumHtml + '<div class="qs-div"></div>' + prHtml;
     }
     const backpaxEl = document.getElementById('backpax');
     const MAX_GROUP = 10; // voyageurs max (easy riders non comptés)
