@@ -5,7 +5,7 @@ export const DEFAULT_LANG: Lang = 'en';
 export const ui = {
   en: {
     nav_home:'Home', nav_tours:'Tours', nav_riders:'Our riders', nav_rental:'Rental', nav_guide:'Travel guide',
-    nav_reviews:'Reviews', nav_book:'Book now',
+    nav_reviews:'Reviews', nav_private:'Private car', nav_book:'Book now',
     hero_eyebrow:'Ha Giang, Northern Vietnam',
     hero_1:'Explore ', hero_em:'the Loop', hero_2:' with Local Riders',
     hero_sub:'Experience the legendary Ha Giang Loop with our trusted local team. Authentic motorbike adventures through the karst highlands, led by the Hmong, Tay and Dao guides who call these mountains home.',
@@ -61,7 +61,7 @@ export const ui = {
   },
   fr: {
     nav_home:'Accueil', nav_tours:'Circuits', nav_riders:'Nos pilotes', nav_rental:'Location', nav_guide:'Guide',
-    nav_reviews:'Avis', nav_book:'Réserver',
+    nav_reviews:'Avis', nav_private:'Voiture privée', nav_book:'Réserver',
     hero_eyebrow:'Ha Giang, Nord Vietnam',
     hero_1:'Explorez ', hero_em:'la Boucle', hero_2:' avec des pilotes locaux',
     hero_sub:'Vivez la légendaire boucle de Ha Giang avec notre équipe locale de confiance. Des aventures à moto authentiques à travers les hauts plateaux karstiques, guidées par les Hmong, Tay et Dao qui vivent dans ces montagnes.',

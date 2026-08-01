@@ -23,6 +23,26 @@ const seo = seoMap[lang] ?? seoMap.en;
   </div></section>
   <TourGrid lang={lang} tours={tours} showHead={false} />
 
+  <section style="padding-top:36px"><div class="wrap">
+    <a class="pc-banner" href={`/${lang}/private-car`}>
+      <div class="pc-banner-txt">
+        <div class="eyebrow">{lang==='fr'?'Service privé & sur mesure':'Private & bespoke'}</div>
+        <h2>{lang==='fr'?'Circuits privés en SUV & Limousine':'Private SUV & Limousine tours'}</h2>
+        <p>{lang==='fr'?'Chauffeur privé, itinéraire 100% personnalisé, confort pour familles et petits groupes. Devis sur mesure.':'Private driver, fully customizable itinerary, comfort for families and small groups. Tailored quote.'}</p>
+      </div>
+      <span class="pc-banner-cta">{lang==='fr'?'Découvrir →':'Discover →'}</span>
+    </a>
+  </div></section>
+  <style>
+    .pc-banner{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+      background:linear-gradient(120deg,#1E3A2B,#2F6E58);color:#fff;border-radius:22px;padding:28px 32px;text-decoration:none;transition:.18s}
+    .pc-banner:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(30,58,43,.28)}
+    .pc-banner .eyebrow{color:#F0B24A}
+    .pc-banner h2{margin:6px 0 8px;font:600 30px 'Fraunces',serif;color:#fff}
+    .pc-banner p{margin:0;max-width:60ch;color:rgba(255,255,255,.85);line-height:1.5}
+    .pc-banner-cta{background:var(--rust,#C2562E);color:#fff;font:600 15px 'Inter',sans-serif;padding:12px 22px;border-radius:999px;white-space:nowrap}
+  </style>
+
   <section class="map-section"><div class="wrap">
     <div class="eyebrow">{lang==='fr'?'L\u2019itinéraire':'The route'}</div>
     <h2 class="title">{lang==='fr'?'La carte de la boucle':'The Ha Giang Loop map'}</h2>

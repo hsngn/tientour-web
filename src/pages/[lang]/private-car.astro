@@ -1,0 +1,215 @@
+---
+import { LANGS } from '../../i18n/ui';
+import Base from '../../layouts/Base.astro';
+export function getStaticPaths(){ return LANGS.map((lang)=>({ params:{ lang }})); }
+const { lang } = Astro.params;
+
+const seoMap = {
+  en:{ t:'Private SUV & Limousine Tours in Ha Giang | Tien Tour', d:'Private car tours of Ha Giang & Northeastern Vietnam. 7-seat SUV or 9–11 seat limousine with a private driver, fully customizable itinerary. Request a tailored quote.' },
+  fr:{ t:'Circuits privés en SUV & Limousine à Ha Giang | Tien Tour', d:'Circuits privés en voiture à Ha Giang & dans le Nord-Est du Vietnam. SUV 7 places ou limousine 9–11 places avec chauffeur privé, itinéraire 100% personnalisable. Demandez un devis sur mesure.' },
+};
+const seo = seoMap[lang] ?? seoMap.en;
+const fr = lang === 'fr';
+
+const c = fr ? {
+  eyebrow:'Service privé & sur mesure',
+  title:'Circuits privés en SUV & Limousine',
+  intro:'Un voyage privé à travers Ha Giang et le Nord-Est du Vietnam — chauffeur dédié, itinéraire personnalisé, à votre rythme.',
+  perfectTitle:'Pour qui ?',
+  perfect:['Couples en quête d’intimité et de confort','Familles avec enfants','Petits groupes d’amis','Voyageurs seniors','Toute personne cherchant une expérience détendue et personnalisée'],
+  vehiclesTitle:'Nos véhicules',
+  vehiclesSub:'Choisissez le véhicule adapté à la taille de votre groupe :',
+  vehicles:[
+    {n:'SUV 7 places', cap:'2 – 4 passagers', h:'Confortable et spacieux, avec de la place pour les bagages — idéal pour les routes de montagne sinueuses de Ha Giang.', p:'Dès 220 $/pers.'},
+    {n:'Limousine 9–11 places', cap:'jusqu’à 8 – 9 passagers', h:'Sièges cuir inclinables haut de gamme, plus d’espace pour les jambes et climatisation douce — le confort pour tout le groupe.', p:'Dès 200 $/pers.'},
+  ],
+  featTitle:'Ce qui est inclus',
+  feat:['Véhicule privé avec chauffeur local expérimenté','Dates de départ et lieux de prise en charge flexibles','Itinéraire 100% personnalisable','Hébergement hôtel, chez l’habitant ou resort au choix','Sites incontournables et pépites locales cachées','Arrêts libres pour admirer et photographier','Eau en bouteille offerte tout au long du trajet'],
+  optTitle:'Services optionnels',
+  opt:['Guide anglophone','Prise en charge aéroport ou hôtel','Surclassement en hébergement de luxe','Circuits multi-jours combinant Ha Giang, Cao Bang et Ba Be','Arrêts photo et expériences sur mesure'],
+  priceTitle:'À propos du prix',
+  priceNote:'Le tarif dépend du type de véhicule et du nombre de voyageurs, pour que chaque groupe bénéficie d’un prix juste et optimisé. Contactez-nous pour une consultation d’itinéraire détaillée et un devis précis, adapté à votre groupe.',
+  formTitle:'Demander un devis',
+  formSub:'Dites-nous en quelques mots votre projet — on revient vers vous sous 24 h avec un itinéraire et un tarif.',
+  f_name:'Nom complet', f_email:'Email', f_wa:'WhatsApp (optionnel)', f_pax:'Nombre de voyageurs',
+  f_veh:'Véhicule souhaité', veh_any:'Je ne sais pas encore', f_dates:'Dates envisagées (optionnel)',
+  f_msg:'Votre projet : itinéraire, durée, envies…',
+  submit:'Envoyer ma demande', wa:'Discuter sur WhatsApp',
+  ok_t:'Demande envoyée 🎉', ok_m:'Merci ! Nous revenons vers vous sous 24 h avec un itinéraire et un devis sur mesure.', ok_c:'Fermer',
+  err:'Une erreur est survenue. Réessayez, ou contactez-nous directement sur WhatsApp.',
+  err_c:'Indiquez votre nom et un email ou un numéro WhatsApp.',
+} : {
+  eyebrow:'Private & bespoke service',
+  title:'Private SUV & Limousine Tours',
+  intro:'A private journey through Ha Giang and Northeastern Vietnam — your own driver, a tailor-made itinerary, at your own pace.',
+  perfectTitle:'Perfect for',
+  perfect:['Couples seeking privacy and comfort','Families with children','Small groups of friends','Senior travelers','Anyone looking for a relaxed and personalized experience'],
+  vehiclesTitle:'Vehicle options',
+  vehiclesSub:'Choose the vehicle that best fits the size of your group:',
+  vehicles:[
+    {n:'7-Seat SUV', cap:'2 – 4 passengers', h:'Comfortable and spacious with plenty of luggage room — ideal for exploring Ha Giang’s winding mountain roads.', p:'From $220/pax'},
+    {n:'9–11 Seat Limousine', cap:'up to 8 – 9 passengers', h:'Premium reclining leather seats, extra legroom and smooth air conditioning — added comfort for the whole group.', p:'From $200/pax'},
+  ],
+  featTitle:'Tour features',
+  feat:['Private vehicle with an experienced local driver','Flexible departure dates and pickup locations','Fully customizable itinerary','Hotel, homestay, or resort accommodation options','Famous landmarks as well as hidden local gems','Stop anytime for sightseeing and photography','Complimentary bottled water throughout the journey'],
+  optTitle:'Optional services',
+  opt:['English-speaking tour guide','Airport or hotel pickup','Luxury accommodation upgrades','Multi-day tours combining Ha Giang with Cao Bang and Ba Be','Photography stops and customized experiences'],
+  priceTitle:'About pricing',
+  priceNote:'Tour pricing depends on the vehicle type and the number of travelers in your group, so every group receives a fair and optimized rate. Get in touch with us for a detailed itinerary consultation and an accurate quote tailored to your group.',
+  formTitle:'Request a quote',
+  formSub:'Tell us a bit about your trip — we’ll get back to you within 24 hours with an itinerary and a price.',
+  f_name:'Full name', f_email:'Email', f_wa:'WhatsApp (optional)', f_pax:'Number of travelers',
+  f_veh:'Preferred vehicle', veh_any:'Not sure yet', f_dates:'Possible dates (optional)',
+  f_msg:'Your trip: itinerary, length, wishes…',
+  submit:'Send my request', wa:'Chat on WhatsApp',
+  ok_t:'Request sent 🎉', ok_m:'Thank you! We’ll get back to you within 24 hours with a tailored itinerary and quote.', ok_c:'Close',
+  err:'Something went wrong. Please try again, or contact us directly on WhatsApp.',
+  err_c:'Please enter your name and either an email or a WhatsApp number.',
+};
+const WA = 'https://wa.me/84865246989';
+---
+<Base title={seo.t} description={seo.d} lang={lang}>
+  <section class="book-hero"><div class="wrap">
+    <div class="eyebrow">{c.eyebrow}</div>
+    <h1>{c.title}</h1>
+    <p>{c.intro}</p>
+  </div></section>
+
+  <div class="wrap pc-wrap">
+    <!-- Perfect for -->
+    <section class="pc-block">
+      <h2 class="pc-h">{c.perfectTitle}</h2>
+      <ul class="pc-ticks">{c.perfect.map((x)=>(<li>{x}</li>))}</ul>
+    </section>
+
+    <!-- Vehicles -->
+    <section class="pc-block">
+      <h2 class="pc-h">{c.vehiclesTitle}</h2>
+      <p class="pc-sub">{c.vehiclesSub}</p>
+      <div class="pc-vehicles">
+        {c.vehicles.map((v)=>(
+          <div class="pc-veh">
+            <div class="pc-veh-top"><h3>{v.n}</h3><span class="pc-cap">{v.cap}</span></div>
+            <p>{v.h}</p>
+            <div class="pc-price">{v.p}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Features + Optional -->
+    <div class="pc-two">
+      <section class="pc-block">
+        <h2 class="pc-h">{c.featTitle}</h2>
+        <ul class="pc-ticks">{c.feat.map((x)=>(<li>{x}</li>))}</ul>
+      </section>
+      <section class="pc-block">
+        <h2 class="pc-h">{c.optTitle}</h2>
+        <ul class="pc-plus">{c.opt.map((x)=>(<li>{x}</li>))}</ul>
+      </section>
+    </div>
+
+    <!-- Pricing note -->
+    <section class="pc-note">
+      <h2 class="pc-h">{c.priceTitle}</h2>
+      <p>{c.priceNote}</p>
+    </section>
+
+    <!-- Quote form -->
+    <section class="pc-quote" id="quote">
+      <div class="pc-quote-head">
+        <h2 class="pc-h">{c.formTitle}</h2>
+        <p class="pc-sub">{c.formSub}</p>
+      </div>
+      <div class="form">
+        <div class="field"><label for="pc_name">{c.f_name}</label><input id="pc_name" type="text" autocomplete="name" /></div>
+        <div class="row2">
+          <div class="field"><label for="pc_email">{c.f_email}</label><input id="pc_email" type="email" autocomplete="email" /></div>
+          <div class="field"><label for="pc_wa">{c.f_wa}</label><input id="pc_wa" type="tel" /></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="pc_pax">{c.f_pax}</label><input id="pc_pax" type="number" min="1" value="2" /></div>
+          <div class="field"><label for="pc_veh">{c.f_veh}</label>
+            <select id="pc_veh">
+              <option value="">{c.veh_any}</option>
+              <option>{c.vehicles[0].n}</option>
+              <option>{c.vehicles[1].n}</option>
+            </select></div>
+        </div>
+        <div class="field"><label for="pc_dates">{c.f_dates}</label><input id="pc_dates" type="text" placeholder="e.g. 12–15 Oct" /></div>
+        <div class="field"><label for="pc_msg">{c.f_msg}</label><textarea id="pc_msg" rows="4"></textarea></div>
+        <div class="formmsg" id="pc_msgbox"></div>
+        <div class="pc-actions">
+          <button class="btn btn-rust" id="pc_submit" type="button">{c.submit}</button>
+          <a class="btn btn-outline" href={WA} target="_blank" rel="noopener">{c.wa}</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="pcOverlay" class="ok-overlay hidden">
+    <div class="ok-modal">
+      <div class="ok-check">✓</div>
+      <h3>{c.ok_t}</h3>
+      <p>{c.ok_m}</p>
+      <button type="button" class="btn btn-rust" id="pcClose">{c.ok_c}</button>
+    </div>
+  </div>
+
+  <script define:vars={{ lang, ERR: c.err, ERRC: c.err_c }}>
+    const $ = (id)=>document.getElementById(id);
+    const val = (id)=>($(id)?.value||'').trim();
+    const box = $('pc_msgbox');
+    const show = (cls,txt)=>{ box.className='formmsg '+cls; box.textContent=txt; };
+    $('pc_submit').addEventListener('click', async ()=>{
+      const name=val('pc_name'), email=val('pc_email'), wa=val('pc_wa');
+      if(!name || (!email && !wa)){ show('err', ERRC); return; }
+      const parts=[];
+      const veh=val('pc_veh'); if(veh) parts.push('Vehicle: '+veh);
+      const dates=val('pc_dates'); if(dates) parts.push('Dates: '+dates);
+      const msg=val('pc_msg'); if(msg) parts.push(msg);
+      const btn=$('pc_submit'); btn.disabled=true;
+      try{
+        const resp=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ name, email, whatsapp:wa, message:parts.join('\n'),
+            tour_slug:'private-car', option:'private_car', travelers:(parseInt(val('pc_pax'))||1),
+            amount:null, language:lang, source:'private_car_page' })});
+        const data=await resp.json().catch(()=>({}));
+        if(resp.ok && data.ok){ $('pcOverlay').classList.remove('hidden');
+          ['pc_name','pc_email','pc_wa','pc_dates','pc_msg'].forEach(i=>{const e=$(i); if(e) e.value='';});
+        } else { const code=data&&data.error?data.error:('HTTP '+resp.status); console.error('PC inquiry failed',resp.status,data); show('err', ERR+' ['+code+']'); }
+      }catch(e){ console.error(e); show('err', ERR+' [network]'); }
+      finally{ btn.disabled=false; }
+    });
+    const ov=$('pcOverlay');
+    $('pcClose').addEventListener('click',()=>ov.classList.add('hidden'));
+    ov.addEventListener('click',(e)=>{ if(e.target===ov) ov.classList.add('hidden'); });
+  </script>
+
+  <style>
+    .pc-wrap{padding-bottom:70px;max-width:1000px}
+    .pc-block{margin-top:40px}
+    .pc-h{font:600 26px 'Fraunces',serif;margin:0 0 14px}
+    .pc-sub{color:var(--muted,#8a8577);margin:0 0 18px}
+    .pc-ticks,.pc-plus{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}
+    .pc-ticks li,.pc-plus li{position:relative;padding-left:28px;line-height:1.5}
+    .pc-ticks li::before{content:'✓';position:absolute;left:0;top:0;color:#2F6E58;font-weight:700}
+    .pc-plus li::before{content:'+';position:absolute;left:0;top:0;color:var(--rust,#C2562E);font-weight:700;font-size:18px;line-height:1}
+    .pc-vehicles{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .pc-veh{border:1px solid var(--line,#e5ddd0);border-radius:18px;padding:22px;background:var(--paper,#FBF8F2)}
+    .pc-veh-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .pc-veh h3{margin:0;font:600 20px 'Fraunces',serif}
+    .pc-cap{font:600 12px 'Inter',sans-serif;color:var(--muted,#8a8577);text-transform:uppercase;letter-spacing:.04em}
+    .pc-veh p{color:var(--muted,#8a8577);line-height:1.55;margin:10px 0 16px}
+    .pc-price{display:inline-block;background:#FFF1E6;color:var(--rust,#C2562E);font:700 15px 'Inter',sans-serif;padding:7px 14px;border-radius:999px}
+    .pc-two{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+    .pc-two .pc-ticks,.pc-two .pc-plus{grid-template-columns:1fr}
+    .pc-note{margin-top:44px;padding:24px 26px;background:var(--forest,#1E3A2B);color:#fff;border-radius:18px}
+    .pc-note .pc-h{color:#fff}
+    .pc-note p{margin:0;color:rgba(255,255,255,.85);line-height:1.6}
+    .pc-quote{margin-top:44px;border:1px solid var(--line,#e5ddd0);border-radius:22px;padding:28px}
+    .pc-quote-head{margin-bottom:18px}
+    .pc-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+    @media(max-width:720px){ .pc-ticks,.pc-plus,.pc-vehicles,.pc-two{grid-template-columns:1fr} }
+  </style>
+</Base>
