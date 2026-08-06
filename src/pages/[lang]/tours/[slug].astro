@@ -48,7 +48,7 @@ const jsonld = { "@context":"https://schema.org","@graph":[
       <aside><div class="bookbox">
         <div class="price">{t(lang,'from')} {fmtPrice}<small> / pers</small></div>
         <div class="meta">{t(lang,'duration')}: {tr.data.durationDays} {t(lang,'days')} · {diff[tr.data.difficulty][lang]}</div>
-        <a class="btn btn-rust btn-block" href={`/${lang}/book`}>{t(lang,'hero_book')}</a>
+        <a class="btn btn-rust btn-block" href={`/${lang}/book?tour=${tr.slug}`}>{t(lang,'hero_book')}</a>
         <div class="meta" style="margin:14px 0 0;text-align:center">5.0★ · 300+ · licensed operator</div>
       </div></aside>
     </div>

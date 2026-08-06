@@ -26,6 +26,13 @@ const L = {
   lblTourRate: lang==='fr' ? 'Tarif circuit' : 'Tour rate',
   lblPrivRoom: lang==='fr' ? 'Chambre privée' : 'Private room',
   lblPrivTour: lang==='fr' ? 'Supplément tour privé' : 'Private tour',
+    insTitle: lang==='fr' ? 'Assurance' : 'Insurance',
+    insBasic: lang==='fr' ? 'Assurance de base' : 'Basic insurance',
+    insInc:   lang==='fr' ? 'incluse' : 'included',
+    insPrem:  lang==='fr' ? 'Assurance premium' : 'Premium insurance',
+    insPremHint: lang==='fr' ? '500 000 VND / pers' : '500,000 VND / pax',
+    roomCap:  lang==='fr' ? 'jusqu\u2019à 2 pers / chambre' : 'up to 2 people / room',
+    bedCap:   lang==='fr' ? '1 pers / lit' : '1 person / bed',
   cta:t(lang,'book_cta'), okMsg:t(lang,'ok_msg'), errMsg:t(lang,'err_msg'), errContact:t(lang,'err_contact'),
 };
 const seoMap = {
@@ -122,6 +129,22 @@ const seo = seoMap[lang] ?? seoMap.en;
         </div>
       </div>
 
+      <div class="accom" id="insurance">
+        <div class="ac-title">{lang==='fr'?'Assurance':'Insurance'}</div>
+        <div class="ac-row">
+          <div class="ac-lbl">{lang==='fr'?'Assurance de base':'Basic insurance'} <small>({lang==='fr'?'incluse':'included'})</small></div>
+          <div style="color:#2F6E58;font-weight:700;font-size:18px">✓</div>
+        </div>
+        <div class="ac-row">
+          <div class="ac-lbl">{lang==='fr'?'Assurance premium':'Premium insurance'} <small>{lang==='fr'?'500 000 VND / pers':'500,000 VND / pax'}</small></div>
+          <div class="travelers sm">
+            <button id="pmin" type="button" aria-label="-">−</button>
+            <span class="v" id="pval">0</span>
+            <button id="pplus" type="button" aria-label="+">+</button>
+          </div>
+        </div>
+      </div>
+
       <div class="step-h"><span class="n italic">04</span><h2>{t(lang,'book_s4')}</h2></div>
       <div class="form">
         <div class="field"><label for="f_name">{t(lang,'f_name')}</label><input id="f_name" type="text" autocomplete="name" /></div>
@@ -195,12 +218,13 @@ const seo = seoMap[lang] ?? seoMap.en;
     };
     const FX = { usdToEur: 0.92 }; // taux indicatif pour l'affichage EUR (ajustable)
     const fmtVND = (n)=> Math.round(n).toLocaleString('en-US').replace(/,/g,'\u00a0') + '\u00a0VND';
-    const state = { opt:'easy_rider', slug:T[0].slug, travelers:1, backPax:0, rooms:0, beds:1, veg:0, vegan:0 };
+    const state = { opt:'easy_rider', slug:T[0].slug, travelers:1, backPax:0, rooms:0, beds:1, veg:0, vegan:0, premium:0 };
     const selTour = ()=> T.find(t=>t.slug===state.slug) || T[0];
     // Tour privé : supplément +780 000 VND / personne (≈ 30 $, base 26 000 VND/$).
     // baseRole = tarif de référence du tour (par personne, selon chambre privée / lit dortoir).
     // Passer baseRole à 'self_driving' si le tour privé doit partir du tarif self-drive.
     const PRIVATE_TOUR = { surchargeVnd: 780, surchargeUsd: 30, baseRole: 'easy_rider' };
+    const PREMIUM = { vndK: 500, usd: 19 }; // assurance premium : 500 000 VND / pax (≈ 19 $)
     function compute(){
       const tr=selTour(), days=tr.days, P=PRICES[days] || PRICES[2];
       const pax=state.travelers, back = state.opt==='self_drive' ? state.backPax : 0;
@@ -208,8 +232,8 @@ const seo = seoMap[lang] ?? seoMap.en;
                      : state.opt==='private'    ? PRIVATE_TOUR.baseRole
                      : 'easy_rider';
       const people = pax + back;
-      // hébergement : rooms personnes en privé, beds personnes en dortoir (rooms+beds = people)
-      const priv = Math.min(state.rooms, people), dorm = people - priv;
+      // hébergement : lits dortoir = personnes en dortoir ; le reste dort en chambre privée (2 pers max/chambre)
+      const dorm = Math.min(state.beds, people), priv = people - dorm;
       // on affecte le privé d'abord aux voyageurs principaux, puis aux passagers arrière
       const privMain = Math.min(priv, pax), privBack = priv - privMain;
       const dormMain = pax - privMain, dormBack = back - privBack;
@@ -219,11 +243,14 @@ const seo = seoMap[lang] ?? seoMap.en;
       add(privBack, 'on_the_back', 'private'); add(dormBack, 'on_the_back', 'dorm');
       // Tour privé : supplément par personne, quel que soit l'hébergement choisi
       if(state.opt==='private'){ vnd += people*PRIVATE_TOUR.surchargeVnd; usd += people*PRIVATE_TOUR.surchargeUsd; }
+      // Assurance premium : 500 000 VND / pax choisis (le reste = assurance de base, incluse)
+      const premCount = Math.max(0, Math.min(state.premium, people));
+      if(premCount>0){ vnd += premCount*PREMIUM.vndK; usd += premCount*PREMIUM.usd; }
       // décomposition pour le devis : base (tarif dortoir) + supplément chambre privée + supplément tour privé
       const baseDorm = (pax>0? pax*P[mainRole].dorm.vnd:0) + (back>0? back*P['on_the_back'].dorm.vnd:0);
       const privSupp = privMain*(P[mainRole].private.vnd-P[mainRole].dorm.vnd) + privBack*(P['on_the_back'].private.vnd-P['on_the_back'].dorm.vnd);
       const privTour = state.opt==='private' ? people*PRIVATE_TOUR.surchargeVnd : 0;
-      return { days, pax, back, people, priv, dorm, vnd: vnd*1000, usd, baseVnd: baseDorm*1000, privSuppVnd: privSupp*1000, surchargeVnd: privTour*1000, mainRole };
+      return { days, pax, back, people, priv, dorm, rooms:Math.max(0,Math.min(state.rooms,priv)), vnd: vnd*1000, usd, baseVnd: baseDorm*1000, privSuppVnd: privSupp*1000, surchargeVnd: privTour*1000, premCount, premVnd: premCount*PREMIUM.vndK*1000, mainRole };
     }
     function render(){
       const r=compute();
@@ -236,9 +263,12 @@ const seo = seoMap[lang] ?? seoMap.en;
       if(r.back>0) paxTxt += ` <small>(${L.inclBack} <b>${r.back}</b> ${L.backLabel.toLowerCase()})</small>`;
       rows.push([L.travelers.charAt(0).toUpperCase()+L.travelers.slice(1), paxTxt]);
       const acc=[];
-      if(r.priv>0) acc.push(`<b>${r.priv}</b> ${L.accomPrivate.toLowerCase()}`);
+      if(r.rooms>0) acc.push(`<b>${r.rooms}</b> ${L.accomPrivate.toLowerCase()}`);
       if(r.dorm>0) acc.push(`<b>${r.dorm}</b> ${L.accomDorm.toLowerCase()}`);
       rows.push([L.accomTitle, acc.length?acc.join(' · '):'—']);
+      rows.push([L.insTitle, r.premCount>0
+        ? `${L.insBasic} <small>(${L.insInc})</small> · <b>${r.premCount}</b> ${L.insPrem.toLowerCase()}`
+        : `${L.insBasic} <small>(${L.insInc})</small>`]);
       const diet=[];
       if(state.veg>0)   diet.push(`<b>${state.veg}</b> ${L.dietVeg.toLowerCase()}`);
       if(state.vegan>0) diet.push(`<b>${state.vegan}</b> ${L.dietVegan.toLowerCase()}`);
@@ -252,6 +282,7 @@ const seo = seoMap[lang] ?? seoMap.en;
       pr.push([`${optName} <small>× ${r.people}</small>`, fmtVND(r.baseVnd)]);
       if(r.priv>0) pr.push([`${L.lblPrivRoom} <small>× ${r.priv}</small>`, '+ '+fmtVND(r.privSuppVnd)]);
       if(state.opt==='private' && r.surchargeVnd>0) pr.push([L.lblPrivTour, '+ '+fmtVND(r.surchargeVnd)]);
+      if(r.premCount>0) pr.push([`${L.insPrem} <small>× ${r.premCount}</small>`, '+ '+fmtVND(r.premVnd)]);
       const prHtml = pr.map(([k,v])=>`<div class="qs-row qs-price"><span class="qs-k">${k}</span><span class="qs-v">${v}</span></div>`).join('');
       document.getElementById('qsum').innerHTML = sumHtml + '<div class="qs-div"></div>' + prHtml;
     }
@@ -267,22 +298,31 @@ const seo = seoMap[lang] ?? seoMap.en;
       backpaxEl.style.display = state.opt==='self_drive' ? '' : 'none';
       if(state.opt!=='self_drive'){ state.backPax=0; document.getElementById('bval').textContent=0; }
       else syncBack();
-      syncRooms(); syncDiet();
+      syncRooms(); syncDiet(); syncPremium();
     }
     const peopleCount = ()=> state.travelers + (state.opt==='self_drive' ? state.backPax : 0);
     function syncRooms(){
       const max=peopleCount();
-      if(state.rooms<0) state.rooms=0; if(state.rooms>max) state.rooms=max;
-      state.beds = max - state.rooms;               // chaque personne a un couchage : rooms + beds = personnes
+      if(state.beds<0) state.beds=0; if(state.beds>max) state.beds=max;
+      const pp = max - state.beds;                       // personnes en chambre privée
+      const rlo = pp>0 ? Math.ceil(pp/2) : 0;            // min chambres (2 pers/chambre max)
+      if(state.rooms<rlo) state.rooms=rlo;
+      if(state.rooms>pp) state.rooms=pp;
       document.getElementById('rval').textContent=state.rooms;
       document.getElementById('dval').textContent=state.beds;
-      document.getElementById('roomsHint').textContent = `${L.accomHint} ${max}`;
-      document.getElementById('bedsHint').textContent  = `${L.accomHint} ${max}`;
+      document.getElementById('roomsHint').textContent = L.roomCap;
+      document.getElementById('bedsHint').textContent  = L.bedCap;
     }
-    document.getElementById('rmin').addEventListener('click',()=>{ state.rooms=Math.max(0,state.rooms-1); syncRooms(); render(); });
-    document.getElementById('rplus').addEventListener('click',()=>{ state.rooms=Math.min(peopleCount(),state.rooms+1); syncRooms(); render(); });
-    document.getElementById('dmin').addEventListener('click',()=>{ state.rooms=Math.min(peopleCount(),state.rooms+1); syncRooms(); render(); });   // − dorm bed = + private room
-    document.getElementById('dplus').addEventListener('click',()=>{ state.rooms=Math.max(0,state.rooms-1); syncRooms(); render(); });               // + dorm bed = − private room
+    document.getElementById('rmin').addEventListener('click',()=>{   // − chambre privée (plus de partage)
+      const pp=peopleCount()-state.beds, lo=pp>0?Math.ceil(pp/2):0;
+      state.rooms=Math.max(lo,state.rooms-1); syncRooms(); render(); });
+    document.getElementById('rplus').addEventListener('click',()=>{  // + chambre privée (moins de partage)
+      const pp=peopleCount()-state.beds;
+      state.rooms=Math.min(pp,state.rooms+1); syncRooms(); render(); });
+    document.getElementById('dmin').addEventListener('click',()=>{   // − lit dortoir → + en chambre privée
+      state.beds=Math.max(0,state.beds-1); syncRooms(); render(); });
+    document.getElementById('dplus').addEventListener('click',()=>{  // + lit dortoir → − en chambre privée
+      state.beds=Math.min(peopleCount(),state.beds+1); syncRooms(); render(); });
     // régime alimentaire : nb. de végétariens + nb. de végans ≤ nb. total de personnes
     function syncDiet(){
       const max=peopleCount();
@@ -293,20 +333,26 @@ const seo = seoMap[lang] ?? seoMap.en;
       document.getElementById('vegHint').textContent   = `${L.accomHint} ${Math.max(0, max - state.vegan)}`;
       document.getElementById('veganHint').textContent = `${L.accomHint} ${Math.max(0, max - state.veg)}`;
     }
-    document.getElementById('vgmin').addEventListener('click',()=>{ state.veg=Math.max(0,state.veg-1); syncDiet(); render(); });
-    document.getElementById('vgplus').addEventListener('click',()=>{ if(state.veg+state.vegan<peopleCount()) state.veg++; syncDiet(); render(); });
-    document.getElementById('vnmin').addEventListener('click',()=>{ state.vegan=Math.max(0,state.vegan-1); syncDiet(); render(); });
-    document.getElementById('vnplus').addEventListener('click',()=>{ if(state.veg+state.vegan<peopleCount()) state.vegan++; syncDiet(); render(); });
+    document.getElementById('vgmin').addEventListener('click',()=>{ state.veg=Math.max(0,state.veg-1); syncDiet(); syncPremium(); render(); });
+    document.getElementById('vgplus').addEventListener('click',()=>{ if(state.veg+state.vegan<peopleCount()) state.veg++; syncDiet(); syncPremium(); render(); });
+    document.getElementById('vnmin').addEventListener('click',()=>{ state.vegan=Math.max(0,state.vegan-1); syncDiet(); syncPremium(); render(); });
+    document.getElementById('vnplus').addEventListener('click',()=>{ if(state.veg+state.vegan<peopleCount()) state.vegan++; syncDiet(); syncPremium(); render(); });
+    function syncPremium(){
+      state.premium=Math.max(0,Math.min(state.premium,peopleCount()));
+      document.getElementById('pval').textContent=state.premium;
+    }
+    document.getElementById('pmin').addEventListener('click',()=>{ state.premium=Math.max(0,state.premium-1); syncPremium(); render(); });
+    document.getElementById('pplus').addEventListener('click',()=>{ state.premium=Math.min(peopleCount(),state.premium+1); syncPremium(); render(); });
     document.querySelectorAll('.opt').forEach(el=>el.addEventListener('click',()=>{
       state.opt=el.dataset.opt; document.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); refreshOptUI(); render();
     }));
     document.querySelectorAll('.tour-opt').forEach(el=>el.addEventListener('click',()=>{
       state.slug=el.dataset.slug; document.querySelectorAll('.tour-opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); render();
     }));
-    document.getElementById('tmin').addEventListener('click',()=>{ state.travelers=Math.max(1,state.travelers-1); document.getElementById('tval').textContent=state.travelers; syncBack(); syncRooms(); syncDiet(); render(); });
-    document.getElementById('tplus').addEventListener('click',()=>{ state.travelers=Math.min(MAX_GROUP,state.travelers+1); document.getElementById('tval').textContent=state.travelers; syncBack(); syncRooms(); syncDiet(); render(); });
-    document.getElementById('bmin').addEventListener('click',()=>{ state.backPax=Math.max(0,state.backPax-1); document.getElementById('bval').textContent=state.backPax; syncRooms(); syncDiet(); render(); });
-    document.getElementById('bplus').addEventListener('click',()=>{ state.backPax=Math.min(backMax(),state.backPax+1); document.getElementById('bval').textContent=state.backPax; syncRooms(); syncDiet(); render(); });
+    document.getElementById('tmin').addEventListener('click',()=>{ state.travelers=Math.max(1,state.travelers-1); document.getElementById('tval').textContent=state.travelers; syncBack(); syncRooms(); syncDiet(); syncPremium(); render(); });
+    document.getElementById('tplus').addEventListener('click',()=>{ const p0=peopleCount(); state.travelers=Math.min(MAX_GROUP,state.travelers+1); if(peopleCount()>p0) state.beds=Math.min(peopleCount(),state.beds+1); document.getElementById('tval').textContent=state.travelers; syncBack(); syncRooms(); syncDiet(); syncPremium(); render(); });
+    document.getElementById('bmin').addEventListener('click',()=>{ state.backPax=Math.max(0,state.backPax-1); document.getElementById('bval').textContent=state.backPax; syncRooms(); syncDiet(); syncPremium(); render(); });
+    document.getElementById('bplus').addEventListener('click',()=>{ const p0=peopleCount(); state.backPax=Math.min(backMax(),state.backPax+1); if(peopleCount()>p0) state.beds=Math.min(peopleCount(),state.beds+1); document.getElementById('bval').textContent=state.backPax; syncRooms(); syncDiet(); syncPremium(); render(); });
     document.getElementById('busWanted').addEventListener('change',(e)=>{ document.getElementById('busCityWrap').style.display = e.target.checked ? '' : 'none'; render(); });
     document.getElementById('busOut').addEventListener('change',render);
     document.getElementById('busRet').addEventListener('change',render);
@@ -321,11 +367,11 @@ const seo = seoMap[lang] ?? seoMap.en;
       btn.disabled=true; const old=btn.textContent; btn.textContent='…';
       try{
         const resp=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ name,email,whatsapp, date:val('f_date'), message:val('f_message'),
+          body:JSON.stringify({ name,email,whatsapp, date:val('f_date'), message:(val('f_message')+(r.premCount>0?`\n[Premium insurance x ${r.premCount} pax]`:'')).trim(),
             tour_slug:tr.slug, tour_title:tr.title, option:state.opt, travelers:r.people, back_pax:r.back, days:r.days,
             amount:r.vnd, bus_booking:document.getElementById('busWanted').checked, bus_out:(document.getElementById('busOut')?.value||''), bus_return:(document.getElementById('busRet')?.value||''),
             accommodation:(state.rooms>0&&state.beds>0?'mixed':(state.beds>0?'dorm':'private')), rooms:state.rooms, dorm_beds:state.beds,
-            veg:state.veg, vegan:state.vegan,
+            veg:state.veg, vegan:state.vegan, premium:r.premCount, premium_amount:r.premVnd,
             country:val('f_country'),
             language:L.lang, source:'book_page' })});
         const data=await resp.json().catch(()=>({}));
@@ -338,8 +384,16 @@ const seo = seoMap[lang] ?? seoMap.en;
     const okOv=document.getElementById('okOverlay');
     document.getElementById('okClose').addEventListener('click',()=>okOv.classList.add('hidden'));
     okOv.addEventListener('click',(e)=>{ if(e.target===okOv) okOv.classList.add('hidden'); });
+    (function(){
+      const qtour=new URLSearchParams(location.search).get('tour');
+      if(qtour && T.some(t=>t.slug===qtour)){
+        state.slug=qtour;
+        document.querySelectorAll('.tour-opt').forEach(x=>x.classList.toggle('sel', x.dataset.slug===qtour));
+      }
+    })();
     syncRooms();
     syncDiet();
+    syncPremium();
     render();
   </script>
 </Base>
