@@ -72,6 +72,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   // 2) Notify operator by email (best-effort — never blocks the booking)
+  let emailStatus = 'skipped:no_env';
   if (env.RESEND_API_KEY && env.NOTIFY_EMAIL) {
     const esc = (s) => String(s || '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
     const html = `
@@ -89,7 +90,7 @@ export async function onRequestPost({ request, env }) {
       <p><b>WhatsApp:</b> ${esc(whatsapp) || '—'}</p>
       <p><b>Message:</b> ${esc(b.message) || '—'}</p>`;
     try {
-      await fetch('https://api.resend.com/emails', {
+      const rs = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -100,8 +101,19 @@ export async function onRequestPost({ request, env }) {
           html,
         }),
       });
-    } catch (_) { /* ignore email errors */ }
+      if (rs.ok) { emailStatus = 'sent'; }
+      else {
+        const detail = await rs.text().catch(() => '');
+        console.error('Resend send failed', rs.status, detail);
+        emailStatus = 'failed:' + rs.status + (detail ? ' ' + detail.slice(0, 200) : '');
+      }
+    } catch (e) {
+      console.error('Resend exception', e);
+      emailStatus = 'failed:exception';
+    }
+  } else {
+    console.error('Email skipped — RESEND_API_KEY and/or NOTIFY_EMAIL not set in Cloudflare env');
   }
 
-  return json({ ok: true });
+  return json({ ok: true, email: emailStatus });
 }
