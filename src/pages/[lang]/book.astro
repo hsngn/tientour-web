@@ -233,24 +233,24 @@ const seo = seoMap[lang] ?? seoMap.en;
                      : 'easy_rider';
       const people = pax + back;
       // hébergement : lits dortoir = personnes en dortoir ; le reste dort en chambre privée (2 pers max/chambre)
-      const dorm = Math.min(state.beds, people), priv = people - dorm;
-      // on affecte le privé d'abord aux voyageurs principaux, puis aux passagers arrière
-      const privMain = Math.min(priv, pax), privBack = priv - privMain;
-      const dormMain = pax - privMain, dormBack = back - privBack;
+      const dorm = Math.min(state.beds, people), privPeople = people - dorm;
+      const rooms = privPeople>0 ? Math.min(Math.max(state.rooms, Math.ceil(privPeople/2)), privPeople) : 0;
       let vnd=0, usd=0;
-      const add=(n,role,acc)=>{ if(n>0){ vnd += n*P[role][acc].vnd; usd += n*P[role][acc].usd; } };
-      add(privMain, mainRole, 'private'); add(dormMain, mainRole, 'dorm');
-      add(privBack, 'on_the_back', 'private'); add(dormBack, 'on_the_back', 'dorm');
-      // Tour privé : supplément par personne, quel que soit l'hébergement choisi
+      // base : tout le monde au tarif dortoir (selon le rôle)
+      const baseVndK = pax*P[mainRole].dorm.vnd + back*P['on_the_back'].dorm.vnd;
+      const baseUsd  = pax*P[mainRole].dorm.usd + back*P['on_the_back'].dorm.usd;
+      vnd += baseVndK; usd += baseUsd;
+      // supplément chambre privée : PAR CHAMBRE (une chambre accueille jusqu'à 2 personnes)
+      const suppVndK = P[mainRole].private.vnd - P[mainRole].dorm.vnd;
+      const suppUsd  = P[mainRole].private.usd - P[mainRole].dorm.usd;
+      vnd += rooms*suppVndK; usd += rooms*suppUsd;
+      // Tour privé : supplément par personne
       if(state.opt==='private'){ vnd += people*PRIVATE_TOUR.surchargeVnd; usd += people*PRIVATE_TOUR.surchargeUsd; }
       // Assurance premium : 500 000 VND / pax choisis (le reste = assurance de base, incluse)
       const premCount = Math.max(0, Math.min(state.premium, people));
       if(premCount>0){ vnd += premCount*PREMIUM.vndK; usd += premCount*PREMIUM.usd; }
-      // décomposition pour le devis : base (tarif dortoir) + supplément chambre privée + supplément tour privé
-      const baseDorm = (pax>0? pax*P[mainRole].dorm.vnd:0) + (back>0? back*P['on_the_back'].dorm.vnd:0);
-      const privSupp = privMain*(P[mainRole].private.vnd-P[mainRole].dorm.vnd) + privBack*(P['on_the_back'].private.vnd-P['on_the_back'].dorm.vnd);
       const privTour = state.opt==='private' ? people*PRIVATE_TOUR.surchargeVnd : 0;
-      return { days, pax, back, people, priv, dorm, rooms:Math.max(0,Math.min(state.rooms,priv)), vnd: vnd*1000, usd, baseVnd: baseDorm*1000, privSuppVnd: privSupp*1000, surchargeVnd: privTour*1000, premCount, premVnd: premCount*PREMIUM.vndK*1000, mainRole };
+      return { days, pax, back, people, priv:privPeople, dorm, rooms, vnd: vnd*1000, usd, baseVnd: baseVndK*1000, privSuppVnd: rooms*suppVndK*1000, surchargeVnd: privTour*1000, premCount, premVnd: premCount*PREMIUM.vndK*1000, mainRole };
     }
     function render(){
       const r=compute();
@@ -280,7 +280,7 @@ const seo = seoMap[lang] ?? seoMap.en;
       const optName = state.opt==='self_drive' ? L.optSd : state.opt==='private' ? L.optPt : L.optEr;
       const pr=[];
       pr.push([`${optName} <small>× ${r.people}</small>`, fmtVND(r.baseVnd)]);
-      if(r.priv>0) pr.push([`${L.lblPrivRoom} <small>× ${r.priv}</small>`, '+ '+fmtVND(r.privSuppVnd)]);
+      if(r.rooms>0) pr.push([`${L.lblPrivRoom} <small>× ${r.rooms}</small>`, '+ '+fmtVND(r.privSuppVnd)]);
       if(state.opt==='private' && r.surchargeVnd>0) pr.push([L.lblPrivTour, '+ '+fmtVND(r.surchargeVnd)]);
       if(r.premCount>0) pr.push([`${L.insPrem} <small>× ${r.premCount}</small>`, '+ '+fmtVND(r.premVnd)]);
       const prHtml = pr.map(([k,v])=>`<div class="qs-row qs-price"><span class="qs-k">${k}</span><span class="qs-v">${v}</span></div>`).join('');
