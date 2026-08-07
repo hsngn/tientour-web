@@ -117,6 +117,8 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     .fld select:focus,.fld textarea:focus{outline:none;border-color:var(--forest)}
     .quote-msg{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;color:#33352c}
     .mactions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+    .btn.danger{background:#B23A2E;border-color:#B23A2E;color:#fff;margin-right:auto}
+    .btn.danger:hover{background:#9c3025}
     .edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
     .edit-grid .fld input[type=date]{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font:400 14px Inter;background:#fff}
     .edit-grid .fld input[type=date]:focus{outline:none;border-color:var(--forest)}
@@ -273,6 +275,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
         <div class="addnote"><textarea id="mNote" placeholder="Add a comment…"></textarea><button class="btn pri" id="mAddNote">Add</button></div>
       </div>
       <div class="mactions">
+        <button class="btn danger" id="mDelete" style="display:none">Delete</button>
         <button class="btn" id="mClose">Close</button>
         <button class="btn pri" id="mSave">Save</button>
       </div>
@@ -322,7 +325,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     const money=(n)=>n==null?'—':Math.round(n).toLocaleString('en-US').replace(/,/g,'\u00a0')+'\u00a0VND';
     const dstr=(d)=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');};
     const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
-    let ALL=[], NOTES={}, CITIES=[], view='dash', charts={}, current=null, fAttn=false;
+    let ALL=[], NOTES={}, CITIES=[], view='dash', charts={}, current=null, fAttn=false, CAN_DELETE=false;
     const TOURS = JSON.parse(document.getElementById('tours-data').textContent||'[]');
     let cal={y:new Date().getFullYear(), m:new Date().getMonth()};
     let period={from:dstr(addDays(new Date(),-90)), to:dstr(new Date())};
@@ -359,7 +362,8 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
       if(r.status===401){ logout(); return; }
       const d=await r.json().catch(()=>({}));
       if(!d.ok){ show('login'); return; }
-      ALL=d.bookings||[]; await loadNotes(); await loadCities(); populateTourSelect(); fillYearFilter(); show('app'); setTab(view);
+      ALL=d.bookings||[]; CAN_DELETE=!!d.canDelete; const _md=$('mDelete'); if(_md) _md.style.display=CAN_DELETE?'':'none';
+      await loadNotes(); await loadCities(); populateTourSelect(); fillYearFilter(); show('app'); setTab(view);
     }
     async function loadCities(){
       try{
@@ -668,6 +672,30 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     $('listTable').addEventListener('click',e=>{const r=e.target.closest('.brow');if(r)openDetail(r.dataset.id);});
     $('mClose').addEventListener('click',closeModal);
     $('mSave').addEventListener('click',saveDetail);
+    $('mDelete').addEventListener('click',deleteDetail);
+    async function deleteDetail(){
+      if(!current || !CAN_DELETE) return;
+      const b=ALL.find(x=>x.id===current); if(!b) return;
+      const tourTitle=(TOURS.find(t=>t.slug===b.tour_slug)||{}).title || b.tour_slug || '—';
+      const msg='⚠️ Permanently DELETE this reservation?\n\n'
+        +'Customer: '+(b.customer_name||'—')+'\n'
+        +'Tour: '+tourTitle+'\n'
+        +'Date: '+(b.date||'—')+'\n'
+        +'Travelers: '+(b.travelers||'—')+'\n'
+        +'Amount: '+money(b.amount)+'\n'
+        +'Status: '+(b.status||'—')+'\n\n'
+        +'This action cannot be undone.';
+      if(!confirm(msg)) return;
+      const btn=$('mDelete'); btn.disabled=true;
+      try{
+        const r=await fetch(API+'/delete',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token()},body:JSON.stringify({id:current})});
+        const d=await r.json().catch(()=>({}));
+        if(r.ok&&d.ok){ ALL=ALL.filter(x=>x.id!==current); closeModal(); setTab(view); }
+        else if(r.status===403){ alert('You do not have permission to delete reservations.'); }
+        else { alert('Delete failed: '+(d.error||('HTTP '+r.status))); }
+      }catch(e){ alert('Network error.'); }
+      btn.disabled=false;
+    }
     $('mStart').addEventListener('change',calcNights);
     $('mEnd').addEventListener('change',calcNights);
     $('mAmount').addEventListener('input',calcRemain);

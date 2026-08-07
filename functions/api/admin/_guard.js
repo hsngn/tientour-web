@@ -11,3 +11,13 @@ export async function adminEmail(request, env) {
   const allow = (env.ADMIN_EMAILS || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
   return (allow.length === 0 || allow.includes(email)) ? email : null;
 }
+
+// Droit de SUPPRESSION, réservé aux super-admins (liste SUPER_ADMIN_EMAILS).
+// Si SUPER_ADMIN_EMAILS n'est pas défini, on retombe sur ADMIN_EMAILS (tous les admins peuvent supprimer).
+export function isSuperAdmin(email, env) {
+  const e = String(email || '').toLowerCase();
+  const supers = (env.SUPER_ADMIN_EMAILS || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+  if (supers.length) return supers.includes(e);
+  const admins = (env.ADMIN_EMAILS || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+  return admins.length === 0 ? true : admins.includes(e);
+}
