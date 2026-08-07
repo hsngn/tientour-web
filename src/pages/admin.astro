@@ -24,7 +24,9 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
     .top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;
       background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30;flex-wrap:wrap}
     .brand{font-family:'Fraunces',serif;font-weight:900;font-size:22px}.brand b{color:var(--rust)}
-    .brand span{font-family:Inter;font-weight:600;font-size:13px;color:var(--muted);margin-left:4px}
+    .brand span{font-family:Inter;font-weight:600;font-size:13px;color:var(--muted);margin-left:8px;vertical-align:middle}
+    .brand-logo{height:30px;width:auto;display:inline-block;vertical-align:middle}
+    .login-logo{height:34px;width:auto;display:block;margin:0 0 18px}
     .top .right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     .em{font-size:13px;color:var(--muted)}
     .btn{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 15px;font:600 13px Inter;cursor:pointer;color:var(--ink)}
@@ -140,6 +142,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
 </head>
 <body>
   <div id="login" class="login">
+    <img src="/logo.png" alt="Tien Tour" class="login-logo" />
     <h1>Sign in</h1>
     <p>Reservations management — staff only.</p>
     <label for="le">Email</label><input id="le" type="email" autocomplete="username" />
@@ -164,7 +167,7 @@ const TOURS = tours.map(t=>({ slug:t.slug, title:t.data.en.title }));
 
   <div id="app" class="hidden">
     <div class="top">
-      <div class="brand">TIEN<b>.</b><span>Admin</span></div>
+      <div class="brand"><img src="/logo.png" alt="Tien Tour" class="brand-logo" /><span>Admin</span></div>
       <div class="right">
         <span class="em" id="email"></span>
         <button class="btn" id="refresh">↻ Refresh</button>
