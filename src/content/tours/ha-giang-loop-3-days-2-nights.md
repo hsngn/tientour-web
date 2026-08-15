@@ -14,8 +14,8 @@ en:
     - { title: "Day 1 — Ha Giang → Yen Minh (105 km)", text: "Bac Sum Pass, Quan Ba Heaven Gate, the Twin Mountains, Lung Khuy Cave and Lung Tam weaving village, then Yen Minh town." }
     - { title: "Day 2 — Yen Minh → Meo Vac (110 km)", text: "Tham Ma Pass, the H'Mong King's Palace, Ma Pi Leng Pass and the Nho Que river, ending in Meo Vac town." }
     - { title: "Day 3 — Meo Vac → Ha Giang (135 km)", text: "H'Mong Cafe, the M-shaped slope, Mau Due, Ngam La tea hill, Thai An and Thuan Hoa communes, back to Ha Giang city." }
-  inclusions: ["Local rider or self-drive bike", "2 nights homestay", "Meals on tour", "Fuel", "Basic travel insurance"]
-  exclusions: ["Transport to Ha Giang", "Tips"]
+  inclusions: ["Accommodation", "Meals (breakfast, lunch, dinner)", "Entrance fees & sightseeing tickets", "Filtered water (1.5L per day)", "Protective gears (helmets, elbow pads, knee pads)", "Basic travel insurance", "FREE night before the tour and luggage storage"]
+  exclusions: ["Bus tickets", "Tips for the driver and guide", "Border permit (260,000 VND/person, paid to the Immigration Office)"]
   faq:
     - { q: "Why choose the 3-day tour?", a: "It's the most popular option — all the classic highlights plus a boat on the Nho Que river, at a comfortable pace." }
     - { q: "Do I need a license?", a: "Not with the easy-rider option — a local pilot drives. To self-drive you need a valid motorcycle licence and an IDP." }
@@ -29,8 +29,8 @@ fr:
     - { title: "Jour 1 — Ha Giang → Yen Minh (105 km)", text: "Col de Bac Sum, Porte du ciel de Quan Ba, les Montagnes Jumelles, grotte de Lung Khuy et village de tissage de Lung Tam, puis Yen Minh." }
     - { title: "Jour 2 — Yen Minh → Meo Vac (110 km)", text: "Col de Tham Ma, palais du roi H'Mong, col de Ma Pi Leng et rivière Nho Què, arrivée à Meo Vac." }
     - { title: "Jour 3 — Meo Vac → Ha Giang (135 km)", text: "H'Mong Cafe, la pente en M, Mau Due, colline de thé de Ngam La, communes de Thai An et Thuan Hoa, retour à Ha Giang." }
-  inclusions: ["Pilote local ou moto self-drive", "2 nuits chez l'habitant", "Repas pendant le tour", "Essence", "Assurance voyage de base"]
-  exclusions: ["Transport jusqu'à Ha Giang", "Pourboires"]
+  inclusions: ["Hébergement", "Repas (petit-déjeuner, déjeuner, dîner)", "Frais d'entrée & billets des sites", "Eau filtrée (1,5 L/jour)", "Équipement de protection (casques, coudières, genouillères)", "Assurance voyage de base", "Nuit OFFERTE avant le tour et consigne à bagages"]
+  exclusions: ["Billets de bus", "Pourboires pour le chauffeur et le guide", "Permis de frontière (260 000 VND/pers., payé au bureau de l'immigration)"]
   faq:
     - { q: "Pourquoi choisir le circuit de 3 jours ?", a: "C'est l'option la plus populaire — tous les incontournables plus un bateau sur la Nho Què, à un rythme confortable." }
     - { q: "Faut-il un permis ?", a: "Pas avec l'option easy rider — un pilote local conduit. Pour conduire vous-même, un permis moto valide et un IDP sont requis." }

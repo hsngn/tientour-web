@@ -13,8 +13,8 @@ en:
   itinerary:
     - { title: "Day 1 — Ha Giang → Dong Van", text: "Bac Sum Pass, Quan Ba Heaven Gate, the Tham Ma Pass and the H'Mong King's Palace, then a night in Dong Van town." }
     - { title: "Day 2 — Dong Van → Ha Giang", text: "Ma Pi Leng Pass, Meo Vac, Yen Minh, Mau Due, Thai An and Thuan Hoa on the scenic ride back to Ha Giang." }
-  inclusions: ["Local rider or self-drive bike", "1 night homestay", "Meals on tour", "Fuel", "Basic travel insurance"]
-  exclusions: ["Transport to Ha Giang", "Tips"]
+  inclusions: ["Accommodation", "Meals (breakfast, lunch, dinner)", "Entrance fees & sightseeing tickets", "Filtered water (1.5L per day)", "Protective gears (helmets, elbow pads, knee pads)", "Basic travel insurance", "FREE night before the tour and luggage storage"]
+  exclusions: ["Bus tickets", "Tips for the driver and guide", "Border permit (260,000 VND/person, paid to the Immigration Office)"]
   faq:
     - { q: "Is 2 days enough for the loop?", a: "Yes — the 2-day tour covers the essential highlights at a steady pace. For a more relaxed rhythm, choose the 3-day tour." }
     - { q: "Do I need a license?", a: "Not with the easy-rider option — a local pilot drives. To self-drive you need a valid motorcycle licence and an IDP." }
@@ -27,8 +27,8 @@ fr:
   itinerary:
     - { title: "Jour 1 — Ha Giang → Dong Van", text: "Col de Bac Sum, Porte du ciel de Quan Ba, col de Tham Ma et palais du roi H'Mong, puis nuit à Dong Van." }
     - { title: "Jour 2 — Dong Van → Ha Giang", text: "Col de Ma Pi Leng, Meo Vac, Yen Minh, Mau Due, Thai An et Thuan Hoa lors du retour panoramique à Ha Giang." }
-  inclusions: ["Pilote local ou moto self-drive", "1 nuit chez l'habitant", "Repas pendant le tour", "Essence", "Assurance voyage de base"]
-  exclusions: ["Transport jusqu'à Ha Giang", "Pourboires"]
+  inclusions: ["Hébergement", "Repas (petit-déjeuner, déjeuner, dîner)", "Frais d'entrée & billets des sites", "Eau filtrée (1,5 L/jour)", "Équipement de protection (casques, coudières, genouillères)", "Assurance voyage de base", "Nuit OFFERTE avant le tour et consigne à bagages"]
+  exclusions: ["Billets de bus", "Pourboires pour le chauffeur et le guide", "Permis de frontière (260 000 VND/pers., payé au bureau de l'immigration)"]
   faq:
     - { q: "2 jours suffisent-ils pour la boucle ?", a: "Oui — le circuit de 2 jours couvre les incontournables à un bon rythme. Pour plus de tranquillité, choisissez le circuit de 3 jours." }
     - { q: "Faut-il un permis ?", a: "Pas avec l'option easy rider — un pilote local conduit. Pour conduire vous-même, un permis moto valide et un IDP sont requis." }
