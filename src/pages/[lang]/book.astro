@@ -31,8 +31,6 @@ const L = {
     insInc:   lang==='fr' ? 'incluse' : 'included',
     insPrem:  lang==='fr' ? 'Assurance premium' : 'Premium insurance',
     insPremHint: lang==='fr' ? '600 000 VND / pers' : '600,000 VND / pax',
-    roomCap:  lang==='fr' ? '1 pers / chambre' : '1 person / room',
-    bedCap:   lang==='fr' ? '1 pers / lit' : '1 person / bed',
   cta:t(lang,'book_cta'), okMsg:t(lang,'ok_msg'), errMsg:t(lang,'err_msg'), errContact:t(lang,'err_contact'),
 };
 const seoMap = {
@@ -92,7 +90,7 @@ const seo = seoMap[lang] ?? seoMap.en;
       <div class="accom">
         <div class="ac-title">{t(lang,'accom_title')}</div>
         <div class="ac-row">
-          <div class="ac-lbl">{t(lang,'accom_private')} <small id="roomsHint"></small></div>
+          <div class="ac-lbl">{t(lang,'accom_private')}</div>
           <div class="travelers sm">
             <button id="rmin" type="button" aria-label="-">−</button>
             <span class="v" id="rval">1</span>
@@ -100,7 +98,7 @@ const seo = seoMap[lang] ?? seoMap.en;
           </div>
         </div>
         <div class="ac-row">
-          <div class="ac-lbl">{t(lang,'accom_dorm')} <small id="bedsHint"></small></div>
+          <div class="ac-lbl">{t(lang,'accom_dorm')}</div>
           <div class="travelers sm">
             <button id="dmin" type="button" aria-label="-">−</button>
             <span class="v" id="dval">0</span>
@@ -309,8 +307,6 @@ const seo = seoMap[lang] ?? seoMap.en;
       state.rooms = max - state.beds;              // 1 personne = 1 chambre privée OU 1 lit dortoir
       document.getElementById('rval').textContent=state.rooms;
       document.getElementById('dval').textContent=state.beds;
-      document.getElementById('roomsHint').textContent = L.roomCap;
-      document.getElementById('bedsHint').textContent  = L.bedCap;
     }
     document.getElementById('rmin').addEventListener('click',()=>{   // − chambre privée → + lit dortoir
       state.beds=Math.min(peopleCount(),state.beds+1); syncRooms(); render(); });
